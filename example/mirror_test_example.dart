@@ -34,11 +34,37 @@ class TestRecordListBuilder extends Builder {
         showDivider: true,
         topAccessoryViews: [],
         template: Template(
-          id: 'test_template', 
-          values: [
-            Value(id: record.id, value: record.id.value),
+          id: 'test_template',
+          values: Values(values: [
+            Value(id: "TestId", value: record.id),
+            Value(id: "TestName", value: record.name),
           ]),
-        onItemSelected: OnItemSelected(builder: TestRecordListBuilder()));
+        ),
+        onItemSelected: OnItemSelected(builder: TestFormBuilder()));
+  }
+}
+
+class TestFormBuilder extends Builder {
+  final TestClass record = TestClass();
+
+  TestFormBuilder() : super(id: 'test_form', record: TestClass());
+
+  @override
+  Feature build() {
+    return Form(
+      id: id,
+      toolbar: Toolbar(items: [
+        ToolbarItem(title: "Submit", actions: [
+          SubmitFormAction(url: "<insert_url>", title: "Updating Card")
+        ])
+      ]),
+      fields: FormFields(fields: {
+        "Header": Header(title: "Test Form"),
+        "Id": Text(title: "Id", displayValue: "id"),
+        "Name": TextInput(title: "Name", bindTo: "name", required: true),
+      }),
+      layout: ["Header", "Id", "Name"],
+    );
   }
 }
 
