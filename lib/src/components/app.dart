@@ -33,7 +33,11 @@ class App {
     if (feature is RecordList) {
       buildFeature(feature.onItemSelected.builder);
     }
-    // TODO: Handle FormRecordList
+    if (feature is Form) {
+      for (var field in feature.fields.getRecordListFields()) {
+        buildFeature(field.builder);
+      }
+    }
     features.add(feature);
   }
 
@@ -44,11 +48,11 @@ class App {
 
     // Initialize Menu Items
     Menu menu = Menu(menuItems: menuItems);
-    writeYaml("menu", menu.toYaml());
+    writeYaml(name, "menu", menu.toYaml());
 
     // Output Features
     for (var feature in features) {
-      writeYaml(feature.id, feature.toYaml());
+      writeYaml(name, feature.id, feature.toYaml());
     }
   }
 }

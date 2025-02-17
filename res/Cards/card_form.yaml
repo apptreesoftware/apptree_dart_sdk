@@ -1,0 +1,77 @@
+form: 
+  id: 'card_form'
+  toolbar: 
+    items: 
+      - 
+        title: 'Save'
+        actions: 
+          - 
+            submitForm: 
+              url: '<insert_url>'
+              title: 'Updating Card'
+
+
+  fields: 
+    Header: 
+      header: 'Card'
+    Id: 
+      text: 
+        title: 'Id'
+        displayValue: 'id'
+
+    Name: 
+      textInput: 
+        title: 'Name'
+        bindTo: 'name'
+        required: true
+
+    Description: 
+      textInput: 
+        title: 'Description'
+        bindTo: 'description'
+        required: true
+
+    Rarity: 
+      textInput: 
+        title: 'Rarity'
+        bindTo: 'rarity'
+        required: true
+
+    Type: 
+      textInput: 
+        title: 'Type'
+        bindTo: 'type'
+        required: true
+
+    Attacks: 
+      recordList: 
+        record_list: 
+          id: 'attack_list'
+          onLoad: 
+            execute_when: null
+            collection: null
+          dataSource: 'attacks'
+          noResultsText: 'No results'
+          showDivider: true
+          topAccessoryViews: []
+          template: 
+            id: 'attack_template'
+            values: 
+              id: 'record().id'
+              name: 'record().name'
+              description: 'record().description'
+              damage: 'record().damage'
+          onItemSelected: 
+            onItemSelected: 
+              navigateTo: 
+                id: 'attack_form'
+
+
+  layout: 
+    - 'Header'
+    - 'Id'
+    - 'Name'
+    - 'Description'
+    - 'Rarity'
+    - 'Type'
+    - 'Attacks'

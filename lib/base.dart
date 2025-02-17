@@ -13,5 +13,6 @@ export 'src/model/builder.dart';
 export 'src/components/form.dart';
 export 'src/components/menu.dart';
 export 'src/components/app.dart';
+export 'src/components/generic.dart';
 
 // TODO: Export any libraries intended for clients of this package.

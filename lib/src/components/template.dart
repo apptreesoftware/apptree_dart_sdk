@@ -9,7 +9,7 @@ class Template {
   Map<String, dynamic> toDict() {
     return {
       'id': id,
-      'values': values.toDict(),
+      'values': values.toDict()
     };
   }
 }

@@ -13,26 +13,21 @@ class Collection {
 }
 
 class Value {
-  final String id;
   final Field value;
+  
+  Value({required this.value});
 
-  Value({required this.id, required this.value});
-
-  Map<String, dynamic> toDict() {
-    return {
-      id: value.getRecordPath(),
-    };
+  String getValue() {
+    return value.getRecordPath();
   }
 }
 
 class Values {
-  final List<Value> values;
+  final Map<String, Value> values;
 
   Values({required this.values});
 
   Map<String, dynamic> toDict() {
-    return {
-      'values': values.map((value) => value.toDict()).toList(),
-    };
+    return values.map((key, value) => MapEntry(key, value.getValue()));
   }
 }

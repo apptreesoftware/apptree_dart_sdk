@@ -1,23 +1,21 @@
 record_list: 
-  id: 'test_record_list'
+  id: 'attack_list'
   onLoad: 
     execute_when: null
     collection: null
-  dataSource: 'test_data_source'
+  dataSource: 'attacks'
   noResultsText: 'No results'
   showDivider: true
   topAccessoryViews: []
   template: 
-    id: 'test_template'
+    id: 'attack_template'
     values: 
-      values: 
-        - 
-          TestId: 'record().testSubclass.id'
-        - 
-          TestName: 'record().name'
-
+      id: 'record().id'
+      name: 'record().name'
+      description: 'record().description'
+      damage: 'record().damage'
   onItemSelected: 
     onItemSelected: 
       navigateTo: 
-        id: 'test_form'
+        id: 'attack_form'
 

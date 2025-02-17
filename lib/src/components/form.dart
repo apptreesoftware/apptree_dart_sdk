@@ -1,16 +1,18 @@
 import "package:apptree_dart_sdk/src/components/feature.dart";
 import "package:yaml_writer/yaml_writer.dart";
+import "package:apptree_dart_sdk/src/model/builder.dart";
 class Form extends Feature {
   final Toolbar toolbar;
   final FormFields fields;
-  final List<String> layout;
+  List<String> layout = [];
 
   Form({
     required super.id,
     required this.toolbar,
     required this.fields,
-    required this.layout,
-  });
+  }) {
+    layout = fields.fields.keys.toList();
+  }
 
   @override
   Map<String, dynamic> toDict() {
@@ -79,8 +81,19 @@ class SubmitFormAction extends ToolbarAction {
 
 class FormFields {
   final Map<String, FormField> fields;
+  List<RecordListFormField> recordListFields = [];
 
-  FormFields({required this.fields});
+  FormFields({required this.fields}) {
+    for (var field in fields.values) {
+      if (field is RecordListFormField) {
+        recordListFields.add(field);
+      }
+    }
+  }
+
+  List<RecordListFormField> getRecordListFields() {
+    return recordListFields;
+  }
 
   Map<String, dynamic> toDict() {
     return fields.map((key, value) => MapEntry(key, value.toDict()));
@@ -137,6 +150,21 @@ class Text extends FormField {
         "title": title,
         "displayValue": displayValue,
       },
+    };
+  }
+}
+
+class RecordListFormField extends FormField {
+  final String title;
+  final Builder builder;
+
+  RecordListFormField({required this.title, required this.builder});
+
+  @override
+  Map<String, dynamic> toDict() {
+    Feature feature = builder.build();
+    return {
+      "recordList": feature.toDict(),
     };
   }
 }

@@ -1,5 +1,4 @@
 import 'package:apptree_dart_sdk/base.dart';
-import 'package:apptree_dart_sdk/src/components/generic.dart';
 
 class TestClass extends Record {
   final IntField id = IntField();
@@ -35,10 +34,10 @@ class TestRecordListBuilder extends Builder {
         topAccessoryViews: [],
         template: Template(
           id: 'test_template',
-          values: Values(values: [
-            Value(id: "TestId", value: record.testSubclass.id),
-            Value(id: "TestName", value: record.name),
-          ]),
+          values: Values(values: {
+            "TestId": Value(value: record.testSubclass.id),
+            "TestName": Value(value: record.name),
+          }),
         ),
         onItemSelected: OnItemSelected(builder: TestFormBuilder()));
   }
@@ -63,7 +62,6 @@ class TestFormBuilder extends Builder {
         "Id": Text(title: "Id", displayValue: "id"),
         "Name": TextInput(title: "Name", bindTo: "name", required: true),
       }),
-      layout: ["Header", "Id", "Name"],
     );
   }
 }
@@ -86,7 +84,7 @@ class TestFormBuilder extends Builder {
 // }
 
 void main() {
-  final app = App(name: "Test App", version: "1.0.0");
+  final app = App(name: "TestApp", version: "1.0.0");
   app.addFeature(TestRecordListBuilder(),
       MenuItem(title: "Test", icon: "dashboard", defaultItem: false, order: 1));
   app.initialize();
