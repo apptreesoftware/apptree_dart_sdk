@@ -3,13 +3,14 @@ import "package:apptree_dart_sdk/src/components/feature.dart";
 import "package:apptree_dart_sdk/src/components/menu.dart";
 import "package:yaml_writer/yaml_writer.dart";
 import "package:apptree_dart_sdk/src/util/file.dart";
+
 class App {
   final String name;
   final String version;
   List<Builder> builders = [];
   List<Feature> features = [];
   List<MenuItem> menuItems = [];
-
+  List<String> layouts = [];
   App({required this.name, required this.version});
 
   void addFeature(Builder builder, MenuItem? menuItem) {
@@ -18,14 +19,6 @@ class App {
       menuItem.setId(builder.id);
       menuItems.add(menuItem);
     }
-  }
-
-  Map<String, dynamic> toDict() {
-    return {"name": name, "version": version, "merge": [], "layouts": []};
-  }
-
-  String toYaml() {
-    return YAMLWriter().write(toDict());
   }
 
   void buildFeature(Builder builder) {
@@ -41,6 +34,21 @@ class App {
     features.add(feature);
   }
 
+  Map<String, dynamic> toDict() {
+    return {
+      "name": name,
+      "version": version,
+      "merge": features.map((feature) => '${feature.id}.yaml').toList(),
+      "layouts": layouts
+    };
+  }
+
+  void toYaml() {
+    Map<String, dynamic> app = toDict();
+
+    writeYaml(name, "template_merge.apptreemobile", YAMLWriter().write(app));
+  }
+
   void initialize() {
     for (var builder in builders) {
       buildFeature(builder);
@@ -54,5 +62,9 @@ class App {
     for (var feature in features) {
       writeYaml(name, feature.id, feature.toYaml());
     }
+
+    layouts = copyTemplates(name);
+
+    toYaml();
   }
 }
