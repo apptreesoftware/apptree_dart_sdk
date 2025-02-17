@@ -1,0 +1,31 @@
+form: 
+  id: 'test_form'
+  toolbar: 
+    items: 
+      - 
+        title: 'Submit'
+        actions: 
+          - 
+            submitForm: 
+              url: '<insert_url>'
+              title: 'Updating Card'
+
+
+  fields: 
+    Header: 
+      header: 'Test Form'
+    Id: 
+      text: 
+        title: 'Id'
+        displayValue: 'id'
+
+    Name: 
+      textInput: 
+        title: 'Name'
+        bindTo: 'name'
+        required: true
+
+  layout: 
+    - 'Header'
+    - 'Id'
+    - 'Name'

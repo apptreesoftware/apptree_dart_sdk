@@ -1,5 +1,5 @@
 import "package:apptree_dart_sdk/src/components/feature.dart";
-
+import "package:yaml_writer/yaml_writer.dart";
 class Form extends Feature {
   final Toolbar toolbar;
   final FormFields fields;
@@ -22,6 +22,11 @@ class Form extends Feature {
         "layout": layout,
       },
     };
+  }
+
+  @override
+  String toYaml() {
+    return YAMLWriter().write(toDict());
   }
 }
 

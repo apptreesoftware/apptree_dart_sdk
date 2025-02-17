@@ -2,8 +2,8 @@ import 'package:apptree_dart_sdk/src/components/feature.dart';
 import 'package:apptree_dart_sdk/src/components/callback.dart';
 import 'package:apptree_dart_sdk/src/components/view.dart';
 import 'package:apptree_dart_sdk/src/components/template.dart';
-
-class RecordList extends Feature {  
+import 'package:yaml_writer/yaml_writer.dart';
+class RecordList extends Feature {
   final OnLoad onLoad;
   final String dataSource;
   final String noResultsText;
@@ -12,7 +12,15 @@ class RecordList extends Feature {
   final Template template;
   final OnItemSelected onItemSelected;
 
-  RecordList({required super.id, required this.onLoad, required this.dataSource, required this.noResultsText, required this.showDivider, required this.topAccessoryViews, required this.template, required this.onItemSelected});
+  RecordList(
+      {required super.id,
+      required this.onLoad,
+      required this.dataSource,
+      required this.noResultsText,
+      required this.showDivider,
+      required this.topAccessoryViews,
+      required this.template,
+      required this.onItemSelected});
 
   @override
   Map<String, dynamic> toDict() {
@@ -23,11 +31,17 @@ class RecordList extends Feature {
         "dataSource": dataSource,
         "noResultsText": noResultsText,
         "showDivider": showDivider,
-        "topAccessoryViews": topAccessoryViews.map((view) => view.toDict()).toList(),
+        "topAccessoryViews":
+            topAccessoryViews.map((view) => view.toDict()).toList(),
         "template": template.toDict(),
         "onItemSelected": onItemSelected.toDict(),
       },
     };
+  }
+
+  @override
+  String toYaml() {
+    return YAMLWriter().write(toDict());
   }
 }
 
@@ -40,8 +54,16 @@ class FormRecordList extends Feature {
   final Template template;
   final OnItemSelectedForm onItemSelectedForm;
 
-  FormRecordList({required super.id, required this.onLoad, required this.dataSource, required this.noResultsText, required this.showDivider, required this.topAccessoryViews, required this.template, required this.onItemSelectedForm});
-  
+  FormRecordList(
+      {required super.id,
+      required this.onLoad,
+      required this.dataSource,
+      required this.noResultsText,
+      required this.showDivider,
+      required this.topAccessoryViews,
+      required this.template,
+      required this.onItemSelectedForm});
+
   @override
   Map<String, dynamic> toDict() {
     return {
@@ -51,10 +73,16 @@ class FormRecordList extends Feature {
         "dataSource": dataSource,
         "noResultsText": noResultsText,
         "showDivider": showDivider,
-        "topAccessoryViews": topAccessoryViews.map((view) => view.toDict()).toList(),
+        "topAccessoryViews":
+            topAccessoryViews.map((view) => view.toDict()).toList(),
         "template": template.toDict(),
         "onItemSelected": onItemSelectedForm.toDict(),
       },
     };
+  }
+
+  @override
+  String toYaml() {
+    return YAMLWriter().write(toDict());
   }
 }

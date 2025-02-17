@@ -5,7 +5,9 @@ abstract class Builder {
   final String id;
   final Record record;
 
-  Builder({required this.id, required this.record});
+  Builder({required this.id, required this.record}) {
+    record.register();
+  }
 
   Feature build();
 }

@@ -20,7 +20,7 @@ class Value {
 
   Map<String, dynamic> toDict() {
     return {
-      id: value.fullFieldPath,
+      id: value.getRecordPath(),
     };
   }
 }

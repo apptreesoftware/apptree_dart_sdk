@@ -36,7 +36,7 @@ class TestRecordListBuilder extends Builder {
         template: Template(
           id: 'test_template',
           values: Values(values: [
-            Value(id: "TestId", value: record.id),
+            Value(id: "TestId", value: record.testSubclass.id),
             Value(id: "TestName", value: record.name),
           ]),
         ),
@@ -85,7 +85,9 @@ class TestFormBuilder extends Builder {
 //   }
 // }
 
-// void main() {
-//   final testClass = TestClass()..register();
-
-// }
+void main() {
+  final app = App(name: "Test App", version: "1.0.0");
+  app.addFeature(TestRecordListBuilder(),
+      MenuItem(title: "Test", icon: "dashboard", defaultItem: false, order: 1));
+  app.initialize();
+}

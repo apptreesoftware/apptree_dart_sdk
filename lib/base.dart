@@ -11,5 +11,7 @@ export 'src/components/template.dart';
 export 'src/components/record_list.dart';
 export 'src/model/builder.dart';
 export 'src/components/form.dart';
+export 'src/components/menu.dart';
+export 'src/components/app.dart';
 
 // TODO: Export any libraries intended for clients of this package.

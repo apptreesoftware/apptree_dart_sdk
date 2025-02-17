@@ -5,5 +5,5 @@ abstract class Feature {
 
   Map<String, dynamic> toDict();
 
-  // String toYaml();
+  String toYaml();
 }

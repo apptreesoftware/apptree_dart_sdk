@@ -290,13 +290,19 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "yaml_writer",
+      "rootUri": "file:///Users/coreys/.pub-cache/hosted/pub.dev/yaml_writer-1.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "apptree_dart_sdk",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-02-13T00:04:36.662106Z",
+  "generated": "2025-02-17T20:05:26.006075Z",
   "generator": "pub",
   "generatorVersion": "3.6.0",
   "flutterRoot": "file:///Users/coreys/fvm/versions/stable",

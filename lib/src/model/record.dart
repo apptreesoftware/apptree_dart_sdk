@@ -4,6 +4,10 @@ class FieldBase {
   Record? parent;
   String? fullFieldPath;
   String? relativeFieldPath;
+
+  String getRecordPath() {
+    return "record().$fullFieldPath"; 
+  }
 }
 
 class Field extends FieldBase {}
