@@ -19,6 +19,7 @@ class TestSubSubclass extends Record {
 }
 
 class TestRecordListBuilder extends Builder {
+  @override
   final TestClass record = TestClass();
 
   TestRecordListBuilder() : super(id: 'test_record_list', record: TestClass());
@@ -44,6 +45,7 @@ class TestRecordListBuilder extends Builder {
 }
 
 class TestFormBuilder extends Builder {
+  @override
   final TestClass record = TestClass();
 
   TestFormBuilder() : super(id: 'test_form', record: TestClass());

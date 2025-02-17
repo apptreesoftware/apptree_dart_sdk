@@ -17,6 +17,7 @@ class Attack extends Record {
 }
 
 class CardRecordListBuilder extends Builder {
+  @override
   final Card record = Card();
 
   CardRecordListBuilder() : super(id: 'card_list', record: Card());
@@ -44,6 +45,7 @@ class CardRecordListBuilder extends Builder {
 }
 
 class CardFormBuilder extends Builder {
+  @override
   final Card record = Card();
 
   CardFormBuilder() : super(id: 'card_form', record: Card());
@@ -73,6 +75,7 @@ class CardFormBuilder extends Builder {
 }
 
 class AttackRecordListBuilder extends Builder {
+  @override
   final Attack record = Attack();
 
   AttackRecordListBuilder() : super(id: 'attack_list', record: Attack());
@@ -99,6 +102,7 @@ class AttackRecordListBuilder extends Builder {
 }
 
 class AttackFormBuilder extends Builder {
+  @override
   final Attack record = Attack();
 
   AttackFormBuilder() : super(id: 'attack_form', record: Attack());
