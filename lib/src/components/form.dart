@@ -1,6 +1,6 @@
 import "package:apptree_dart_sdk/src/components/feature.dart";
-import "package:yaml_writer/yaml_writer.dart";
 import "package:apptree_dart_sdk/src/model/builder.dart";
+
 class Form extends Feature {
   final Toolbar toolbar;
   final FormFields fields;
@@ -17,18 +17,14 @@ class Form extends Feature {
   @override
   Map<String, dynamic> toDict() {
     return {
-      "form": {
-        "id": id,
-        "toolbar": toolbar.toDict(),
-        "fields": fields.toDict(),
-        "layout": layout,
-      },
+      id: {
+        "form": {
+          "toolbar": toolbar.toDict(),
+          "fields": fields.toDict(),
+          "layout": layout,
+        },
+      }
     };
-  }
-
-  @override
-  String toYaml() {
-    return YAMLWriter().write(toDict());
   }
 }
 
@@ -112,7 +108,7 @@ class Header extends FormField {
   @override
   Map<String, dynamic> toDict() {
     return {
-      "header": title,
+      "Header": title,
     };
   }
 }

@@ -1,0 +1,9 @@
+name: 'Cards'
+configVersion: 2
+merge: 
+  - 'CardsUpdateForm.yaml'
+  - 'MyCardsRecordList.yaml'
+  - 'menu.yaml'
+templates: 
+  - 'templates/record_count.fsx'
+  - 'templates/workbench.fsx'

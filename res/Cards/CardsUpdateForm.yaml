@@ -1,0 +1,55 @@
+features: 
+  CardsUpdateForm: 
+    form: 
+      toolbar: 
+        items: 
+          - 
+            title: 'Save'
+            actions: 
+              - 
+                submitForm: 
+                  url: 'https://corey.apptree.dev/UpdateCard'
+                  title: 'Updating Card'
+
+
+      fields: 
+        Header: 
+          Header: 'Card'
+        Id: 
+          text: 
+            title: 'Id'
+            displayValue: 'cardId'
+
+        Name: 
+          textInput: 
+            title: 'Name'
+            bindTo: 'name'
+            required: true
+
+        Description: 
+          textInput: 
+            title: 'Description'
+            bindTo: 'description'
+            required: true
+
+        Rarity: 
+          textInput: 
+            title: 'Rarity'
+            bindTo: 'rarity'
+            required: true
+
+        Type: 
+          textInput: 
+            title: 'Type'
+            bindTo: 'type'
+            required: true
+
+      layout: 
+        - 'Header'
+        - 'Id'
+        - 'Name'
+        - 'Description'
+        - 'Rarity'
+        - 'Type'
+
+

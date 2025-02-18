@@ -2,19 +2,23 @@ import 'package:apptree_dart_sdk/src/model/record.dart';
 
 class Collection {
   final String url;
+  final String collection;
 
-  Collection({required this.url});
+  Collection({required this.url, required this.collection});
 
   Map<String, dynamic> toDict() {
     return {
       'url': url,
+      'data': { 
+        'collection': collection,
+      },
     };
   }
 }
 
 class Value {
   final Field value;
-  
+
   Value({required this.value});
 
   String getValue() {

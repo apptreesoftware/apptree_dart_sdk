@@ -6,7 +6,9 @@ class FieldBase {
   String? relativeFieldPath;
 
   String getRecordPath() {
-    return "record().$fullFieldPath"; 
+    String prefix = '\$';
+    String recordPath = "$prefix{record().$fullFieldPath}";
+    return recordPath; 
   }
 }
 

@@ -1,3 +1,5 @@
+import "package:yaml_writer/yaml_writer.dart";
+
 abstract class Feature {
   final String id;
 
@@ -5,5 +7,7 @@ abstract class Feature {
 
   Map<String, dynamic> toDict();
 
-  String toYaml();
+  String toYaml() {
+    return YAMLWriter().write({"features": toDict()});
+  }
 }

@@ -1,17 +1,17 @@
 import 'dart:io';
 
 class FileUtil {
-  static void writeYaml(String dir, String fileName, String yaml) {
+  static void writeYaml(String dir, String fileName, String yaml, {String? extension = '.yaml'}) {
     var directory = Directory('res/$dir');
     if (!directory.existsSync()) {
       directory.createSync(recursive: true);
     }
-    File("res/$dir/$fileName.yaml").writeAsString(yaml);
+    File("res/$dir/$fileName$extension").writeAsString(yaml);
   }
 }
 
-void writeYaml(String dir, String fileName, String yaml) {
-  FileUtil.writeYaml(dir, fileName, yaml);
+void writeYaml(String dir, String fileName, String yaml, {String? extension = '.yaml'}) {
+  FileUtil.writeYaml(dir, fileName, yaml, extension: extension);
 }
 
 List<String> copyDirectory(Directory source, Directory destination) {

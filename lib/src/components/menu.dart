@@ -33,13 +33,15 @@ class MenuItem {
 }
 
 class Menu {
-  final List<MenuItem> menuItems;
+  final Map<String, MenuItem> menuItems;
 
   Menu({required this.menuItems});
 
   Map<String, dynamic> toDict() {
     return {
-      "items": menuItems.map((menuItem) => menuItem.toDict()).toList(),
+      "menu": {
+        "items": menuItems.map((key, menuItem) => MapEntry(key, menuItem.toDict())),
+      }
     };
   }
 
