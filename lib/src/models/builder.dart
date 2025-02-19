@@ -1,5 +1,5 @@
 import 'package:apptree_dart_sdk/src/components/feature.dart';
-import 'package:apptree_dart_sdk/src/model/record.dart';
+import 'package:apptree_dart_sdk/src/models/record.dart';
 
 abstract class Builder {
   final String id;

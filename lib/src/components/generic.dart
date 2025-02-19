@@ -1,4 +1,4 @@
-import 'package:apptree_dart_sdk/src/model/record.dart';
+import 'package:apptree_dart_sdk/src/models/record.dart';
 
 class Collection {
   final String url;

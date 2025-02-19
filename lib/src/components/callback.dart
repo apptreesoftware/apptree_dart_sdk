@@ -1,4 +1,4 @@
-import 'package:apptree_dart_sdk/src/model/builder.dart';
+import 'package:apptree_dart_sdk/src/models/builder.dart';
 
 class OnLoad {
   final String collection;

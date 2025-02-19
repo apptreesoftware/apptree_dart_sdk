@@ -1,5 +1,5 @@
 import "package:apptree_dart_sdk/src/components/feature.dart";
-import "package:apptree_dart_sdk/src/model/builder.dart";
+import "package:apptree_dart_sdk/src/models/builder.dart";
 
 class Form extends Feature {
   final Toolbar toolbar;

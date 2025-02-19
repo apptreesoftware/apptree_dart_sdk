@@ -28,6 +28,12 @@ features:
             bindTo: name
             required: true
 
+        Owner: 
+          textInput: 
+            title: Owner
+            bindTo: owner
+            required: true
+
         Description: 
           textInput: 
             title: Description
@@ -71,6 +77,7 @@ features:
         - Header
         - Id
         - Name
+        - Owner
         - Description
         - Rarity
         - Type

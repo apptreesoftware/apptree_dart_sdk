@@ -3,6 +3,7 @@ import 'package:apptree_dart_sdk/base.dart';
 class Card extends Record {
   final StringField cardId = StringField();
   final StringField name = StringField();
+  final StringField owner = StringField();
   final StringField description = StringField();
   final StringField rarity = StringField();
   final StringField type = StringField();
@@ -62,6 +63,7 @@ class CardFormBuilder extends Builder {
           'Header': Header(title: 'Card'),
           'Id': Text(title: 'Id', displayValue: 'cardId'),
           'Name': TextInput(title: 'Name', bindTo: 'name', required: true),
+          'Owner': TextInput(title: 'Owner', bindTo: 'owner', required: true),
           'Description': TextInput(
               title: 'Description', bindTo: 'description', required: true),
           'Rarity':
