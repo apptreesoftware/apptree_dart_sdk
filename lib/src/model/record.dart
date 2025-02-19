@@ -4,6 +4,7 @@ class FieldBase {
   Record? parent;
   String? fullFieldPath;
   String? relativeFieldPath;
+  bool? primaryKey;
 
   String getRecordPath() {
     String prefix = '\$';
@@ -21,6 +22,7 @@ class StringField extends Field {}
 class BoolField extends Field {}
 
 abstract class Record extends FieldBase {
+
   void register() {
     buildMemberGraph();
     buildFieldPaths();
@@ -35,6 +37,7 @@ abstract class Record extends FieldBase {
         final fieldInstance = instanceMirror.getField(symbol).reflectee;
         // Assign metadata indicating that this field is a member of the current instance.
         if (fieldInstance is Field) {
+
           reflect(fieldInstance).setField(const Symbol('parent'), this);
         }
         // If the field is a Record, recursively build its member graph.

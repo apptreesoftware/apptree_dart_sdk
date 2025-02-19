@@ -8,6 +8,6 @@ abstract class Feature {
   Map<String, dynamic> toDict();
 
   String toYaml() {
-    return YAMLWriter().write({"features": toDict()});
+    return YAMLWriter(allowUnquotedStrings: true).write({"features": toDict()});
   }
 }

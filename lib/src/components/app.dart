@@ -29,11 +29,17 @@ class App {
         buildFeature(field.builder);
       }
     }
-    features.add(feature);
+    if (feature is FormRecordList) {
+      buildFeature(feature.onItemSelected.builder);
+    }
+    if (feature is! FormRecordList) {
+      features.add(feature);
+    }
   }
 
   Map<String, dynamic> toDict() {
-    List<String> featureIds = features.map((feature) => '${feature.id}.yaml').toList();
+    List<String> featureIds =
+        features.map((feature) => '${feature.id}.yaml').toList();
     featureIds.add("menu.yaml");
     return {
       "name": name,
@@ -60,6 +66,9 @@ class App {
     writeYaml(name, "menu", menu.toYaml());
     // Output Features
     for (var feature in features) {
+      if (feature is FormRecordList) {
+        continue;
+      }
       writeYaml(name, feature.id, feature.toYaml());
     }
 

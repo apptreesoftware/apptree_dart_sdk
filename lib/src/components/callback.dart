@@ -18,23 +18,24 @@ class OnLoad {
 
 class OnItemSelected {
   final Builder builder;
-
   OnItemSelected({required this.builder});
+
 
   Map<String, dynamic> toDict() {
     final feature = builder.build();
-    return {
-      'navigateTo': {
-        "id": feature.id,
-      }
-    };
-  }
+      return {
+        'navigateTo': {
+          "id": feature.id,
+        }
+      };
+    }
 }
 
 class OnItemSelectedForm {
   final Builder builder;
-
-  OnItemSelectedForm({required this.builder});
+  final String primaryKey;
+  
+  OnItemSelectedForm({required this.builder, required this.primaryKey});
 
   List<Map<String, dynamic>> toDict() {
     final feature = builder.build();
@@ -42,6 +43,7 @@ class OnItemSelectedForm {
         {
         'navigateTo': {
           "id": feature.id,
+          "pkField": primaryKey,
         }
       }
     ];

@@ -10,10 +10,9 @@ class Card extends Record {
 }
 
 class Attack extends Record {
-  final StringField id = StringField();
+  final StringField attackId = StringField();
   final StringField name = StringField();
-  final StringField description = StringField();
-  final StringField damage = StringField();
+  final IntField damage = IntField();
 }
 
 class CardRecordListBuilder extends Builder {
@@ -33,7 +32,8 @@ class CardRecordListBuilder extends Builder {
               'title': Value(value: record.cardId),
               'subtitle': Value(value: record.name),
             })),
-        onLoad: OnLoad(collection: 'my_cards', url: 'https://corey.apptree.dev/MyCards'),
+        onLoad: OnLoad(
+            collection: 'my_cards', url: 'https://corey.apptree.dev/MyCards'),
         noResultsText: 'No results',
         showDivider: true,
         topAccessoryViews: [],
@@ -53,7 +53,9 @@ class CardFormBuilder extends Builder {
         id: id,
         toolbar: Toolbar(items: [
           ToolbarItem(title: 'Save', actions: [
-            SubmitFormAction(url: 'https://corey.apptree.dev/UpdateCard', title: 'Updating Card')
+            SubmitFormAction(
+                url: 'https://corey.apptree.dev/UpdateCard',
+                title: 'Updating Card')
           ])
         ]),
         fields: FormFields(fields: {
@@ -65,6 +67,52 @@ class CardFormBuilder extends Builder {
           'Rarity':
               TextInput(title: 'Rarity', bindTo: 'rarity', required: true),
           'Type': TextInput(title: 'Type', bindTo: 'type', required: true),
+          'Attacks': RecordListFormField(
+              title: 'Attacks', builder: AttackRecordListBuilder())
+        }));
+  }
+}
+
+class AttackRecordListBuilder extends Builder {
+  @override
+  final Attack record = Attack();
+
+  AttackRecordListBuilder() : super(id: 'AttacksRecordList', record: Attack());
+
+  @override
+  Feature build() {
+    return FormRecordList(
+        id: id,
+        bindTo: 'attacks',
+        template: Template(id: 'attack_workbench', values: Values(values: {
+          'title': Value(value: record.attackId),
+          'subtitle': Value(value: record.name),
+        })),
+        showHeader: true,
+        headerText: 'Attacks',
+        collapsed: false,
+        collapsible: true,
+        placeholderText: 'Search attacks',
+        sort: 'damage ASC',
+        onItemSelected: OnItemSelectedForm(builder: AttackFormBuilder(), primaryKey: 'attackId'));
+  }
+}
+
+class AttackFormBuilder extends Builder {
+  @override
+  final Attack record = Attack();
+
+  AttackFormBuilder() : super(id: 'AttacksUpdateForm', record: Attack());
+
+  @override
+  Feature build() {
+    return Form(
+        id: id,
+        toolbar: Toolbar(items: []),
+        fields: FormFields(fields: {
+          'Id': Text(title: 'Id', displayValue: 'attackId'),
+          'Name': TextInput(title: 'Name', bindTo: 'name', required: true),
+          'Damage': TextInput(title: 'Damage', bindTo: 'damage', required: true)
         }));
   }
 }

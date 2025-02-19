@@ -8,16 +8,16 @@ features:
             collection: 'my_cards'
 
       dataSource: 'my_cards'
-      noResultsText: 'No results'
+      noResultsText: No results
       showDivider: true
       topAccessoryViews: []
       template: 
-        id: 'workbench'
+        id: workbench
         values: 
           title: '${record().cardId}'
           subtitle: '${record().name}'
       onItemSelected: 
         navigateTo: 
-          id: 'CardsUpdateForm'
+          id: CardsUpdateForm
 
 

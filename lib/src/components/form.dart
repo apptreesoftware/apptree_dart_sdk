@@ -108,7 +108,7 @@ class Header extends FormField {
   @override
   Map<String, dynamic> toDict() {
     return {
-      "Header": title,
+      "header": { "title": title },
     };
   }
 }
