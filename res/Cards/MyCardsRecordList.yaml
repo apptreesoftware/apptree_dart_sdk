@@ -5,6 +5,7 @@ features:
         - 
           url: 'https://corey.apptree.dev/MyCards'
           data: 
+            owner: '${user().username}'
             collection: 'my_cards'
 
       dataSource: 'my_cards'

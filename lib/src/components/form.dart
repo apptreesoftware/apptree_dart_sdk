@@ -152,7 +152,7 @@ class Text extends FormField {
 
 class RecordListFormField extends FormField {
   final String title;
-  final Builder builder;
+  final FormRecordListBuilder builder;
 
   RecordListFormField({required this.title, required this.builder});
 

@@ -1,20 +1,31 @@
-import 'package:apptree_dart_sdk/src/models/datasource.dart';
+import 'package:apptree_dart_sdk/base.dart';
 
 abstract class CollectionEndpoint<I, R> {
-  final DataSource<I, R> dataSource;
+  final String url;
+  final String collection;
+  final String dataSource;
+  final Request? request;
+  final Record record;
 
-  CollectionEndpoint({required this.dataSource});
-
-  Future<List<R>> fetch(I input) {
-    return dataSource.fetch(input);
+  CollectionEndpoint(
+      {required this.url,
+      required this.collection,
+      required this.dataSource,
+      this.request,
+      required this.record}) {
+    request?.register();
   }
-}
 
-abstract class SubmissionEndpoint<I, R> {
-  final DataSource<I, R> dataSource;
-
-  SubmissionEndpoint({required this.dataSource});
-  Future<R> submit(I input) {
-    return dataSource.submit(input);
+  OnLoad onLoad() {
+    return OnLoad(
+      url: url,
+      collection: collection,
+      request: request,
+    );
   }
+
+  String getDataSource() {
+    return dataSource;
+  }
+
 }

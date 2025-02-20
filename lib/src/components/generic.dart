@@ -9,7 +9,7 @@ class Collection {
   Map<String, dynamic> toDict() {
     return {
       'url': url,
-      'data': { 
+      'data': {
         'collection': collection,
       },
     };
@@ -22,7 +22,7 @@ class Value {
   Value({required this.value});
 
   String getValue() {
-    return value.getRecordPath();
+    return value.getPath();
   }
 }
 

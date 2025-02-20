@@ -2,10 +2,9 @@ import 'package:apptree_dart_sdk/src/components/feature.dart';
 import 'package:apptree_dart_sdk/src/components/callback.dart';
 import 'package:apptree_dart_sdk/src/components/view.dart';
 import 'package:apptree_dart_sdk/src/components/template.dart';
-
+import 'package:apptree_dart_sdk/src/models/endpoint.dart';
 class RecordList extends Feature {
-  final OnLoad onLoad;
-  final String dataSource;
+  final CollectionEndpoint collectionEndpoint;
   final String noResultsText;
   final bool showDivider;
   final List<TopAccessoryView> topAccessoryViews;
@@ -14,8 +13,7 @@ class RecordList extends Feature {
 
   RecordList(
       {required super.id,
-      required this.onLoad,
-      required this.dataSource,
+      required this.collectionEndpoint,
       required this.noResultsText,
       required this.showDivider,
       required this.topAccessoryViews,
@@ -27,8 +25,8 @@ class RecordList extends Feature {
     return {
       id: {
         "recordList": {
-          "onLoad": onLoad.toDict(),
-          "dataSource": dataSource,
+          "onLoad": collectionEndpoint.onLoad().toDict(),
+          "dataSource": collectionEndpoint.getDataSource(),
           "noResultsText": noResultsText,
           "showDivider": showDivider,
           "topAccessoryViews":

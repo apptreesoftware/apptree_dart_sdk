@@ -17,4 +17,5 @@ export 'src/components/generic.dart';
 export 'src/models/endpoint.dart';
 export 'src/models/datasource.dart';
 export 'src/models/request.dart';
+export 'src/models/user.dart';
 // TODO: Export any libraries intended for clients of this package.

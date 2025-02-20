@@ -1,28 +1,44 @@
 import 'dart:mirrors';
+import 'package:apptree_dart_sdk/src/constants.dart';
 
 class FieldBase {
+  FieldScope scope = FieldScope.record;
   Record? parent;
   String? fullFieldPath;
   String? relativeFieldPath;
   bool? primaryKey;
+  String? value;
 
-  String getRecordPath() {
+  FieldBase({this.scope = FieldScope.record});
+
+  String getScope() {
+    return scope.name;
+  }
+
+  String getPath() {
     String prefix = '\$';
-    String recordPath = "$prefix{record().$fullFieldPath}";
-    return recordPath; 
+    String recordPath = "$prefix{${getScope()}().$fullFieldPath}";
+    return recordPath;
   }
 }
 
-class Field extends FieldBase {}
+class Field extends FieldBase {
+  Field({super.scope = FieldScope.record});
+}
 
-class IntField extends Field {}
+class IntField extends Field {
+  IntField({super.scope = FieldScope.record});
+}
 
-class StringField extends Field {}
+class StringField extends Field {
+  StringField({super.scope = FieldScope.record});
+}
 
-class BoolField extends Field {}
+class BoolField extends Field {
+  BoolField({super.scope = FieldScope.record});
+}
 
 abstract class Record extends FieldBase {
-
   void register() {
     buildMemberGraph();
     buildFieldPaths();
@@ -37,7 +53,6 @@ abstract class Record extends FieldBase {
         final fieldInstance = instanceMirror.getField(symbol).reflectee;
         // Assign metadata indicating that this field is a member of the current instance.
         if (fieldInstance is Field) {
-
           reflect(fieldInstance).setField(const Symbol('parent'), this);
         }
         // If the field is a Record, recursively build its member graph.
