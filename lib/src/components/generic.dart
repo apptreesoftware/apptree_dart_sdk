@@ -1,4 +1,4 @@
-import 'package:apptree_dart_sdk/src/model/record.dart';
+import 'package:apptree_dart_sdk/src/models/record.dart';
 
 class Collection {
   final String url;
@@ -9,7 +9,7 @@ class Collection {
   Map<String, dynamic> toDict() {
     return {
       'url': url,
-      'data': { 
+      'data': {
         'collection': collection,
       },
     };
@@ -22,7 +22,7 @@ class Value {
   Value({required this.value});
 
   String getValue() {
-    return value.getRecordPath();
+    return value.getPath();
   }
 }
 

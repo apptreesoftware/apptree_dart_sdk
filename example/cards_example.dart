@@ -3,10 +3,25 @@ import 'package:apptree_dart_sdk/base.dart';
 class Card extends Record {
   final StringField cardId = StringField();
   final StringField name = StringField();
+  final StringField owner = StringField();
   final StringField description = StringField();
   final StringField rarity = StringField();
   final StringField type = StringField();
   final Attack attacks = Attack();
+}
+
+class MyCardsRequest extends Request {
+  final StringField owner = User().username;
+}
+
+class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
+  MyCardsEndpoint()
+      : super(
+            dataSource: 'my_cards',
+            url: 'https://corey.apptree.dev/MyCards',
+            collection: 'my_cards',
+            request: MyCardsRequest(),
+            record: Card());
 }
 
 class Attack extends Record {
@@ -15,25 +30,25 @@ class Attack extends Record {
   final IntField damage = IntField();
 }
 
-class CardRecordListBuilder extends Builder {
+class CardRecordListBuilder extends RecordListBuilder {
   @override
   final Card record = Card();
 
-  CardRecordListBuilder() : super(id: 'MyCardsRecordList', record: Card());
+  CardRecordListBuilder()
+      : super(
+            id: 'MyCardsRecordList', request: MyCardsRequest(), record: Card());
 
   @override
-  Feature build() {
+  RecordList build() {
     return RecordList(
         id: id,
-        dataSource: 'my_cards',
+        collectionEndpoint: MyCardsEndpoint(),
         template: Template(
             id: 'workbench',
             values: Values(values: {
               'title': Value(value: record.cardId),
               'subtitle': Value(value: record.name),
             })),
-        onLoad: OnLoad(
-            collection: 'my_cards', url: 'https://corey.apptree.dev/MyCards'),
         noResultsText: 'No results',
         showDivider: true,
         topAccessoryViews: [],
@@ -41,14 +56,14 @@ class CardRecordListBuilder extends Builder {
   }
 }
 
-class CardFormBuilder extends Builder {
+class CardFormBuilder extends FormBuilder {
   @override
   final Card record = Card();
 
   CardFormBuilder() : super(id: 'CardsUpdateForm', record: Card());
 
   @override
-  Feature build() {
+  Form build() {
     return Form(
         id: id,
         toolbar: Toolbar(items: [
@@ -62,6 +77,7 @@ class CardFormBuilder extends Builder {
           'Header': Header(title: 'Card'),
           'Id': Text(title: 'Id', displayValue: 'cardId'),
           'Name': TextInput(title: 'Name', bindTo: 'name', required: true),
+          'Owner': TextInput(title: 'Owner', bindTo: 'owner', required: true),
           'Description': TextInput(
               title: 'Description', bindTo: 'description', required: true),
           'Rarity':
@@ -73,39 +89,42 @@ class CardFormBuilder extends Builder {
   }
 }
 
-class AttackRecordListBuilder extends Builder {
+class AttackRecordListBuilder extends FormRecordListBuilder {
   @override
   final Attack record = Attack();
 
   AttackRecordListBuilder() : super(id: 'AttacksRecordList', record: Attack());
 
   @override
-  Feature build() {
+  FormRecordList build() {
     return FormRecordList(
         id: id,
         bindTo: 'attacks',
-        template: Template(id: 'attack_workbench', values: Values(values: {
-          'title': Value(value: record.attackId),
-          'subtitle': Value(value: record.name),
-        })),
+        template: Template(
+            id: 'attack_workbench',
+            values: Values(values: {
+              'title': Value(value: record.attackId),
+              'subtitle': Value(value: record.name),
+            })),
         showHeader: true,
         headerText: 'Attacks',
         collapsed: false,
         collapsible: true,
         placeholderText: 'Search attacks',
         sort: 'damage ASC',
-        onItemSelected: OnItemSelectedForm(builder: AttackFormBuilder(), primaryKey: 'attackId'));
+        onItemSelected: OnItemSelectedForm(
+            builder: AttackFormBuilder(), primaryKey: 'attackId'));
   }
 }
 
-class AttackFormBuilder extends Builder {
+class AttackFormBuilder extends FormBuilder {
   @override
   final Attack record = Attack();
 
   AttackFormBuilder() : super(id: 'AttacksUpdateForm', record: Attack());
 
   @override
-  Feature build() {
+  Form build() {
     return Form(
         id: id,
         toolbar: Toolbar(items: []),
