@@ -17,9 +17,8 @@ class MyCardsRequest extends Request {
 class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
   MyCardsEndpoint()
       : super(
-            dataSource: 'my_cards',
-            url: 'https://corey.apptree.dev/MyCards',
-            collection: 'my_cards',
+            name: 'MyCards',
+            dataSource: DataSource(url: 'https://corey.apptree.dev/MyCards', collection: 'my_cards', dataSource: 'my_cards'),
             request: MyCardsRequest(),
             record: Card());
 }
@@ -36,7 +35,7 @@ class CardRecordListBuilder extends RecordListBuilder {
 
   CardRecordListBuilder()
       : super(
-            id: 'MyCardsRecordList', request: MyCardsRequest(), record: Card());
+            id: 'MyCardsRecordList', record: Card(), endpoint: MyCardsEndpoint());
 
   @override
   RecordList build() {

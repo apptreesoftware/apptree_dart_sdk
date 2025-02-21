@@ -1,8 +1,8 @@
 import 'package:apptree_dart_sdk/src/models/record.dart';
-import 'package:apptree_dart_sdk/src/models/request.dart';
 import 'package:apptree_dart_sdk/src/components/record_list.dart';
 import 'package:apptree_dart_sdk/src/components/form.dart';
 import 'package:apptree_dart_sdk/src/components/feature.dart';
+import 'package:apptree_dart_sdk/src/models/endpoint.dart';
 abstract class Builder {
   final String id;
   final Record record;
@@ -15,9 +15,9 @@ abstract class Builder {
 }
 
 abstract class RecordListBuilder extends Builder {
-  final Request request;
+  final CollectionEndpoint endpoint;
 
-  RecordListBuilder({required super.id, required super.record, required this.request});
+  RecordListBuilder({required super.id, required super.record, required this.endpoint});
 
   @override
   RecordList build();

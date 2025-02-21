@@ -1,0 +1,13 @@
+menu: 
+  items: 
+    MyCards: 
+      title: 'MyCards'
+      icon: 'dashboard'
+      default: false
+      order: 1
+      onSelected: 
+        - 
+          navigateTo: 
+            id: 'MyCardsRecordList'
+
+

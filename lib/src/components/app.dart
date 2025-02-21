@@ -57,9 +57,18 @@ class App {
   }
 
   void initialize() {
+    Map<String, dynamic> configDict = {};
+
     for (var builder in builders) {
       buildFeature(builder);
+
+      if (builder is RecordListBuilder) {
+        configDict[builder.endpoint.name] = {"output": true, "skip": false};
+        writeModelYaml(name, builder.endpoint.name, builder.endpoint.getModelYaml());
+      }
     }
+
+    writeConfigYaml(name, YAMLWriter().write(configDict));
 
     // Initialize Menu Items
     Menu menu = Menu(menuItems: menuItems);
