@@ -1,4 +1,5 @@
 import 'package:apptree_dart_sdk/base.dart';
+import 'package:yaml_writer/yaml_writer.dart';
 
 abstract class CollectionEndpoint<I, R> {
   final String url;
@@ -14,6 +15,9 @@ abstract class CollectionEndpoint<I, R> {
       this.request,
       required this.record}) {
     request?.register();
+    record.register();
+    String modelYaml = getModelYaml();
+    print(modelYaml);
   }
 
   OnLoad onLoad() {
@@ -24,8 +28,16 @@ abstract class CollectionEndpoint<I, R> {
     );
   }
 
-  String getDataSource() {
-    return dataSource;
+  Map<String, dynamic> getModelDict() {
+    return {
+      "RequestParams" : request?.toModelDict(),
+      "Model" : record.toModelDict(),
+    };
+  }
+  
+
+  String getModelYaml() {
+    return YAMLWriter().write(getModelDict());
   }
 
 }

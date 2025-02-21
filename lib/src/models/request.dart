@@ -40,6 +40,25 @@ abstract class Request {
     return dataDict;
   }
 
+  Map<String, dynamic> getFieldTypes() {
+    final instanceMirror = reflect(this);
+    final Map<String, dynamic> dataDict = {};
+    instanceMirror.type.declarations.forEach((symbol, declaration) {
+      if (declaration is VariableMirror && !declaration.isStatic) {
+        final fieldInstance = instanceMirror.getField(symbol).reflectee;
+        if (fieldInstance is Field) {
+          final fieldName = MirrorSystem.getName(symbol);
+          dataDict[fieldName] = fieldInstance.getFieldType();
+        }
+      }
+    });
+    return dataDict;
+  }
+
+  Map<String, dynamic> toModelDict() {
+    return getFieldTypes();
+  }
+
   // void buildFieldPaths() {
   //   final instanceMirror = reflect(this);
   //   /*Loop through all the fields and assign the full and relative field paths to each field. The full path is the path from the root of the object graph to the field. The relative path is the path from the parent of the field to the field.

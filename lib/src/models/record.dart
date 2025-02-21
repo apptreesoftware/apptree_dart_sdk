@@ -22,20 +22,34 @@ class FieldBase {
   }
 }
 
-class Field extends FieldBase {
+abstract class Field extends FieldBase {
   Field({super.scope = FieldScope.record});
+
+  String getFieldType();
 }
 
 class IntField extends Field {
   IntField({super.scope = FieldScope.record});
+
+  String getFieldType() {
+    return 'int';
+  }
 }
 
 class StringField extends Field {
   StringField({super.scope = FieldScope.record});
+
+  String getFieldType() {
+    return 'string';
+  }
 }
 
 class BoolField extends Field {
   BoolField({super.scope = FieldScope.record});
+
+  String getFieldType() {
+    return 'bool';
+  }
 }
 
 abstract class Record extends FieldBase {
@@ -85,5 +99,28 @@ abstract class Record extends FieldBase {
         }
       }
     });
+  }
+
+  Map<String, dynamic> getFieldTypes() {
+    final instanceMirror = reflect(this);
+    Map<String, dynamic> fields = {};
+    instanceMirror.type.declarations.forEach((symbol, declaration) {
+      if (declaration is VariableMirror && !declaration.isStatic) {
+        final fieldInstance = instanceMirror.getField(symbol).reflectee;
+        if (fieldInstance is Field) {
+          fields[fieldInstance.relativeFieldPath ?? 'NULL'] = fieldInstance.getFieldType();
+        }
+        if (fieldInstance is Record) {
+          fields[fieldInstance.relativeFieldPath ?? 'NULL'] = fieldInstance.getFieldTypes();
+        }
+      }
+    });
+    return fields;
+  }
+
+  Map<String, dynamic> toModelDict() {
+    return {
+       MirrorSystem.getName(reflect(this).type.simpleName): getFieldTypes(),
+    };
   }
 }
