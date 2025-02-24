@@ -1,56 +1,6 @@
 import 'dart:mirrors';
-import 'package:apptree_dart_sdk/src/constants.dart';
-
-class FieldBase {
-  FieldScope scope = FieldScope.record;
-  Record? parent;
-  String? fullFieldPath;
-  String? relativeFieldPath;
-  bool? primaryKey;
-  String? value;
-
-  FieldBase({this.scope = FieldScope.record});
-
-  String getScope() {
-    return scope.name;
-  }
-
-  String getPath() {
-    String prefix = '\$';
-    String recordPath = "$prefix{${getScope()}().$fullFieldPath}";
-    return recordPath;
-  }
-}
-
-abstract class Field extends FieldBase {
-  Field({super.scope = FieldScope.record});
-
-  String getFieldType();
-}
-
-class IntField extends Field {
-  IntField({super.scope = FieldScope.record});
-
-  String getFieldType() {
-    return 'int';
-  }
-}
-
-class StringField extends Field {
-  StringField({super.scope = FieldScope.record});
-
-  String getFieldType() {
-    return 'string';
-  }
-}
-
-class BoolField extends Field {
-  BoolField({super.scope = FieldScope.record});
-
-  String getFieldType() {
-    return 'bool';
-  }
-}
+import 'package:apptree_dart_sdk/src/models/field.dart';
+import 'package:apptree_dart_sdk/src/models/base.dart';
 
 abstract class Record extends FieldBase {
   void register() {
