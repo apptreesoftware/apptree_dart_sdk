@@ -84,26 +84,17 @@ class CardFormBuilder extends FormBuilder {
           'Common': Text(
             title: 'Common', 
             displayValue: 'This is a common card', 
-            visibleWhen: StringExpression(
-              field1: record.rarity, 
-              operator: Equals(), 
-              value: 'Common')
+            visibleWhen: record.rarity.contains('Common')
           ),
           'Rare': Text(
             title: 'Rare', 
             displayValue: 'This is a rare card',
-            visibleWhen: StringExpression(
-              field1: record.rarity, 
-              operator: Equals(), 
-              value: 'Rare')
+            visibleWhen: record.rarity.contains('Rare')
           ),
           'Epic': Text(
             title: 'Epic', 
             displayValue: 'This is an epic card!!!',
-            visibleWhen: StringExpression(
-              field1: record.rarity, 
-              operator: Equals(), 
-              value: 'Epic')
+            visibleWhen: record.rarity.contains('Epic')
           ),
           'Type': Text(title: 'Type', displayValue: 'type'),
           'Attacks': RecordListFormField(

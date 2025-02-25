@@ -44,6 +44,11 @@ class Or extends Operator {
   final String value = '||';
 }
 
+class Contains extends Operator {
+  @override
+  final String value = 'contains';
+}
+
 class AdditionalConditional {
   final Operator operator;
   final Conditional condition;
@@ -92,6 +97,18 @@ class StringExpression extends Conditional {
   @override
   String toString() {
     return '${field1.getFormPath()} ${operator.value} "$value"';
+  }
+}
+
+class ContainsExpression extends Conditional {
+  final Field field1;
+  final String value;
+
+  ContainsExpression({required this.field1, required super.operator, required this.value});
+
+  @override
+  String toString() {
+    return '${field1.getFormPath()}.${operator.value}("$value")';
   }
 }
 

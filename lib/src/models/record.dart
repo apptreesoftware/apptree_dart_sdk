@@ -1,5 +1,6 @@
 import 'dart:mirrors';
 import 'package:apptree_dart_sdk/src/constants.dart';
+import 'package:apptree_dart_sdk/src/models/expression.dart';
 
 class FieldBase {
   FieldScope scope = FieldScope.record;
@@ -31,6 +32,10 @@ abstract class Field extends FieldBase {
   Field({super.scope = FieldScope.record});
 
   String getFieldType();
+
+  ContainsExpression contains(String value) {
+    return ContainsExpression(field1: this, operator: Contains(), value: value);
+  }
 }
 
 class IntField extends Field {

@@ -48,19 +48,19 @@ features:
           text: 
             title: Common
             displayValue: This is a common card
-            visibleWhen: 'record().rarity == "Common"'
+            visibleWhen: 'record().rarity.contains("Common")'
 
         Rare: 
           text: 
             title: Rare
             displayValue: This is a rare card
-            visibleWhen: 'record().rarity == "Rare"'
+            visibleWhen: 'record().rarity.contains("Rare")'
 
         Epic: 
           text: 
-            title: Rarity
+            title: Epic
             displayValue: 'This is an epic card!!!'
-            visibleWhen: 'record().rarity == "Epic"'
+            visibleWhen: 'record().rarity.contains("Epic")'
 
         Type: 
           text: 
