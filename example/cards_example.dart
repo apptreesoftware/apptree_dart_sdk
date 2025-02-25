@@ -96,7 +96,6 @@ class CardFormBuilder extends FormBuilder {
             displayValue: 'This is an epic card!!!',
             visibleWhen: record.rarity.contains('Epic')
           ),
-          'Rarity Length': Text(title: 'Rarity Length', displayValue: record.rarity.length()),
           'Type': Text(title: 'Type', displayValue: 'type'),
           'Attacks': RecordListFormField(
               title: 'Attacks', builder: AttackRecordListBuilder())
