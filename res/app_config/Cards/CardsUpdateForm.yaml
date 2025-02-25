@@ -21,36 +21,52 @@ features:
           text: 
             title: Id
             displayValue: cardId
+            visibleWhen: 
 
         Name: 
           textInput: 
             title: Name
             bindTo: name
             required: true
+            visibleWhen: 
 
         Owner: 
           textInput: 
             title: Owner
             bindTo: owner
             required: true
+            visibleWhen: 
 
         Description: 
           textInput: 
             title: Description
             bindTo: description
             required: true
+            visibleWhen: 
 
-        Rarity: 
-          textInput: 
+        Common: 
+          text: 
+            title: Common
+            displayValue: This is a common card
+            visibleWhen: 'record().rarity == "Common"'
+
+        Rare: 
+          text: 
+            title: Rare
+            displayValue: This is a rare card
+            visibleWhen: 'record().rarity == "Rare"'
+
+        Epic: 
+          text: 
             title: Rarity
-            bindTo: rarity
-            required: true
+            displayValue: 'This is an epic card!!!'
+            visibleWhen: 'record().rarity == "Epic"'
 
         Type: 
-          textInput: 
+          text: 
             title: Type
-            bindTo: type
-            required: true
+            displayValue: type
+            visibleWhen: 
 
         Attacks: 
           recordList: 
@@ -72,14 +88,16 @@ features:
                   id: AttacksUpdateForm
                   pkField: attackId
 
-
+          visibleWhen: 
       layout: 
         - Header
         - Id
         - Name
         - Owner
         - Description
-        - Rarity
+        - Common
+        - Rare
+        - Epic
         - Type
         - Attacks
 

@@ -8,18 +8,21 @@ features:
           text: 
             title: Id
             displayValue: attackId
+            visibleWhen: 
 
         Name: 
           textInput: 
             title: Name
             bindTo: name
             required: true
+            visibleWhen: 
 
         Damage: 
           textInput: 
             title: Damage
             bindTo: damage
             required: true
+            visibleWhen: 
 
       layout: 
         - Id

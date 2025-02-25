@@ -1,47 +1,47 @@
-import 'package:apptree_dart_sdk/src/models/field.dart';
+import 'package:apptree_dart_sdk/src/models/record.dart';
 
 abstract class Operator {
-  String get operator;
+  String get value;
 }
 
 class Equals extends Operator {
   @override
-  final String operator = '==';
+  final String value = '==';
 }
 
 class NotEquals extends Operator {
   @override
-  final String operator = '!=';
+  final String value = '!=';
 }
 
 class GreaterThan extends Operator {
   @override
-  final String operator = '>';
+  final String value = '>';
 }
 
 class LessThan extends Operator {
   @override
-  final String operator = '<';
+  final String value = '<';
 }
 
 class GreaterThanOrEqual extends Operator {
   @override
-  final String operator = '>=';
+  final String value = '>=';
 }
 
 class LessThanOrEqual extends Operator {
   @override
-  final String operator = '<=';
+  final String value = '<=';
 }
 
 class And extends Operator {
   @override
-  final String operator = '&&';
+  final String value = '&&';
 }
 
 class Or extends Operator {
   @override
-  final String operator = '||';
+  final String value = '||';
 }
 
 class AdditionalConditional {
@@ -58,7 +58,8 @@ abstract class Conditional {
   Conditional({required this.operator});
 
   void and(Conditional condition) {
-    conditions.add(AdditionalConditional(operator: And(), condition: condition));
+    conditions
+        .add(AdditionalConditional(operator: And(), condition: condition));
   }
 
   void or(Conditional condition) {
@@ -78,7 +79,19 @@ class Expression extends Conditional {
 
   @override
   String toString() {
-    return '${field1.fullFieldPath} $operator ${field2.fullFieldPath}';
+    return '${field1.getFormPath()} ${operator.value} ${field2.fullFieldPath}';
+  }
+}
+
+class StringExpression extends Conditional {
+  final Field field1;
+  final String value;
+
+  StringExpression({required this.field1, required super.operator, required this.value});
+
+  @override
+  String toString() {
+    return '${field1.getFormPath()} ${operator.value} "$value"';
   }
 }
 
@@ -89,7 +102,7 @@ class TrueExpression extends Conditional {
 
   @override
   String toString() {
-    return '${field1.fullFieldPath} $operator true';
+    return '${field1.getFormPath()} ${operator.value} true';
   }
 }
 
@@ -100,6 +113,6 @@ class FalseExpression extends Conditional {
 
   @override
   String toString() {
-    return '${field1.fullFieldPath} $operator false';
+    return '${field1.getFormPath()} ${operator.value} false';
   }
 }

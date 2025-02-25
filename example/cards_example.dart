@@ -1,5 +1,5 @@
 import 'package:apptree_dart_sdk/base.dart';
-
+import 'package:apptree_dart_sdk/src/models/expression.dart';
 class Card extends Record {
   final StringField cardId = StringField();
   final StringField name = StringField();
@@ -78,10 +78,34 @@ class CardFormBuilder extends FormBuilder {
           'Name': TextInput(title: 'Name', bindTo: 'name', required: true),
           'Owner': TextInput(title: 'Owner', bindTo: 'owner', required: true),
           'Description': TextInput(
-              title: 'Description', bindTo: 'description', required: true),
-          'Rarity':
-              TextInput(title: 'Rarity', bindTo: 'rarity', required: true),
-          'Type': TextInput(title: 'Type', bindTo: 'type', required: true),
+              title: 'Description', 
+              bindTo: 'description', 
+              required: true),
+          'Common': Text(
+            title: 'Common', 
+            displayValue: 'This is a common card', 
+            visibleWhen: StringExpression(
+              field1: record.rarity, 
+              operator: Equals(), 
+              value: 'Common')
+          ),
+          'Rare': Text(
+            title: 'Rare', 
+            displayValue: 'This is a rare card',
+            visibleWhen: StringExpression(
+              field1: record.rarity, 
+              operator: Equals(), 
+              value: 'Rare')
+          ),
+          'Epic': Text(
+            title: 'Epic', 
+            displayValue: 'This is an epic card!!!',
+            visibleWhen: StringExpression(
+              field1: record.rarity, 
+              operator: Equals(), 
+              value: 'Epic')
+          ),
+          'Type': Text(title: 'Type', displayValue: 'type'),
           'Attacks': RecordListFormField(
               title: 'Attacks', builder: AttackRecordListBuilder())
         }));

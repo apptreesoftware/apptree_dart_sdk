@@ -1,6 +1,68 @@
 import 'dart:mirrors';
-import 'package:apptree_dart_sdk/src/models/field.dart';
-import 'package:apptree_dart_sdk/src/models/base.dart';
+import 'package:apptree_dart_sdk/src/constants.dart';
+
+class FieldBase {
+  FieldScope scope = FieldScope.record;
+  Record? parent;
+  String? fullFieldPath;
+  String? relativeFieldPath;
+  bool? primaryKey;
+  String? value;
+
+  FieldBase({this.scope = FieldScope.record});
+
+  String getScope() {
+    return scope.name;
+  }
+
+  String getPath() {
+    String prefix = '\$';
+    String recordPath = "$prefix{${getScope()}().$fullFieldPath}";
+    return recordPath;
+  }
+
+  String getFormPath() {
+    String recordPath = "${getScope()}().$fullFieldPath";
+    return recordPath;
+  }
+}
+
+abstract class Field extends FieldBase {
+  Field({super.scope = FieldScope.record});
+
+  String getFieldType();
+}
+
+class IntField extends Field {
+  IntField({super.scope = FieldScope.record});
+
+  @override
+  String getFieldType() {
+    return 'int';
+  }
+}
+
+class StringField extends Field {
+  StringField({super.scope = FieldScope.record});
+
+  @override
+  String getFieldType() {
+    return 'string';
+  }
+}
+
+class BoolField extends Field {
+  bool falseValue = false;
+
+  BoolField({
+    super.scope = FieldScope.record,
+  });
+
+  @override
+  String getFieldType() {
+    return 'bool';
+  }
+}
 
 abstract class Record extends FieldBase {
   void register() {
@@ -58,10 +120,12 @@ abstract class Record extends FieldBase {
       if (declaration is VariableMirror && !declaration.isStatic) {
         final fieldInstance = instanceMirror.getField(symbol).reflectee;
         if (fieldInstance is Field) {
-          fields[fieldInstance.relativeFieldPath ?? 'NULL'] = fieldInstance.getFieldType();
+          fields[fieldInstance.relativeFieldPath ?? 'NULL'] =
+              fieldInstance.getFieldType();
         }
         if (fieldInstance is Record) {
-          fields[fieldInstance.relativeFieldPath ?? 'NULL'] = fieldInstance.getFieldTypes();
+          fields[fieldInstance.relativeFieldPath ?? 'NULL'] =
+              fieldInstance.getFieldTypes();
         }
       }
     });
@@ -70,7 +134,7 @@ abstract class Record extends FieldBase {
 
   Map<String, dynamic> toModelDict() {
     return {
-       MirrorSystem.getName(reflect(this).type.simpleName): getFieldTypes(),
+      MirrorSystem.getName(reflect(this).type.simpleName): getFieldTypes(),
     };
   }
 }
