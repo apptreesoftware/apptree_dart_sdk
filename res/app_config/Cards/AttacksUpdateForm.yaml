@@ -13,14 +13,14 @@ features:
         Name: 
           textInput: 
             title: Name
-            bindTo: name
+            bindTo: 'record().name'
             required: true
             visibleWhen: 
 
         Damage: 
           textInput: 
             title: Damage
-            bindTo: damage
+            bindTo: 'record().damage'
             required: true
             visibleWhen: 
 

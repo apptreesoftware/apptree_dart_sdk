@@ -1,3 +1,4 @@
+import "package:apptree_dart_sdk/base.dart";
 import "package:apptree_dart_sdk/src/components/feature.dart";
 import "package:apptree_dart_sdk/src/models/builder.dart";
 import "package:apptree_dart_sdk/src/models/expression.dart";
@@ -119,7 +120,7 @@ class Header extends FormField {
 
 class TextInput extends FormField {
   final String title;
-  final String bindTo; // TODO: This should be a Field object
+  final Field bindTo; // TODO: This should be a Field object
   final bool required;
 
   TextInput(
@@ -130,7 +131,7 @@ class TextInput extends FormField {
     return {
       "textInput": {
         "title": title,
-        "bindTo": bindTo,
+        "bindTo": bindTo.getFormPath(),
         "required": required,
         "visibleWhen": visibleWhen == null ? "" : visibleWhen.toString(),
       },
@@ -149,7 +150,7 @@ class Text extends FormField {
     return {
       "text": {
         "title": title,
-        "displayValue": displayValue,
+        "displayValue": displayValue, // TODO: Should Be Able to Handle String Interpolation
         "visibleWhen": visibleWhen == null ? "" : visibleWhen.toString(),
       },
     };

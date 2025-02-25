@@ -26,28 +26,28 @@ features:
         Name: 
           textInput: 
             title: Name
-            bindTo: name
+            bindTo: 'record().name'
             required: true
             visibleWhen: 
 
         Owner: 
           textInput: 
             title: Owner
-            bindTo: owner
+            bindTo: 'record().owner'
             required: true
             visibleWhen: 
 
         Description: 
           textInput: 
             title: Description
-            bindTo: description
+            bindTo: 'record().description'
             required: true
             visibleWhen: 
 
         Common: 
           text: 
             title: Common
-            displayValue: This is a common card
+            displayValue: "Name: ${record().name}"
             visibleWhen: 'record().rarity.contains("Common")'
 
         Rare: 
@@ -98,6 +98,7 @@ features:
         - Common
         - Rare
         - Epic
+        - Rarity Length
         - Type
         - Attacks
 

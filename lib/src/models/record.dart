@@ -36,6 +36,10 @@ abstract class Field extends FieldBase {
   ContainsExpression contains(String value) {
     return ContainsExpression(field1: this, operator: Contains(), value: value);
   }
+
+  String length() {
+    return '${getPath()}.length()';
+  }
 }
 
 class IntField extends Field {
