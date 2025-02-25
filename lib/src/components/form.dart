@@ -1,5 +1,7 @@
+import "package:apptree_dart_sdk/base.dart";
 import "package:apptree_dart_sdk/src/components/feature.dart";
 import "package:apptree_dart_sdk/src/models/builder.dart";
+import "package:apptree_dart_sdk/src/models/expression.dart";
 
 class Form extends Feature {
   final Toolbar toolbar;
@@ -97,37 +99,41 @@ class FormFields {
 }
 
 abstract class FormField {
+  Conditional? visibleWhen;
   Map<String, dynamic> toDict();
+
+  FormField({this.visibleWhen});
 }
 
 class Header extends FormField {
   final String title;
 
-  Header({required this.title});
+  Header({required this.title, super.visibleWhen});
 
   @override
   Map<String, dynamic> toDict() {
     return {
-      "header": { "title": title },
+      "header": {"title": title},
     };
   }
 }
 
 class TextInput extends FormField {
   final String title;
-  final String bindTo; // TODO: This should be a Field object
+  final Field bindTo; // TODO: This should be a Field object
   final bool required;
 
   TextInput(
-      {required this.title, required this.bindTo, required this.required});
+      {required this.title, required this.bindTo, required this.required, super.visibleWhen});
 
   @override
   Map<String, dynamic> toDict() {
     return {
       "textInput": {
         "title": title,
-        "bindTo": bindTo,
+        "bindTo": bindTo.getFormPath(),
         "required": required,
+        "visibleWhen": visibleWhen == null ? "" : visibleWhen.toString(),
       },
     };
   }
@@ -137,14 +143,15 @@ class Text extends FormField {
   final String title;
   final String displayValue;
 
-  Text({required this.title, required this.displayValue});
+  Text({required this.title, required this.displayValue, super.visibleWhen});
 
   @override
   Map<String, dynamic> toDict() {
     return {
       "text": {
         "title": title,
-        "displayValue": displayValue,
+        "displayValue": displayValue, // TODO: Should Be Able to Handle String Interpolation
+        "visibleWhen": visibleWhen == null ? "" : visibleWhen.toString(),
       },
     };
   }
@@ -154,13 +161,14 @@ class RecordListFormField extends FormField {
   final String title;
   final FormRecordListBuilder builder;
 
-  RecordListFormField({required this.title, required this.builder});
+  RecordListFormField({required this.title, required this.builder, super.visibleWhen});
 
   @override
   Map<String, dynamic> toDict() {
     Feature feature = builder.build();
     return {
       "recordList": feature.toDict(),
+      "visibleWhen": visibleWhen == null ? "" : visibleWhen.toString(),
     };
   }
 }

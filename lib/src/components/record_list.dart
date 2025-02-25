@@ -26,7 +26,7 @@ class RecordList extends Feature {
       id: {
         "recordList": {
           "onLoad": collectionEndpoint.onLoad().toDict(),
-          "dataSource": collectionEndpoint.getDataSource(),
+          "dataSource": collectionEndpoint.dataSource.dataSource,
           "noResultsText": noResultsText,
           "showDivider": showDivider,
           "topAccessoryViews":

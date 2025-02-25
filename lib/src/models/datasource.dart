@@ -1,4 +1,7 @@
-abstract class DataSource<I, R> {
-  Future<List<R>> fetch(I input);
-  Future<R> submit(I input);
+class DataSource {
+  final String url;
+  final String collection;
+  final String dataSource; 
+  
+  DataSource({required this.url, required this.collection, required this.dataSource});
 }

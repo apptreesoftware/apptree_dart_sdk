@@ -1,0 +1,16 @@
+MyCards: 
+  RequestParams: 
+    owner: 'string'
+  Model: 
+    Card: 
+      cardId: 'string'
+      name: 'string'
+      owner: 'string'
+      description: 'string'
+      rarity: 'string'
+      type: 'string'
+      attacks: 
+        attackId: 'string'
+        name: 'string'
+        damage: 'int'
+

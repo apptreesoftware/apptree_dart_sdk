@@ -1,17 +1,25 @@
 import 'dart:io';
 
 class FileUtil {
-  static void writeYaml(String dir, String fileName, String yaml, {String? extension = '.yaml'}) {
-    var directory = Directory('res/$dir');
+  static void writeYaml(String dir, String filename, String yaml) {
+    var directory = Directory(dir);
     if (!directory.existsSync()) {
       directory.createSync(recursive: true);
     }
-    File("res/$dir/$fileName$extension").writeAsString(yaml);
+    File(filename).writeAsString(yaml);
   }
 }
 
 void writeYaml(String dir, String fileName, String yaml, {String? extension = '.yaml'}) {
-  FileUtil.writeYaml(dir, fileName, yaml, extension: extension);
+  FileUtil.writeYaml('res/app_config/$dir', "res/app_config/$dir/$fileName$extension", yaml);
+}
+
+void writeModelYaml(String dir, String fileName, String yaml) {
+  FileUtil.writeYaml('res/connector/models/$dir', "res/connector/models/$dir/$fileName.yaml", yaml);
+}
+
+void writeConfigYaml(String dir, String yaml) {
+  FileUtil.writeYaml('res/connector/config/$dir', "res/connector/config/$dir/config.yaml", yaml);
 }
 
 List<String> copyDirectory(Directory source, Directory destination) {
@@ -35,7 +43,7 @@ List<String> copyDirectory(Directory source, Directory destination) {
 
 List<String> copyTemplates(String dir) {
   Directory source = Directory('res/includes/templates');
-  Directory destination = Directory('res/$dir/templates');
+  Directory destination = Directory('res/app_config/$dir/templates');
   if (!destination.existsSync()) {
     destination.createSync(recursive: true);
   }

@@ -2,5 +2,5 @@ enum FieldScope {
   record,
   user,
   app,
-  debug,
+  context,
 }
