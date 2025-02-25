@@ -1,5 +1,6 @@
 import 'package:apptree_dart_sdk/base.dart';
 import 'package:apptree_dart_sdk/src/models/expression.dart';
+
 class Card extends Record {
   final StringField cardId = StringField();
   final StringField name = StringField();
@@ -18,7 +19,10 @@ class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
   MyCardsEndpoint()
       : super(
             name: 'MyCards',
-            dataSource: DataSource(url: 'https://corey.apptree.dev/MyCards', collection: 'my_cards', dataSource: 'my_cards'),
+            dataSource: DataSource(
+                url: 'https://corey.apptree.dev/MyCards',
+                collection: 'my_cards',
+                dataSource: 'my_cards'),
             request: MyCardsRequest(),
             record: Card());
 }
@@ -29,13 +33,12 @@ class Attack extends Record {
   final IntField damage = IntField();
 }
 
-class CardRecordListBuilder extends RecordListBuilder {
-  @override
-  final Card record = Card();
-
+class CardRecordListBuilder extends RecordListBuilder<Card> {
   CardRecordListBuilder()
       : super(
-            id: 'MyCardsRecordList', record: Card(), endpoint: MyCardsEndpoint());
+            id: 'MyCardsRecordList',
+            record: Card(),
+            endpoint: MyCardsEndpoint());
 
   @override
   RecordList build() {
@@ -55,9 +58,7 @@ class CardRecordListBuilder extends RecordListBuilder {
   }
 }
 
-class CardFormBuilder extends FormBuilder {
-  @override
-  final Card record = Card();
+class CardFormBuilder extends FormBuilder<Card> {
 
   CardFormBuilder() : super(id: 'CardsUpdateForm', record: Card());
 
@@ -76,26 +77,22 @@ class CardFormBuilder extends FormBuilder {
           'Header': Header(title: 'Card'),
           'Id': Text(title: 'Id', displayValue: 'cardId'),
           'Name': TextInput(title: 'Name', bindTo: record.name, required: true),
-          'Owner': TextInput(title: 'Owner', bindTo: record.owner, required: true),
+          'Owner':
+              TextInput(title: 'Owner', bindTo: record.owner, required: true),
           'Description': TextInput(
-              title: 'Description', 
-              bindTo: record.description, 
-              required: true),
+              title: 'Description', bindTo: record.description, required: true),
           'Common': Text(
-            title: 'Common', 
-            displayValue: 'Name: ${record.name}', 
-            visibleWhen: record.rarity.contains('Common')
-          ),
+              title: 'Common',
+              displayValue: 'Name: ${record.name}',
+              visibleWhen: record.rarity.contains('Common')),
           'Rare': Text(
-            title: 'Rare', 
-            displayValue: 'This is a rare card',
-            visibleWhen: record.rarity.contains('Rare')
-          ),
+              title: 'Rare',
+              displayValue: 'This is a rare card',
+              visibleWhen: record.rarity.contains('Rare')),
           'Epic': Text(
-            title: 'Epic', 
-            displayValue: 'This is an epic card!!!',
-            visibleWhen: record.rarity.contains('Epic')
-          ),
+              title: 'Epic',
+              displayValue: 'This is an epic card!!!',
+              visibleWhen: record.rarity.contains('Epic')),
           'Type': Text(title: 'Type', displayValue: 'type'),
           'Attacks': RecordListFormField(
               title: 'Attacks', builder: AttackRecordListBuilder())
@@ -145,7 +142,8 @@ class AttackFormBuilder extends FormBuilder {
         fields: FormFields(fields: {
           'Id': Text(title: 'Id', displayValue: 'attackId'),
           'Name': TextInput(title: 'Name', bindTo: record.name, required: true),
-          'Damage': TextInput(title: 'Damage', bindTo: record.damage, required: true)
+          'Damage':
+              TextInput(title: 'Damage', bindTo: record.damage, required: true)
         }));
   }
 }
