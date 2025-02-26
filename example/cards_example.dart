@@ -1,8 +1,6 @@
 import 'package:apptree_dart_sdk/base.dart';
 import 'package:apptree_dart_sdk/src/models/expression.dart';
 
-final user = User();
-
 class Card extends Record {
   final StringField cardId = StringField();
   final StringField name = StringField();
@@ -11,10 +9,6 @@ class Card extends Record {
   final StringField rarity = StringField();
   final StringField type = StringField();
   final Attack attacks = Attack();
-}
-
-class UserData extends Record {
-  final BoolField isAdmin = BoolField();
 }
 
 class MyCardsRequest extends Request {
@@ -65,6 +59,7 @@ class CardRecordListBuilder extends RecordListBuilder<Card> {
 }
 
 class CardFormBuilder extends FormBuilder<Card> {
+
   CardFormBuilder() : super(id: 'CardsUpdateForm', record: Card());
 
   @override
@@ -89,7 +84,7 @@ class CardFormBuilder extends FormBuilder<Card> {
           'Common': Text(
               title: 'Common',
               displayValue: 'Name: ${record.name}',
-              visibleWhen: record.rarity.equals('Common')),
+              visibleWhen: record.rarity.contains('Common')),
           'Rare': Text(
               title: 'Rare',
               displayValue: 'This is a rare card',
