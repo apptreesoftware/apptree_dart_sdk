@@ -2,16 +2,7 @@ features:
   CardsUpdateForm: 
     form: 
       toolbar: 
-        items: 
-          - 
-            title: Save
-            actions: 
-              - 
-                submitForm: 
-                  url: 'https://corey.apptree.dev/UpdateCard'
-                  title: Updating Card
-
-
+        items: []
       fields: 
         Header: 
           header: 
@@ -20,85 +11,36 @@ features:
         Id: 
           text: 
             title: Id
-            displayValue: cardId
-            visibleWhen: 
+            displayValue: 'Hello ${record().cardId} - ${record().description}'
 
         Name: 
           textInput: 
             title: Name
-            bindTo: 'record().name'
+            bindTo: name
             required: true
-            visibleWhen: 
 
         Owner: 
           textInput: 
             title: Owner
-            bindTo: 'record().owner'
+            bindTo: owner
             required: true
-            visibleWhen: 
 
         Description: 
           textInput: 
             title: Description
-            bindTo: 'record().description'
+            bindTo: description
             required: true
-            visibleWhen: 
 
-        Common: 
-          text: 
-            title: Common
-            displayValue: "Name: Instance of 'StringField'"
-            visibleWhen: 'record().rarity.contains("Common")'
-
-        Rare: 
-          text: 
-            title: Rare
-            displayValue: This is a rare card
-            visibleWhen: 'record().rarity.contains("Rare")'
-
-        Epic: 
-          text: 
-            title: Epic
-            displayValue: 'This is an epic card!!!'
-            visibleWhen: 'record().rarity.contains("Epic")'
-
-        Type: 
-          text: 
-            title: Type
-            displayValue: type
-            visibleWhen: 
-
-        Attacks: 
-          recordList: 
-            showHeader: true
-            headerText: Attacks
-            collapsed: false
-            collapsible: true
-            placeholderText: Search attacks
-            sort: damage ASC
-            bindTo: attacks
-            template: 
-              id: 'attack_workbench'
-              values: 
-                title: '${record().attackId}'
-                subtitle: '${record().name}'
-            onItemSelected: 
-              - 
-                navigateTo: 
-                  id: AttacksUpdateForm
-                  pkField: attackId
-
-          visibleWhen: 
       layout: 
         - Header
         - Id
         - Name
-        - Owner
+        - 
+          Owner: 
+            direction: vertical
+            size: 
+              sm: 6
+
         - Description
-        - Common
-        - Rare
-        - Epic
-        - Type
-        - Attacks
 
 

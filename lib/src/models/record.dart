@@ -12,6 +12,10 @@ class FieldBase {
 
   FieldBase({this.scope = FieldScope.record});
 
+  dynamic toJson() {
+    return getPath();
+  }
+
   String getScope() {
     return scope.name;
   }
@@ -26,6 +30,11 @@ class FieldBase {
     String recordPath = "${getScope()}().$fullFieldPath";
     return recordPath;
   }
+
+  @override
+  String toString() {
+    return getPath();
+  }
 }
 
 abstract class Field extends FieldBase {
@@ -35,10 +44,6 @@ abstract class Field extends FieldBase {
 
   ContainsExpression contains(String value) {
     return ContainsExpression(field1: this, operator: Contains(), value: value);
-  }
-
-  String length() {
-    return '${getPath()}.length()';
   }
 }
 
@@ -63,9 +68,7 @@ class StringField extends Field {
 class BoolField extends Field {
   bool falseValue = false;
 
-  BoolField({
-    super.scope = FieldScope.record,
-  });
+  BoolField({super.scope = FieldScope.record});
 
   @override
   String getFieldType() {
@@ -110,9 +113,10 @@ abstract class Record extends FieldBase {
         final fieldInstance = instanceMirror.getField(symbol).reflectee;
         if (fieldInstance is FieldBase) {
           final fieldName = MirrorSystem.getName(symbol);
-          fieldInstance.fullFieldPath = fieldInstance.parent?.parent != null
-              ? '${fieldInstance.parent!.fullFieldPath}.$fieldName'
-              : fieldName;
+          fieldInstance.fullFieldPath =
+              fieldInstance.parent?.parent != null
+                  ? '${fieldInstance.parent!.fullFieldPath}.$fieldName'
+                  : fieldName;
           fieldInstance.relativeFieldPath = fieldName;
           if (fieldInstance is Record) {
             fieldInstance.buildFieldPaths();

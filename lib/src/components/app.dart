@@ -1,40 +1,20 @@
 import "package:apptree_dart_sdk/base.dart";
+import "package:apptree_dart_sdk/src/components/menu.dart";
 import "package:yaml_writer/yaml_writer.dart";
 import "package:apptree_dart_sdk/src/util/file.dart";
 
 class App {
   final String name;
   final int configVersion;
-  List<Builder> builders = [];
   List<Feature> features = [];
   Map<String, MenuItem> menuItems = {};
   List<String> layouts = [];
   App({required this.name, required this.configVersion});
 
-  void addFeature(Builder builder, MenuItem? menuItem) {
-    builders.add(builder);
-    if (menuItem != null) {
-      menuItem.setId(builder.id);
-      menuItems[menuItem.title] = menuItem;
-    }
-  }
-
-  void buildFeature(Builder builder) {
-    Feature feature = builder.build();
-    if (feature is RecordList) {
-      buildFeature(feature.onItemSelected.builder);
-    }
-    if (feature is Form) {
-      for (var field in feature.fields.getRecordListFields()) {
-        buildFeature(field.builder);
-      }
-    }
-    if (feature is FormRecordList) {
-      buildFeature(feature.onItemSelected.builder);
-    }
-    if (feature is! FormRecordList) {
-      features.add(feature);
-    }
+  void addFeature(Feature feature, {required MenuItem menuItem}) {
+    features.add(feature);
+    menuItem.setId(feature.id);
+    menuItems[menuItem.title] = menuItem;
   }
 
   Map<String, dynamic> toDict() {
@@ -45,26 +25,33 @@ class App {
       "name": name,
       "configVersion": configVersion,
       "merge": featureIds,
-      "templates": layouts
+      "templates": layouts,
     };
   }
 
   void toYaml() {
     Map<String, dynamic> app = toDict();
 
-    writeYaml(name, "template_merge", YAMLWriter().write(app),
-        extension: '.apptreemobile');
+    writeYaml(
+      name,
+      "template_merge",
+      YAMLWriter().write(app),
+      extension: '.apptreemobile',
+    );
   }
 
   void initialize() {
     Map<String, dynamic> configDict = {};
+    var buildContext = BuildContext(user: User());
 
-    for (var builder in builders) {
-      buildFeature(builder);
-
-      if (builder is RecordListBuilder) {
-        configDict[builder.endpoint.name] = {"output": true, "skip": false};
-        writeModelYaml(name, builder.endpoint.name, builder.endpoint.getModelYaml());
+    for (var feature in features) {
+      if (feature is RecordList) {
+        configDict[feature.dataSource.id] = {"output": true, "skip": false};
+        writeModelYaml(
+          name,
+          feature.dataSource.id,
+          feature.dataSource.getModelYaml(),
+        );
       }
     }
 
@@ -73,16 +60,25 @@ class App {
     // Initialize Menu Items
     Menu menu = Menu(menuItems: menuItems);
     writeYaml(name, "menu", menu.toYaml());
-    // Output Features
+
     for (var feature in features) {
-      if (feature is FormRecordList) {
-        continue;
-      }
-      writeYaml(name, feature.id, feature.toYaml());
+      writeFeature(feature, buildContext: buildContext);
     }
 
     layouts = copyTemplates(name);
 
     toYaml();
+  }
+
+  void writeFeature(Feature feature, {required BuildContext buildContext}) {
+    var buildResult = feature.build(buildContext);
+    var yaml = YAMLWriter(
+      allowUnquotedStrings: true,
+    ).write({"features": buildResult.featureData});
+    writeYaml(name, feature.id, yaml);
+
+    for (var childFeature in buildResult.childFeatures) {
+      writeFeature(childFeature, buildContext: buildContext);
+    }
   }
 }

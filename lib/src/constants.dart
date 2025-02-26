@@ -1,6 +1,1 @@
-enum FieldScope {
-  record,
-  user,
-  app,
-  context,
-}
+enum FieldScope { record, user, app, context }

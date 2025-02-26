@@ -3,12 +3,12 @@ features:
     recordList: 
       onLoad: 
         - 
-          url: 'https://corey.apptree.dev/MyCards'
+          url: '{{environment.url}}/MyCards'
           data: 
             owner: '${user().username}'
-            collection: 'my_cards'
+            collection: MyCards
 
-      dataSource: 'my_cards'
+      dataSource: MyCards
       noResultsText: No results
       showDivider: true
       topAccessoryViews: []
@@ -18,7 +18,10 @@ features:
           title: '${record().cardId}'
           subtitle: '${record().name}'
       onItemSelected: 
-        navigateTo: 
-          id: CardsUpdateForm
+        - 
+          navigateTo: 
+            id: CardsUpdateForm
+            navigationContext: 
+              user: '${user().appVersion}'
 
 

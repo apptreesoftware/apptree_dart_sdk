@@ -1,8 +1,6 @@
 name: 'Cards'
 configVersion: 2
 merge: 
-  - 'AttacksUpdateForm.yaml'
-  - 'CardsUpdateForm.yaml'
   - 'MyCardsRecordList.yaml'
   - 'menu.yaml'
 templates: 
