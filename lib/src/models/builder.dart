@@ -1,41 +1,73 @@
-import 'package:apptree_dart_sdk/src/models/record.dart';
-import 'package:apptree_dart_sdk/src/components/record_list.dart';
-import 'package:apptree_dart_sdk/src/components/form.dart';
-import 'package:apptree_dart_sdk/src/components/feature.dart';
-import 'package:apptree_dart_sdk/src/models/endpoint.dart';
+import 'dart:mirrors';
 
-abstract class Builder<T extends Record> {
+import 'package:apptree_dart_sdk/base.dart';
+
+typedef TemplateBuilder<I extends Record> =
+    Template Function(BuildContext context, I record);
+typedef OnItemSelectedBuilder<I extends Record> =
+    NavigateTo Function(BuildContext context, I record);
+
+typedef FormFieldsBuilder<I extends Record> =
+    List<FormField> Function(BuildContext context, I record);
+
+typedef ToolbarBuilder = Toolbar Function(BuildContext context);
+typedef FormToolbarBuilder<I extends Record> =
+    Toolbar Function(BuildContext context, I record);
+
+class BuildContext {
+  final User user;
+
+  BuildContext({required this.user});
+}
+
+class BuildResult {
+  final Map<String, dynamic> featureData;
+  final List<Feature> childFeatures;
+
+  BuildResult({required this.featureData, required this.childFeatures});
+}
+
+abstract class Builder {
   final String id;
-  final T record;
 
-  Builder({required this.id, required this.record}) {
-    record.register();
+  Builder({required this.id});
+}
+
+abstract class RecordListBuilder<I extends Request, R extends Record>
+    extends Builder {
+  final CollectionEndpoint<I, R> endpoint;
+
+  RecordListBuilder({required super.id, required this.endpoint});
+
+  RecordList build(R record);
+}
+
+// abstract class FormRecordListBuilder<I extends Request, R extends Record>
+//     extends Builder {
+//   FormRecordListBuilder({required super.id, required this.endpoint});
+
+//   FormRecordList build(R record);
+// }
+
+abstract class FormBuilder<I extends Request, R extends Record>
+    extends Builder {
+  final CollectionEndpoint<I, R> endpoint;
+  FormBuilder({required super.id, required this.endpoint});
+
+  Form build(R record);
+}
+
+I instantiateRecord<I extends Record>() {
+  // Verify this is an instance of Record
+  if (!reflectClass(I).isSubclassOf(reflectClass(Record))) {
+    throw ArgumentError('${I.toString()} is not a subclass of Record');
   }
-
-  Feature build();
-}
-
-abstract class RecordListBuilder<T extends Record> extends Builder<T> {
-  final CollectionEndpoint endpoint;
-
-  RecordListBuilder(
-      {required super.id, required super.record, required this.endpoint});
-
-  @override
-  RecordList build();
-}
-
-abstract class FormRecordListBuilder<T extends Record> extends Builder {
-
-  FormRecordListBuilder({required super.id, required super.record});
-
-  @override
-  FormRecordList build();
-}
-
-abstract class FormBuilder<T extends Record> extends Builder<T> {
-  FormBuilder({required super.id, required super.record});
-
-  @override
-  Form build();
+  // Verify the record has a zero-argument constructor
+  if (reflectClass(I).declarations.entries.any((entry) => entry.key == 'new')) {
+    throw ArgumentError(
+      '${I.toString()} does not have a zero-argument constructor',
+    );
+  }
+  return (reflectClass(I).newInstance(Symbol(''), []).reflectee as I)
+    ..register();
 }

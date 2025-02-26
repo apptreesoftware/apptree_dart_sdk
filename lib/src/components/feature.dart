@@ -1,3 +1,4 @@
+import "package:apptree_dart_sdk/base.dart";
 import "package:yaml_writer/yaml_writer.dart";
 
 abstract class Feature {
@@ -5,9 +6,11 @@ abstract class Feature {
 
   Feature({required this.id});
 
-  Map<String, dynamic> toDict();
+  BuildResult build(BuildContext context);
 
-  String toYaml() {
-    return YAMLWriter(allowUnquotedStrings: true).write({"features": toDict()});
+  String toYaml(BuildContext context) {
+    return YAMLWriter(
+      allowUnquotedStrings: true,
+    ).write({"features": build(context)});
   }
 }
