@@ -1,46 +1,43 @@
-features: 
-  CardsUpdateForm: 
-    form: 
-      toolbar: 
+features:
+  CardsUpdateForm:
+    form:
+      toolbar:
         items: []
-      fields: 
-        Header: 
-          header: 
+      fields:
+        Header:
+          header:
             title: Card
 
-        Id: 
-          text: 
+        Id:
+          text:
             title: Id
             displayValue: 'Hello ${record().cardId} - ${record().description}'
 
-        Name: 
-          textInput: 
+        Name:
+          textInput:
             title: Name
             bindTo: name
             required: true
 
-        Owner: 
-          textInput: 
+        Owner:
+          textInput:
             title: Owner
             bindTo: owner
             required: true
 
-        Description: 
-          textInput: 
+        Description:
+          textInput:
             title: Description
             bindTo: description
             required: true
 
-      layout: 
+      layout:
         - Header
         - Id
         - Name
-        - 
-          Owner: 
+        - Owner:
             direction: vertical
-            size: 
+            size:
               sm: 6
 
         - Description
-
-

@@ -5,10 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "apptree_dart_sdk",
+            "name": "Cards Example",
             "request": "launch",
             "type": "dart",
             "program": "example/cards_example.dart"
+        },
+        {
+            "name": "Expression Test",
+            "request": "launch",
+            "type": "dart",
+            "program": "test/expression_test.dart"
         }
     ]
 }
