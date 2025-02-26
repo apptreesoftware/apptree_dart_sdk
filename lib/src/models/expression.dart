@@ -4,107 +4,85 @@ abstract class Operator {
   String get value;
 }
 
-class Equals extends Operator {
+class EQUALS extends Operator {
   @override
   final String value = '==';
 }
 
-class NotEquals extends Operator {
+class NEQUALS extends Operator {
   @override
   final String value = '!=';
 }
 
-class GreaterThan extends Operator {
-  @override
-  final String value = '>';
-}
-
-class LessThan extends Operator {
-  @override
-  final String value = '<';
-}
-
-class GreaterThanOrEqual extends Operator {
-  @override
-  final String value = '>=';
-}
-
-class LessThanOrEqual extends Operator {
-  @override
-  final String value = '<=';
-}
-
-class And extends Operator {
-  @override
-  final String value = '&&';
-}
-
-class Or extends Operator {
-  @override
-  final String value = '||';
-}
-
-class Contains extends Operator {
+class CONTAINS extends Operator {
   @override
   final String value = 'contains';
 }
 
-class AdditionalConditional {
-  final Operator operator;
-  final Conditional condition;
+class AND extends Operator {
+  @override
+  final String value = '&&';
+}
 
-  AdditionalConditional({required this.operator, required this.condition});
+class OR extends Operator {
+  @override
+  final String value = '||';
 }
 
 abstract class Conditional {
   Operator operator;
-  List<AdditionalConditional> conditions = [];
+  List<Conditional> conditions = [];
 
-  Conditional({required this.operator});
+  Conditional({required this.operator, required this.conditions});
 
-  void and(Conditional condition) {
-    conditions
-        .add(AdditionalConditional(operator: And(), condition: condition));
+  Conditional and(Conditional condition) {
+    return Expression(operator: AND(), condition1: this, condition2: condition);
   }
 
-  void or(Conditional condition) {
-    conditions.add(AdditionalConditional(operator: Or(), condition: condition));
+  Conditional or(Conditional condition) {
+    return Expression(operator: OR(), condition1: this, condition2: condition);
+  }
+}
+
+class Or extends Conditional {
+  Or(Conditional first, Conditional second, [List<Conditional>? additional])
+      : super(operator: OR(), conditions: [first, second, ...?additional]);
+
+  @override
+  String toString() {
+    return '(${conditions.map((e) => e.toString()).join(' ${operator.value} ')})';
+  }
+}
+
+class And extends Conditional {
+  And(Conditional first, Conditional second, [List<Conditional>? additional])
+      : super(operator: AND(), conditions: [first, second, ...?additional]);
+
+  @override
+  String toString() {
+    return '(${conditions.map((e) => e.toString()).join(' ${operator.value} ')})';
   }
 }
 
 class Expression extends Conditional {
-  final Field field1;
-  final Field field2;
+  final Conditional condition1;
+  final Conditional condition2;
 
-  Expression({
-    required this.field1,
-    required this.field2,
-    required super.operator,
-  });
+  Expression({required this.condition1, required this.condition2, required super.operator})
+      : super(conditions: []);
 
   @override
   String toString() {
-    return '${field1.getFormPath()} ${operator.value} ${field2.fullFieldPath}';
+    return '${condition1.toString()} ${operator.value} ${condition2.toString()}';
   }
 }
 
-class StringExpression extends Conditional {
+class Contains extends Conditional {
   final Field field1;
   final String value;
 
-  StringExpression({required this.field1, required super.operator, required this.value});
-
-  @override
-  String toString() {
-    return '${field1.getFormPath()} ${operator.value} "$value"';
-  }
-}
-
-class ContainsExpression extends Conditional {
-  final Field field1;
-  final String value;
-
-  ContainsExpression({required this.field1, required super.operator, required this.value});
+  Contains(this.field1, this.value)
+      : super(operator: CONTAINS(), conditions: []);
 
   @override
   String toString() {
@@ -112,24 +90,42 @@ class ContainsExpression extends Conditional {
   }
 }
 
-class TrueExpression extends Conditional {
+class StringEquals extends Conditional {
   final Field field1;
+  final String value;
 
-  TrueExpression({required this.field1, required super.operator});
+  StringEquals(this.field1, this.value)
+      : super(operator: EQUALS(), conditions: []);
 
   @override
   String toString() {
-    return '${field1.getFormPath()} ${operator.value} true';
+    return '${field1.getFormPath()} ${operator.value} "$value"';
   }
 }
 
-class FalseExpression extends Conditional {
+class IntEquals extends Conditional {
   final Field field1;
+  final int value;
 
-  FalseExpression({required this.field1, required super.operator});
+  IntEquals(this.field1, this.value)
+      : super(operator: EQUALS(), conditions: []);
+
+    
+  @override
+  String toString() {
+    return '${field1.getFormPath()} ${operator.value} $value';
+  }
+}
+
+class BoolEquals extends Conditional {
+  final Field field1;
+  final bool value;
+
+  BoolEquals(this.field1, this.value)
+      : super(operator: EQUALS(), conditions: []);
 
   @override
   String toString() {
-    return '${field1.getFormPath()} ${operator.value} false';
+    return '${field1.getFormPath()} ${operator.value} $value';
   }
 }

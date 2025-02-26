@@ -33,13 +33,10 @@ abstract class Field extends FieldBase {
 
   String getFieldType();
 
-  ContainsExpression contains(String value) {
-    return ContainsExpression(field1: this, operator: Contains(), value: value);
-  }
-
   String length() {
     return '${getPath()}.length()';
   }
+
 }
 
 class IntField extends Field {
@@ -49,6 +46,10 @@ class IntField extends Field {
   String getFieldType() {
     return 'int';
   }
+
+  Conditional equals(int value) {
+    return IntEquals(this, value);
+  }
 }
 
 class StringField extends Field {
@@ -57,6 +58,14 @@ class StringField extends Field {
   @override
   String getFieldType() {
     return 'string';
+  }
+
+  Conditional equals(String value) {
+    return StringEquals(this, value);
+  }
+
+  Contains contains(String value) {
+    return Contains(this, value);
   }
 }
 
@@ -70,6 +79,10 @@ class BoolField extends Field {
   @override
   String getFieldType() {
     return 'bool';
+  }
+
+  Conditional equals(bool value) {
+    return BoolEquals(this, value);
   }
 }
 
