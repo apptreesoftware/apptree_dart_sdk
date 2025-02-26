@@ -48,7 +48,7 @@ features:
           text: 
             title: Common
             displayValue: "Name: Instance of 'StringField'"
-            visibleWhen: 'record().rarity.contains("Common")'
+            visibleWhen: 'record().rarity == name'
 
         Rare: 
           text: 

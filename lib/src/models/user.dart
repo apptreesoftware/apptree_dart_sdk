@@ -19,8 +19,9 @@ class User extends Record {
   final StringField status = StringField(scope: FieldScope.user);
   final StringField uid = StringField(scope: FieldScope.user);
   final StringField username = StringField(scope: FieldScope.user);
+  Record? data;
 
-  User() {
+  User({this.data}) {
     register();
   }
 }
