@@ -67,6 +67,16 @@ class StringField extends Field {
   Contains contains(String value) {
     return Contains(this, value);
   }
+
+  StringField toUpper() {
+    fullFieldPath = '$fullFieldPath.toUpper()';
+    return this;
+  }
+
+  StringField toLower() {
+    fullFieldPath = '$fullFieldPath.toLower()';
+    return this;
+  }
 }
 
 class BoolField extends Field {
