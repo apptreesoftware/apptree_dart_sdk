@@ -174,7 +174,7 @@ class Header extends FormField {
 
 class TextInput extends FormField {
   final String title;
-  final Field bindTo; // TODO: This should be a Field object
+  final Field bindTo;
   final bool required;
 
   TextInput({

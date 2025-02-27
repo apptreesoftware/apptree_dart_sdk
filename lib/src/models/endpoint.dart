@@ -1,5 +1,4 @@
 import 'package:apptree_dart_sdk/apptree.dart';
-import 'package:apptree_dart_sdk/src/components/callback.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
 abstract class SubmissionEndpoint<I extends Request, R extends Record> {
@@ -12,26 +11,18 @@ abstract class SubmissionEndpoint<I extends Request, R extends Record> {
 
 abstract class CollectionEndpoint<I extends Request, R extends Record> {
   final String id;
-  final I? request;
   final R record;
 
-  CollectionEndpoint({required this.id, this.request, required this.record}) {
-    request?.register();
-    record.register();
-  }
+  CollectionEndpoint({required this.id}) : record = instantiateRecord();
 
-  OnLoad onLoad() {
-    return OnLoad(
-      url: '{{environment.url}}/$id',
-      collection: id,
-      request: request,
-    );
+  Map<String, dynamic> buildRequest(I request) {
+    return {"url": '{{environment.url}}/$id', "data": request.toJson()};
   }
 
   Map<String, dynamic> getModelDict() {
     return {
       id: {
-        "RequestParams": request?.toModelDict(),
+        "RequestParams": describeRequest<I>(),
         "Model": record.toModelDict(),
       },
     };
@@ -40,4 +31,16 @@ abstract class CollectionEndpoint<I extends Request, R extends Record> {
   String getModelYaml() {
     return YAMLWriter().write(getModelDict());
   }
+}
+
+class CollectionEndpointRequest {
+  String url;
+  String collection;
+  Map<String, dynamic> requestData;
+
+  CollectionEndpointRequest({
+    required this.url,
+    required this.collection,
+    required this.requestData,
+  });
 }

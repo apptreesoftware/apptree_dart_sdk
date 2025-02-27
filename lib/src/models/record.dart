@@ -8,7 +8,6 @@ class FieldBase {
   String? fullFieldPath;
   String? relativeFieldPath;
   bool? primaryKey;
-  String? value;
 
   FieldBase({this.scope = FieldScope.record});
 
@@ -18,6 +17,10 @@ class FieldBase {
 
   String getScope() {
     return scope.name;
+  }
+
+  String get value {
+    return getPath();
   }
 
   String getPath() {

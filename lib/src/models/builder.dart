@@ -1,5 +1,3 @@
-import 'dart:mirrors';
-
 import 'package:apptree_dart_sdk/apptree.dart';
 
 typedef TemplateBuilder<I extends Record> =
@@ -11,6 +9,7 @@ typedef FormFieldsBuilder<I extends Record> =
     List<FormField> Function(BuildContext context, I record);
 
 typedef ToolbarBuilder = Toolbar Function(BuildContext context);
+typedef RequestBuilder<I> = I Function(BuildContext context);
 
 typedef FormToolbarBuilder<I extends Record> =
     Toolbar Function(BuildContext context, I record);
@@ -56,19 +55,4 @@ abstract class FormBuilder<I extends Request, R extends Record>
   FormBuilder({required super.id, required this.endpoint});
 
   Form build(R record);
-}
-
-I instantiateRecord<I extends Record>() {
-  // Verify this is an instance of Record
-  if (!reflectClass(I).isSubclassOf(reflectClass(Record))) {
-    throw ArgumentError('${I.toString()} is not a subclass of Record');
-  }
-  // Verify the record has a zero-argument constructor
-  if (reflectClass(I).declarations.entries.any((entry) => entry.key == 'new')) {
-    throw ArgumentError(
-      '${I.toString()} does not have a zero-argument constructor',
-    );
-  }
-  return (reflectClass(I).newInstance(Symbol(''), []).reflectee as I)
-    ..register();
 }

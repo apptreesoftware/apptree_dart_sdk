@@ -2,59 +2,56 @@ import 'package:apptree_dart_sdk/apptree.dart';
 import 'models.dart';
 
 class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
-  MyCardsEndpoint()
-    : super(id: 'MyCards', request: MyCardsRequest(), record: Card());
+  MyCardsEndpoint() : super(id: 'MyCards');
 }
 
 var cardsForm = Form<Card>(
   id: 'CardsUpdateForm',
-  toolbarBuilder: (BuildContext context, Card record) => Toolbar(items: []),
-  fieldsBuilder:
-      (BuildContext context, Card record) => [
-        Header(title: 'Card', id: 'Header'),
-        Text(
-          title: 'Id',
-          displayValue: "Hello ${record.cardId} - ${record.description}",
-          id: 'Id',
-        ),
-        TextInput(
-          title: 'Name',
-          bindTo: record.name,
-          required: true,
-          id: 'Name',
-        ),
-        TextInput(
-          layoutDirection: LayoutDirection.vertical,
-          layoutSize: FormFieldLayoutSize(xs: 12, sm: 6),
-          title: 'Owner',
-          bindTo: record.owner,
-          required: true,
-          id: 'Owner',
-        ),
-        TextInput(
-          id: 'Description',
-          title: 'Description',
-          bindTo: record.description,
-          required: true,
-        ),
-      ],
+  toolbarBuilder: (context, record) => Toolbar(items: []),
+  fieldsBuilder: (context, record) {
+    return [
+      Header(title: 'Card', id: 'Header'),
+      Text(
+        title: 'Id',
+        displayValue: "Hello ${record.cardId} - ${record.description}",
+        id: 'Id',
+      ),
+      TextInput(title: 'Name', bindTo: record.name, required: true, id: 'Name'),
+      TextInput(
+        layoutDirection: LayoutDirection.vertical,
+        layoutSize: FormFieldLayoutSize(xs: 12, sm: 6),
+        title: 'Owner',
+        bindTo: record.owner,
+        required: true,
+        id: 'Owner',
+      ),
+      TextInput(
+        id: 'Description',
+        title: 'Description',
+        bindTo: record.description,
+        required: true,
+      ),
+    ];
+  },
 );
 
 var cardRecordList = RecordList<MyCardsRequest, Card>(
   id: 'MyCardsRecordList',
   dataSource: MyCardsEndpoint(),
-  toolbarBuilder:
-      (BuildContext context) => Toolbar(
-        items: [
-          ToolbarItem(
-            title: 'Sort',
-            icon: Icon.sort,
-            actions: [ShowSortDialogAction(analytics: Analytics(tag: 'sort'))],
-          ),
-        ],
-      ),
-  templateBuilder:
-      (BuildContext context, Card record) => Template(
+
+  toolbar: (context) {
+    return Toolbar(
+      items: [
+        ToolbarItem(
+          title: 'Sort',
+          icon: Icon.sort,
+          actions: [ShowSortDialogAction(analytics: Analytics(tag: 'sort'))],
+        ),
+      ],
+    );
+  },
+  template:
+      (context, record) => Template(
         id: 'workbench',
         values: Values(
           values: {
@@ -63,7 +60,6 @@ var cardRecordList = RecordList<MyCardsRequest, Card>(
           },
         ),
       ),
-
   noResultsText: 'No results',
   showDivider: true,
   topAccessoryViews: [],
