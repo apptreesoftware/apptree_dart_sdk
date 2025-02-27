@@ -1,6 +1,7 @@
 MyCards: 
   RequestParams: 
     owner: 'string'
+    filter: 'string'
   Model: 
     Card: 
       cardId: 'string'
