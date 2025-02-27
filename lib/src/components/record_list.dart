@@ -32,6 +32,7 @@ class RecordList<I extends Request, R extends Record> extends Feature {
     var builtToolbar = toolbar?.build(context);
 
     var navigateTo = navigation?.build(context);
+
     var featureData = {
       id: {
         "recordList": {
@@ -57,6 +58,10 @@ class RecordList<I extends Request, R extends Record> extends Feature {
       featureData: featureData,
       childFeatures: navigateTo?.childFeatures ?? [],
     );
+  }
+
+  Template getTemplate(BuildContext context) {
+    return templateBuilder(context, dataSource.record);
   }
 }
 

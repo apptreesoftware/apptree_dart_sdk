@@ -4,6 +4,4 @@ merge:
   - 'MyCardsRecordList.yaml'
   - 'menu.yaml'
 templates: 
-  - 'templates/attack_workbench.fsx'
-  - 'templates/record_count.fsx'
   - 'templates/workbench.fsx'

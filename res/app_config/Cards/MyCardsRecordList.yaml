@@ -1,9 +1,10 @@
-features:
-  MyCardsRecordList:
-    recordList:
-      onLoad:
-        - url: '{{environment.url}}/MyCards'
-          data:
+features: 
+  MyCardsRecordList: 
+    recordList: 
+      onLoad: 
+        - 
+          url: '{{environment.url}}/MyCards'
+          data: 
             owner: '${user().username}'
             collection: MyCards
 
@@ -11,22 +12,29 @@ features:
       noResultsText: No results
       showDivider: true
       topAccessoryViews: []
-      template:
+      template: 
         id: workbench
-        values:
+        values: 
           title: '${record().cardId}'
           subtitle: '${record().name}'
-      onItemSelected:
-        - navigateTo:
+      onItemSelected: 
+        - 
+          navigateTo: 
             id: CardsUpdateForm
-            navigationContext:
+            navigationContext: 
               user: '${user().appVersion}'
 
-      toolbar:
-        items:
-          - title: Sort
+      toolbar: 
+        items: 
+          - 
+            title: Sort
             icon: sort
-            actions:
-              - sort:
-                  analytics:
+            actions: 
+              - 
+                sort: 
+                  analytics: 
                     tag: sort
+
+
+
+

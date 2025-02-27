@@ -4,6 +4,7 @@ import 'package:apptree_dart_sdk/apptree.dart';
 
 typedef TemplateBuilder<I extends Record> =
     Template Function(BuildContext context, I record);
+    
 typedef OnItemSelectedBuilder<I extends Record> =
     NavigateTo Function(BuildContext context, I record);
 
