@@ -2,15 +2,14 @@ import 'package:apptree_dart_sdk/apptree.dart';
 import 'models.dart';
 
 class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
-  MyCardsEndpoint()
-    : super(id: 'MyCards', request: MyCardsRequest(), record: Card());
+  MyCardsEndpoint() : super(id: 'MyCards');
 }
 
 var cardsForm = Form<Card>(
   id: 'CardsUpdateForm',
-  toolbarBuilder: (BuildContext context, Card record) => Toolbar(items: []),
+  toolbarBuilder: (context, record) => Toolbar(items: []),
   fieldsBuilder:
-      (BuildContext context, Card record) => [
+      (context, record) => [
         Header(title: 'Card', id: 'Header'),
         Text(
           title: 'Id',
@@ -40,23 +39,30 @@ var cardsForm = Form<Card>(
       ],
 );
 
-var cardRecordList = RecordList<MyCardsRequest, Card>(
+var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
   id: 'MyCardsRecordList',
   dataSource: MyCardsEndpoint(),
-  toolbarBuilder:
-      (BuildContext context) => Toolbar(
-        items: [
-          ToolbarItem(
-            title: 'Sort',
-            icon: Icon.sort,
-            actions: [ShowSortDialogAction(analytics: Analytics(tag: 'sort'))],
-          ),
-        ],
-      ),
-  templateBuilder:
-      (BuildContext context, Card record) => Workbench(
-        title: record.cardId,
-        subtitle: record.name,
+
+  toolbar: (context) {
+    return Toolbar(
+      items: [
+        ToolbarItem(
+          title: 'Sort',
+          icon: Icon.sort,
+          actions: [ShowSortDialogAction(analytics: Analytics(tag: 'sort'))],
+        ),
+      ],
+    );
+  },
+  template:
+      (context, record) => Template(
+        id: 'workbench',
+        values: Values(
+          values: {
+            'title': Value(value: record.cardId),
+            'subtitle': Value(value: record.name),
+          },
+        ),
       ),
   noResultsText: 'No results',
   showDivider: true,
