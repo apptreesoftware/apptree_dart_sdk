@@ -1,14 +1,16 @@
 import 'package:apptree_dart_sdk/models.dart';
 import 'package:apptree_dart_sdk/components.dart';
 
-class RecordList<I extends Request, R extends Record> extends Feature {
-  final CollectionEndpoint<I, R> dataSource;
+class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
+    extends Feature {
+  final CollectionEndpoint<INPUT, RECORD> dataSource;
   final String noResultsText;
   final bool showDivider;
   final List<TopAccessoryView> topAccessoryViews;
-  final TemplateBuilder<R> templateBuilder;
-  final OnItemSelectedBuilder<R>? onItemSelected;
-  final ToolbarBuilder? toolbarBuilder;
+  final TemplateBuilder<RECORD> template;
+  final OnItemSelectedBuilder<RECORD>? onItemSelected;
+  final ToolbarBuilder? toolbar;
+  final RequestBuilder<INPUT>? onLoadRequest;
 
   RecordList({
     required super.id,
@@ -16,9 +18,10 @@ class RecordList<I extends Request, R extends Record> extends Feature {
     required this.noResultsText,
     required this.showDivider,
     required this.topAccessoryViews,
-    required this.templateBuilder,
+    required this.template,
     required this.onItemSelected,
-    this.toolbarBuilder,
+    this.toolbar,
+    this.onLoadRequest,
   });
 
   @override
@@ -27,22 +30,21 @@ class RecordList<I extends Request, R extends Record> extends Feature {
         onItemSelected != null
             ? onItemSelected!(context, dataSource.record)
             : null;
-
-    var toolbar = toolbarBuilder?.call(context);
-    var builtToolbar = toolbar?.build(context);
-
+    var toolbarResult = toolbar?.call(context);
+    var builtToolbar = toolbarResult?.build(context);
+    var request = onLoadRequest?.call(context);
     var navigateTo = navigation?.build(context);
 
     var featureData = {
       id: {
         "recordList": {
-          "onLoad": dataSource.onLoad().toDict(),
+          if (request != null) "onLoad": [dataSource.buildRequest(request)],
           "dataSource": dataSource.id,
           "noResultsText": noResultsText,
           "showDivider": showDivider,
           "topAccessoryViews":
               topAccessoryViews.map((view) => view.toDict()).toList(),
-          "template": templateBuilder(context, dataSource.record).toDict(),
+          "template": template(context, dataSource.record).toDict(),
           "onItemSelected":
               navigateTo != null
                   ? [
@@ -56,7 +58,10 @@ class RecordList<I extends Request, R extends Record> extends Feature {
 
     return BuildResult(
       featureData: featureData,
-      childFeatures: navigateTo?.childFeatures ?? [],
+      childFeatures: [
+        if (navigateTo != null) ...navigateTo.childFeatures,
+        if (builtToolbar != null) ...builtToolbar.childFeatures,
+      ],
     );
   }
 
