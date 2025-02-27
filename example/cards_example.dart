@@ -51,14 +51,9 @@ var cardRecordList = RecordList<MyCardsRequest, Card>(
     );
   },
   template:
-      (context, record) => Template(
-        id: 'workbench',
-        values: Values(
-          values: {
-            'title': Value(value: record.cardId),
-            'subtitle': Value(value: record.name),
-          },
-        ),
+      (BuildContext context, Card record) => Workbench(
+        title: record.cardId,
+        subtitle: record.name,
       ),
   noResultsText: 'No results',
   showDivider: true,
