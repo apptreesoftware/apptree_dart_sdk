@@ -1,8 +1,7 @@
 import 'package:apptree_dart_sdk/models.dart';
 import 'package:apptree_dart_sdk/components.dart';
 
-class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
-    extends Feature {
+class RecordList<INPUT extends Request, RECORD extends Record> extends Feature {
   final CollectionEndpoint<INPUT, RECORD> dataSource;
   final String noResultsText;
   final bool showDivider;

@@ -8,38 +8,34 @@ class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
 var cardsForm = Form<Card>(
   id: 'CardsUpdateForm',
   toolbarBuilder: (context, record) => Toolbar(items: []),
-  fieldsBuilder:
-      (context, record) => [
-        Header(title: 'Card', id: 'Header'),
-        Text(
-          title: 'Id',
-          displayValue: "Hello ${record.cardId} - ${record.description}",
-          id: 'Id',
-        ),
-        TextInput(
-          title: 'Name',
-          bindTo: record.name,
-          required: true,
-          id: 'Name',
-        ),
-        TextInput(
-          layoutDirection: LayoutDirection.vertical,
-          layoutSize: FormFieldLayoutSize(xs: 12, sm: 6),
-          title: 'Owner',
-          bindTo: record.owner,
-          required: true,
-          id: 'Owner',
-        ),
-        TextInput(
-          id: 'Description',
-          title: 'Description',
-          bindTo: record.description,
-          required: true,
-        ),
-      ],
+  fieldsBuilder: (context, record) {
+    return [
+      Header(title: 'Card', id: 'Header'),
+      Text(
+        title: 'Id',
+        displayValue: "Hello ${record.cardId} - ${record.description}",
+        id: 'Id',
+      ),
+      TextInput(title: 'Name', bindTo: record.name, required: true, id: 'Name'),
+      TextInput(
+        layoutDirection: LayoutDirection.vertical,
+        layoutSize: FormFieldLayoutSize(xs: 12, sm: 6),
+        title: 'Owner',
+        bindTo: record.owner,
+        required: true,
+        id: 'Owner',
+      ),
+      TextInput(
+        id: 'Description',
+        title: 'Description',
+        bindTo: record.description,
+        required: true,
+      ),
+    ];
+  },
 );
 
-var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
+var cardRecordList = RecordList<MyCardsRequest, Card>(
   id: 'MyCardsRecordList',
   dataSource: MyCardsEndpoint(),
 
