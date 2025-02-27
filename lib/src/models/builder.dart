@@ -1,6 +1,6 @@
 import 'dart:mirrors';
 
-import 'package:apptree_dart_sdk/base.dart';
+import 'package:apptree_dart_sdk/apptree.dart';
 
 typedef TemplateBuilder<I extends Record> =
     Template Function(BuildContext context, I record);
@@ -11,6 +11,7 @@ typedef FormFieldsBuilder<I extends Record> =
     List<FormField> Function(BuildContext context, I record);
 
 typedef ToolbarBuilder = Toolbar Function(BuildContext context);
+
 typedef FormToolbarBuilder<I extends Record> =
     Toolbar Function(BuildContext context, I record);
 

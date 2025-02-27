@@ -5,3 +5,7 @@ export 'src/components/generic.dart';
 export 'src/components/record_list.dart';
 export 'src/components/template.dart';
 export 'src/components/view.dart';
+export 'src/components/toolbar.dart';
+export 'src/components/icons.dart';
+export 'src/components/app.dart';
+export 'src/components/menu.dart';

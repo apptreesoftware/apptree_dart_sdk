@@ -1,35 +1,14 @@
-import 'package:apptree_dart_sdk/base.dart';
-import 'package:apptree_dart_sdk/src/components/app.dart';
-import 'package:apptree_dart_sdk/src/components/menu.dart';
-
-class Card extends Record {
-  final StringField cardId = StringField();
-  final StringField name = StringField();
-  final StringField owner = StringField();
-  final StringField description = StringField();
-  final StringField rarity = StringField();
-  final StringField type = StringField();
-  final Attack attacks = Attack();
-}
-
-class MyCardsRequest extends Request {
-  final StringField owner = User().username;
-}
+import 'package:apptree_dart_sdk/apptree.dart';
+import 'models.dart';
 
 class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
   MyCardsEndpoint()
     : super(id: 'MyCards', request: MyCardsRequest(), record: Card());
 }
 
-class Attack extends Record {
-  final StringField attackId = StringField();
-  final StringField name = StringField();
-  final IntField damage = IntField();
-}
-
 var cardsForm = Form<Card>(
   id: 'CardsUpdateForm',
-  toolbarBuilder: (BuildContext context) => Toolbar(items: []),
+  toolbarBuilder: (BuildContext context, Card record) => Toolbar(items: []),
   fieldsBuilder:
       (BuildContext context, Card record) => [
         Header(title: 'Card', id: 'Header'),
@@ -64,6 +43,16 @@ var cardsForm = Form<Card>(
 var cardRecordList = RecordList<MyCardsRequest, Card>(
   id: 'MyCardsRecordList',
   dataSource: MyCardsEndpoint(),
+  toolbarBuilder:
+      (BuildContext context) => Toolbar(
+        items: [
+          ToolbarItem(
+            title: 'Sort',
+            icon: Icon.sort,
+            actions: [ShowSortDialogAction(analytics: Analytics(tag: 'sort'))],
+          ),
+        ],
+      ),
   templateBuilder:
       (BuildContext context, Card record) => Template(
         id: 'workbench',

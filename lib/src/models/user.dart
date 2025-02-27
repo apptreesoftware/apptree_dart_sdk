@@ -1,6 +1,6 @@
 // User model populated with static fields
 
-import 'package:apptree_dart_sdk/base.dart';
+import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:apptree_dart_sdk/src/constants.dart';
 
 class User extends Record {

@@ -1,10 +1,11 @@
-import "package:apptree_dart_sdk/base.dart";
+import "package:apptree_dart_sdk/apptree.dart";
 import "package:apptree_dart_sdk/src/models/expression.dart";
 
 class Form<I extends Record> extends Feature {
-  final ToolbarBuilder toolbarBuilder;
+  final FormToolbarBuilder<I>? toolbarBuilder;
   final FormFieldsBuilder<I> fieldsBuilder;
   late I record;
+
   Form({
     required super.id,
     required this.toolbarBuilder,
@@ -22,40 +23,20 @@ class Form<I extends Record> extends Feature {
     }
 
     var layouts = fields.map((field) => field.layoutInfo).toList();
+    var toolbar = toolbarBuilder?.call(context, record).build(context);
     var featureData = {
       id: {
         "form": {
-          "toolbar": toolbarBuilder(context).toDict(),
           "fields": fieldMap,
           "layout": layouts,
+          if (toolbar != null) "toolbar": toolbar.featureData,
         },
       },
     };
-    return BuildResult(featureData: featureData, childFeatures: []);
-  }
-}
-
-class Toolbar {
-  final List<ToolbarItem> items;
-
-  Toolbar({required this.items});
-
-  Map<String, dynamic> toDict() {
-    return {"items": items.map((item) => item.toDict()).toList()};
-  }
-}
-
-class ToolbarItem {
-  final String title;
-  final List<ToolbarAction> actions;
-
-  ToolbarItem({required this.title, required this.actions});
-
-  Map<String, dynamic> toDict() {
-    return {
-      "title": title,
-      "actions": actions.map((action) => action.toDict()).toList(),
-    };
+    return BuildResult(
+      featureData: featureData,
+      childFeatures: toolbar?.childFeatures ?? [],
+    );
   }
 }
 
