@@ -1,6 +1,5 @@
 import 'package:apptree_dart_sdk/models.dart';
-import 'package:apptree_dart_sdk/src/components/feature.dart';
-import 'package:apptree_dart_sdk/src/components/view.dart';
+import 'package:apptree_dart_sdk/components.dart';
 
 class RecordList<I extends Request, R extends Record> extends Feature {
   final CollectionEndpoint<I, R> dataSource;
@@ -9,6 +8,7 @@ class RecordList<I extends Request, R extends Record> extends Feature {
   final List<TopAccessoryView> topAccessoryViews;
   final TemplateBuilder<R> templateBuilder;
   final OnItemSelectedBuilder<R>? onItemSelected;
+  final ToolbarBuilder? toolbarBuilder;
 
   RecordList({
     required super.id,
@@ -18,6 +18,7 @@ class RecordList<I extends Request, R extends Record> extends Feature {
     required this.topAccessoryViews,
     required this.templateBuilder,
     required this.onItemSelected,
+    this.toolbarBuilder,
   });
 
   @override
@@ -26,6 +27,11 @@ class RecordList<I extends Request, R extends Record> extends Feature {
         onItemSelected != null
             ? onItemSelected!(context, dataSource.record)
             : null;
+
+    var toolbar = toolbarBuilder?.call(context);
+    var builtToolbar = toolbar?.build(context);
+
+    var navigateTo = navigation?.build(context);
     var featureData = {
       id: {
         "recordList": {
@@ -37,18 +43,19 @@ class RecordList<I extends Request, R extends Record> extends Feature {
               topAccessoryViews.map((view) => view.toDict()).toList(),
           "template": templateBuilder(context, dataSource.record).toDict(),
           "onItemSelected":
-              navigation != null
+              navigateTo != null
                   ? [
-                    {'navigateTo': navigation.toDict()},
+                    {'navigateTo': navigateTo.featureData},
                   ]
                   : null,
+          if (builtToolbar != null) "toolbar": builtToolbar.featureData,
         },
       },
     };
 
     return BuildResult(
       featureData: featureData,
-      childFeatures: [if (navigation != null) navigation.feature],
+      childFeatures: navigateTo?.childFeatures ?? [],
     );
   }
 }

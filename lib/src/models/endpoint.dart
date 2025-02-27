@@ -1,4 +1,4 @@
-import 'package:apptree_dart_sdk/base.dart';
+import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:apptree_dart_sdk/src/components/callback.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
