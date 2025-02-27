@@ -66,7 +66,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
   }
 
   Template getTemplate(BuildContext context) {
-    return templateBuilder(context, dataSource.record);
+    return template(context, dataSource.record);
   }
 }
 
