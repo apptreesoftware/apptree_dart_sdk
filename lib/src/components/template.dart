@@ -1,5 +1,4 @@
 import 'package:apptree_dart_sdk/apptree.dart';
-import 'package:apptree_dart_sdk/apptree.dart';
 
 abstract class Template {
   final String id;
@@ -42,38 +41,6 @@ class Workbench extends Template {
             <Text textAlign="start" overflow="ellipsis" style:fontColor="ff448aff" style:fontSize="18.0"
                   value:binding="title" value="This is the title"/>
         </Row>
-        // Subtitle
-        <Text textAlign="start" value:binding="subtitle" value="This is the subtitle"/>
-      </Column>
-    </Padding>
-  </Card>
-</template>
-  ''';
-}
-
-class ListTile extends Template {
-  final StringField title;
-  final StringField subtitle;
-
-  ListTile({required this.title, required this.subtitle}) : super(id: "list_tile");
-
-  @override
-  Map<String, dynamic> toDict() => {
-        'id': id,
-        'values': {
-          'title': title,
-          'subtitle': subtitle,
-        },
-      };
-
-  @override
-  String toFsx() => '''
-<template id="$id">
-  <Card elevation="1" color="#ffffff">
-    <Padding padding="8.0,8.0,8.0,8.0">
-      <Column mainAxisSize="min">
-        // Title
-        <Text textAlign="start" overflow="ellipsis" style:fontColor="ff448aff" style:fontSize="18.0" value:binding="title" value="This is the title"/>
         // Subtitle
         <Text textAlign="start" value:binding="subtitle" value="This is the subtitle"/>
       </Column>
