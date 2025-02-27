@@ -1,6 +1,13 @@
 features: 
   MyCardsRecordList: 
     recordList: 
+      onLoad: 
+        - 
+          url: '{{environment.url}}/MyCards'
+          data: 
+            owner: '${user().username}'
+            collection: MyCards
+
       dataSource: MyCards
       noResultsText: No results
       showDivider: true

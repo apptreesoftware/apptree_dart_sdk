@@ -63,6 +63,10 @@ class RecordList<INPUT extends Request, RECORD extends Record> extends Feature {
       ],
     );
   }
+
+  Template getTemplate(BuildContext context) {
+    return templateBuilder(context, dataSource.record);
+  }
 }
 
 // class FormRecordList extends Feature {
