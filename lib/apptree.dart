@@ -5,6 +5,7 @@ library;
 
 export 'models.dart';
 export 'components.dart';
+export 'generators.dart';
 export 'src/util/mirror_utils.dart';
 
 // TODO: Export any libraries intended for clients of this package.

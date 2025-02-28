@@ -1,0 +1,1 @@
+export 'src/generators/model_generator.dart';

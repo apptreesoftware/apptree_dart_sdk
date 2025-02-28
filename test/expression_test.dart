@@ -4,14 +4,14 @@ import 'package:apptree_dart_sdk/src/models/expression.dart';
 import 'package:apptree_dart_sdk/src/models/record.dart';
 
 class Card extends Record {
-  final StringField name = StringField();
+  final StringField fieldName = StringField();
   final StringField rarity = StringField();
   final StringField type = StringField();
   final Attack attacks = Attack();
 }
 
 class Attack extends Record {
-  final StringField name = StringField();
+  final StringField fieldName = StringField();
   final IntField damage = IntField();
 }
 
@@ -20,7 +20,7 @@ class Test extends Record {
 }
 
 class User extends Record {
-  final StringField name = StringField(scope: FieldScope.user);
+  final StringField fieldName = StringField(scope: FieldScope.user);
 }
 
 void main() {
@@ -30,21 +30,29 @@ void main() {
     var user = User()..register();
 
     test('StringField contains expression test', () {
-      var expr = cardModel.name.contains('test');
+      var expr = cardModel.fieldName.contains('test');
 
       expect(expr.toString(), equals('record().name.contains("test")'));
     });
 
     test('Expression equals test', () {
-      var expr = record.assetName.equals('assetName').and(Or(
+      var expr = record.assetName
+          .equals('assetName')
+          .and(
+            Or(
               record.assetName.contains('assetName2'),
-              record.assetName.equals('assetName3'))
-          .and(user.name.equals('user1').or(user.name.equals('user2'))));
+              record.assetName.equals('assetName3'),
+            ).and(
+              user.fieldName.equals('user1').or(user.fieldName.equals('user2')),
+            ),
+          );
 
       expect(
-          expr.toString(),
-          equals(
-              'record().assetName == "assetName" && (record().assetName.contains("assetName2") || record().assetName == "assetName3") && user().name == "user1" || user().name == "user2"'));
+        expr.toString(),
+        equals(
+          'record().assetName == "assetName" && (record().assetName.contains("assetName2") || record().assetName == "assetName3") && user().name == "user1" || user().name == "user2"',
+        ),
+      );
     });
   });
 }

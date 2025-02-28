@@ -21,6 +21,12 @@
       "request": "launch",
       "type": "dart",
       "program": "example_connector/bin/server.dart"
+    },
+    {
+      "name": "Generators",
+      "request": "launch",
+      "type": "dart",
+      "program": "example/generators.dart"
     }
   ]
 }

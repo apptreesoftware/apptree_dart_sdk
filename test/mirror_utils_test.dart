@@ -3,12 +3,12 @@ import 'package:apptree_dart_sdk/apptree.dart';
 
 // Test classes
 class SimpleRecord extends Record {
-  final StringField name = StringField();
+  final StringField fieldName = StringField();
   final IntField age = IntField();
 }
 
 class ComplexRecord extends Record {
-  final StringField name = StringField();
+  final StringField fieldName = StringField();
   final SimpleRecord nested = SimpleRecord();
   final List<SimpleRecord> records = [];
 }
@@ -39,21 +39,21 @@ void main() {
     test('should instantiate a simple record', () {
       final record = instantiateRecord<SimpleRecord>();
       expect(record, isA<SimpleRecord>());
-      expect(record.name, isA<StringField>());
+      expect(record.fieldName, isA<StringField>());
       expect(record.age, isA<IntField>());
     });
 
     test('should instantiate a complex record with nested records', () {
       final record = instantiateRecord<ComplexRecord>();
       expect(record, isA<ComplexRecord>());
-      expect(record.name, isA<StringField>());
+      expect(record.fieldName, isA<StringField>());
       expect(record.nested, isA<SimpleRecord>());
       expect(record.records, isA<List<SimpleRecord>>());
     });
 
     test('should register fields after instantiation', () {
       final record = instantiateRecord<SimpleRecord>();
-      expect(record.name.parent, equals(record));
+      expect(record.fieldName.parent, equals(record));
       expect(record.age.parent, equals(record));
     });
   });
