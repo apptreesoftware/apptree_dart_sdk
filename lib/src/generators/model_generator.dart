@@ -56,7 +56,7 @@ class ModelGenerator {
   }
 
   String generateImports() {
-    return 'import \'package:server/server.dart\';\n';
+    return 'import \'package:server/server.dart\';\n\n';
   }
 
   String generateSignature(String recordName, Map<String, dynamic> recordMap) {

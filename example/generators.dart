@@ -3,5 +3,7 @@ import 'models.dart';
 
 void main() {
   final card = Card();
-  final modelGenerator = ModelGenerator(record: card);
+  final cardRequest = MyCardsRequest(owner: 'John Doe', filter: 'My Cards');
+  // final modelGenerator = ModelGenerator(record: card);
+  final requestGenerator = RequestGenerator(request: cardRequest);
 }

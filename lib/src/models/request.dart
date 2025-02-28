@@ -1,8 +1,10 @@
 import 'dart:mirrors';
 
+import 'package:apptree_dart_sdk/src/models/record.dart';
 import 'package:apptree_dart_sdk/src/util/object_extensions.dart';
 
 abstract class Request {
+
   void register() {}
 
   Map<String, dynamic> toJson() {
@@ -16,19 +18,19 @@ abstract class Request {
       if (declaration is VariableMirror && !declaration.isStatic) {
         final fieldInstance = instanceMirror.getField(symbol).reflectee;
         // if fieldInstance is String, add "string" to dataDict for the field name
-        if (fieldInstance is String) {
-          dataDict[MirrorSystem.getName(symbol)] = 'string';
+        if (fieldInstance.runtimeType == String) {
+          dataDict[MirrorSystem.getName(symbol)] = 'String';
         }
-        if (fieldInstance is int) {
+        else if (fieldInstance.runtimeType == int) {
           dataDict[MirrorSystem.getName(symbol)] = 'int';
         }
-        if (fieldInstance is bool) {
+        else if (fieldInstance.runtimeType == bool) {
           dataDict[MirrorSystem.getName(symbol)] = 'bool';
         }
-        if (fieldInstance is double) {
+        else if (fieldInstance.runtimeType == double) {
           dataDict[MirrorSystem.getName(symbol)] = 'double';
         }
-        if (fieldInstance is DateTime) {
+        else if (fieldInstance.runtimeType == DateTime) {
           dataDict[MirrorSystem.getName(symbol)] = 'datetime';
         } else {
           throw Exception(
