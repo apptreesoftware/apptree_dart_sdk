@@ -95,3 +95,7 @@ Map<String, dynamic> describeRequest<I extends Request>() {
 
   return dataDict;
 }
+
+String getRequestName<I extends Request>() {
+  return MirrorSystem.getName(reflectClass(I).simpleName);
+}
