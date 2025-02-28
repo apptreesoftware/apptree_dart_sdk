@@ -1,7 +1,0 @@
-name: 'Cards'
-configVersion: 2
-merge: 
-  - 'MyCardsRecordList.yaml'
-  - 'menu.yaml'
-templates: 
-  - 'templates/workbench.fsx'
