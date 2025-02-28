@@ -7,13 +7,21 @@ class App {
   final int configVersion;
   List<Feature> features = [];
   Map<String, MenuItem> menuItems = {};
-  List<String> layouts = [];
+  List<Template> templates = [];
   App({required this.name, required this.configVersion});
 
   void addFeature(Feature feature, {required MenuItem menuItem}) {
     features.add(feature);
     menuItem.setId(feature.id);
     menuItems[menuItem.title] = menuItem;
+  }
+
+  void addTemplate(Template template) {
+    // If Template is already in templates, skip
+    if (templates.any((t) => t.id == template.id)) {
+      return;
+    }
+    templates.add(template);
   }
 
   Map<String, dynamic> toDict() {
@@ -24,7 +32,7 @@ class App {
       "name": name,
       "configVersion": configVersion,
       "merge": featureIds,
-      "templates": layouts,
+      "templates": templates.map((t) => "templates/${t.id}.fsx").toList(),
     };
   }
 
@@ -51,7 +59,12 @@ class App {
           feature.dataSource.id,
           feature.dataSource.getModelYaml(),
         );
+        templates.add(feature.getTemplate(buildContext));
       }
+    }
+
+    for (var template in templates) {
+      writeTemplate(name, template.id, template.toFsx());
     }
 
     writeConfigYaml(name, YAMLWriter().write(configDict));
@@ -63,8 +76,6 @@ class App {
     for (var feature in features) {
       writeFeature(feature, buildContext: buildContext);
     }
-
-    layouts = copyTemplates(name);
 
     toYaml();
   }

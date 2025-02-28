@@ -8,10 +8,22 @@ class FileUtil {
     }
     File(filename).writeAsString(yaml);
   }
+
+  static void writeFsx(String dir, String fileName, String fsx) {
+    var directory = Directory(dir);
+    if (!directory.existsSync()) {
+      directory.createSync(recursive: true);
+    }
+    File(fileName).writeAsString(fsx);
+  }
 }
 
 void writeYaml(String dir, String fileName, String yaml, {String? extension = '.yaml'}) {
   FileUtil.writeYaml('res/app_config/$dir', "res/app_config/$dir/$fileName$extension", yaml);
+}
+
+void writeTemplate(String dir, String fileName, String fsx) {
+  FileUtil.writeFsx('res/app_config/$dir/templates', "res/app_config/$dir/templates/$fileName.fsx", fsx);
 }
 
 void writeModelYaml(String dir, String fileName, String yaml) {
@@ -20,32 +32,4 @@ void writeModelYaml(String dir, String fileName, String yaml) {
 
 void writeConfigYaml(String dir, String yaml) {
   FileUtil.writeYaml('res/connector/config/$dir', "res/connector/config/$dir/config.yaml", yaml);
-}
-
-List<String> copyDirectory(Directory source, Directory destination) {
-  if (!destination.existsSync()) {
-    destination.createSync(recursive: true);
-  }
-
-  for (FileSystemEntity entity in source.listSync(recursive: false)) {
-    String newPath = '${destination.path}/${entity.uri.pathSegments.last}';
-
-    if (entity is File) {
-      entity.copySync(newPath);
-    } else if (entity is Directory) {
-      copyDirectory(entity, Directory(newPath));
-    }
-  }
-
-  // Returns a list of the filenames prefixed with templates/
-  return destination.listSync().map((e) => 'templates/${e.uri.pathSegments.last}').toList();
-}
-
-List<String> copyTemplates(String dir) {
-  Directory source = Directory('res/includes/templates');
-  Directory destination = Directory('res/app_config/$dir/templates');
-  if (!destination.existsSync()) {
-    destination.createSync(recursive: true);
-  }
-  return copyDirectory(source, destination);
 }

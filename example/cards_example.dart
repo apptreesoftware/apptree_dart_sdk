@@ -8,34 +8,38 @@ class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
 var cardsForm = Form<Card>(
   id: 'CardsUpdateForm',
   toolbarBuilder: (context, record) => Toolbar(items: []),
-  fieldsBuilder: (context, record) {
-    return [
-      Header(title: 'Card', id: 'Header'),
-      Text(
-        title: 'Id',
-        displayValue: "Hello ${record.cardId} - ${record.description}",
-        id: 'Id',
-      ),
-      TextInput(title: 'Name', bindTo: record.name, required: true, id: 'Name'),
-      TextInput(
-        layoutDirection: LayoutDirection.vertical,
-        layoutSize: FormFieldLayoutSize(xs: 12, sm: 6),
-        title: 'Owner',
-        bindTo: record.owner,
-        required: true,
-        id: 'Owner',
-      ),
-      TextInput(
-        id: 'Description',
-        title: 'Description',
-        bindTo: record.description,
-        required: true,
-      ),
-    ];
-  },
+  fieldsBuilder:
+      (context, record) => [
+        Header(title: 'Card', id: 'Header'),
+        Text(
+          title: 'Id',
+          displayValue: "Hello ${record.cardId} - ${record.description}",
+          id: 'Id',
+        ),
+        TextInput(
+          title: 'Name',
+          bindTo: record.name,
+          required: true,
+          id: 'Name',
+        ),
+        TextInput(
+          layoutDirection: LayoutDirection.vertical,
+          layoutSize: FormFieldLayoutSize(xs: 12, sm: 6),
+          title: 'Owner',
+          bindTo: record.owner,
+          required: true,
+          id: 'Owner',
+        ),
+        TextInput(
+          id: 'Description',
+          title: 'Description',
+          bindTo: record.description,
+          required: true,
+        ),
+      ],
 );
 
-var cardRecordList = RecordList<MyCardsRequest, Card>(
+var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
   id: 'MyCardsRecordList',
   dataSource: MyCardsEndpoint(),
 
@@ -51,14 +55,9 @@ var cardRecordList = RecordList<MyCardsRequest, Card>(
     );
   },
   template:
-      (context, record) => Template(
-        id: 'workbench',
-        values: Values(
-          values: {
-            'title': Value(value: record.cardId),
-            'subtitle': Value(value: record.name),
-          },
-        ),
+      (BuildContext context, Card record) => Workbench(
+        title: record.cardId,
+        subtitle: record.name,
       ),
   noResultsText: 'No results',
   showDivider: true,
@@ -230,3 +229,4 @@ void main() {
   );
   app.initialize();
 }
+
