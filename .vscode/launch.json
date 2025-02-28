@@ -1,20 +1,26 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Cards Example",
-            "request": "launch",
-            "type": "dart",
-            "program": "example/cards_example.dart"
-        },
-        {
-            "name": "Expression Test",
-            "request": "launch",
-            "type": "dart",
-            "program": "test/expression_test.dart"
-        }
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cards Example",
+      "request": "launch",
+      "type": "dart",
+      "program": "example/cards_example.dart"
+    },
+    {
+      "name": "Expression Test",
+      "request": "launch",
+      "type": "dart",
+      "program": "test/expression_test.dart"
+    },
+    {
+      "name": "Example Connector",
+      "request": "launch",
+      "type": "dart",
+      "program": "example_connector/bin/server.dart"
+    }
+  ]
 }

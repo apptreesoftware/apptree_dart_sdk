@@ -55,10 +55,8 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
     );
   },
   template:
-      (BuildContext context, Card record) => Workbench(
-        title: record.cardId,
-        subtitle: record.name,
-      ),
+      (BuildContext context, Card record) =>
+          Workbench(title: record.cardId, subtitle: record.name),
   noResultsText: 'No results',
   showDivider: true,
   topAccessoryViews: [],
@@ -229,4 +227,3 @@ void main() {
   );
   app.initialize();
 }
-
