@@ -29,3 +29,7 @@ void writeConfigYaml(String dir, String yaml) {
 void writeModelDart(String fileName, String dart) {
   FileUtil.writeFile('res/generated/models', "res/generated/models/$fileName.dart", dart);
 }
+
+void writeDatasourceDart(String fileName, String dart) {
+  FileUtil.writeFile('res/generated/datasources', "res/generated/datasources/$fileName.dart", dart);
+}
