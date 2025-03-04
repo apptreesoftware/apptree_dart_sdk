@@ -30,6 +30,14 @@ void writeModelDart(String fileName, String dart) {
   FileUtil.writeFile('res/generated/models', "res/generated/models/$fileName.dart", dart);
 }
 
+String readModelDart(String fileName) {
+  return File('res/generated/models/$fileName.dart').readAsStringSync();
+}
+
 void writeDatasourceDart(String fileName, String dart) {
   FileUtil.writeFile('res/generated/datasources', "res/generated/datasources/$fileName.dart", dart);
+}
+
+void writeSampleDart(String fileName, String dart) {
+  FileUtil.writeFile('res/generated/samples', "res/generated/samples/$fileName.dart", dart);
 }

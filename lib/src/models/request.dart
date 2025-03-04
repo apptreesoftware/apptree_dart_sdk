@@ -1,6 +1,5 @@
 import 'dart:mirrors';
 
-import 'package:apptree_dart_sdk/src/models/record.dart';
 import 'package:apptree_dart_sdk/src/util/object_extensions.dart';
 
 abstract class Request {

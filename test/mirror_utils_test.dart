@@ -3,11 +3,13 @@ import 'package:apptree_dart_sdk/apptree.dart';
 
 // Test classes
 class SimpleRecord extends Record {
+  @override
   final StringField fieldName = StringField();
   final IntField age = IntField();
 }
 
 class ComplexRecord extends Record {
+  @override
   final StringField fieldName = StringField();
   final SimpleRecord nested = SimpleRecord();
   final List<SimpleRecord> records = [];

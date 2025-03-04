@@ -61,7 +61,7 @@ class ModelGenerator {
 
   String generateSignature(String recordName, Map<String, dynamic> recordMap) {
     String result = '';
-    result += 'class ${recordName} {\n';
+    result += 'class $recordName {\n';
     for (final entry in recordMap.entries) {
       result += '  final ${entry.value["type"]} ${entry.key};\n';
     }
@@ -72,24 +72,24 @@ class ModelGenerator {
   String generateInit(String recordName, Map<String, dynamic> recordMap) {
     String result = '';
     result +=
-        '  ${recordName}(\{${recordMap.entries.map((e) => 'required this.${e.key}').join(', ')}\});\n';
+        '  $recordName({${recordMap.entries.map((e) => 'required this.${e.key}').join(', ')}});\n';
     result += '\n';
     return result;
   }
 
   String generateFromJson(String recordName, Map<String, dynamic> recordMap) {
     String result = '';
-    result += '  factory ${recordName}.fromJson(Map<String, dynamic> json) {\n';
+    result += '  factory $recordName.fromJson(Map<String, dynamic> json) {\n';
     result += '    final invalidProperties = <String, String>{};\n';
     for (final entry in recordMap.entries) {
       result +=
           '    final ${entry.key} = JsonUtils.validateField<${entry.value["validationType"]}>(fieldName: \'${entry.key}\', value: json[\'${entry.key}\'], invalidProperties: invalidProperties);\n\n';
     }
     result +=
-        '    JsonUtils.validateAndThrowIfInvalid(modelType: ${recordName}, invalidProperties: invalidProperties);\n\n';
+        '    JsonUtils.validateAndThrowIfInvalid(modelType: $recordName, invalidProperties: invalidProperties);\n\n';
     // Build the constructor, if a field has a validaitonType of Map<String, dynamic> then it is a Record and we need to call the fromJson method
     result +=
-        '    return ${recordName}(${recordMap.entries.map((e) => '${e.key}: ${e.value["validationType"] == "Map<String, dynamic>" ? "${e.value["type"]}.fromJson(${e.key}!)" : '${e.key}!'}').join(', ')});\n';
+        '    return $recordName(${recordMap.entries.map((e) => '${e.key}: ${e.value["validationType"] == "Map<String, dynamic>" ? "${e.value["type"]}.fromJson(${e.key}!)" : '${e.key}!'}').join(', ')});\n';
     result += '  }\n';
     return result;
   }

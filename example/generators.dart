@@ -5,6 +5,6 @@ import 'models.dart';
 void main() {
   final card = Card();
   final cardRequest = MyCardsRequest(owner: 'John Doe', filter: 'My Cards');
-  // final modelGenerator = ModelGenerator(record: card);
+  final modelGenerator = ModelGenerator(record: card);
   final requestGenerator = DatasourceGenerator(datasourceName: "MyCards", record: card, request: cardRequest);
 }

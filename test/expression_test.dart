@@ -4,6 +4,7 @@ import 'package:apptree_dart_sdk/src/models/expression.dart';
 import 'package:apptree_dart_sdk/src/models/record.dart';
 
 class Card extends Record {
+  @override
   final StringField fieldName = StringField();
   final StringField rarity = StringField();
   final StringField type = StringField();
@@ -11,6 +12,7 @@ class Card extends Record {
 }
 
 class Attack extends Record {
+  @override
   final StringField fieldName = StringField();
   final IntField damage = IntField();
 }
@@ -20,6 +22,7 @@ class Test extends Record {
 }
 
 class User extends Record {
+  @override
   final StringField fieldName = StringField(scope: FieldScope.user);
 }
 

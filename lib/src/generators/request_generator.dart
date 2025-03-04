@@ -1,5 +1,4 @@
 import 'package:apptree_dart_sdk/apptree.dart';
-import 'dart:mirrors';
 
 import 'package:apptree_dart_sdk/src/util/file.dart';
 
