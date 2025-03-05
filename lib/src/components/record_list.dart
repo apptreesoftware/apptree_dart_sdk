@@ -7,6 +7,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
   final String noResultsText;
   final bool showDivider;
   final List<TopAccessoryView> topAccessoryViews;
+
   final TemplateBuilder<RECORD> template;
   final OnItemSelectedBuilder<RECORD>? onItemSelected;
   final ToolbarBuilder? toolbar;
@@ -35,6 +36,8 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
     var request = onLoadRequest?.call(context);
     var navigateTo = navigation?.build(context);
 
+    var templateData = template(context, dataSource.record).toDict();
+
     var featureData = {
       id: {
         "recordList": {
@@ -44,7 +47,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
           "showDivider": showDivider,
           "topAccessoryViews":
               topAccessoryViews.map((view) => view.toDict()).toList(),
-          "template": template(context, dataSource.record).toDict(),
+          "template": templateData,
           "onItemSelected":
               navigateTo != null
                   ? [

@@ -1,5 +1,4 @@
 import 'package:apptree_dart_sdk/apptree.dart';
-import 'package:apptree_dart_sdk/src/models/expression.dart';
 
 class Toolbar {
   final List<ToolbarItem> items;

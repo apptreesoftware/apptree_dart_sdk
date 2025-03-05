@@ -1,13 +1,27 @@
 import 'package:apptree_dart_sdk/apptree.dart';
 
+class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
+  const MyCardsEndpoint() : super(id: 'MyCards');
+}
+
+class OwnersListEndpoint extends ListEndpoint<EmptyRequest, Owner> {
+  const OwnersListEndpoint() : super(id: 'Owners');
+}
+
 class Card extends Record {
   final StringField cardId = StringField();
   final StringField name = StringField();
-  final StringField owner = StringField();
+  @ListField(endpoint: OwnersListEndpoint(), key: 'ownerId')
+  final Owner owner = Owner();
   final StringField description = StringField();
   final StringField rarity = StringField();
   final StringField type = StringField();
   final Attack attacks = Attack();
+}
+
+class Owner extends Record {
+  final StringField ownerId = StringField();
+  final StringField name = StringField();
 }
 
 class Attack extends Record {
@@ -40,3 +54,5 @@ class CardsOptions {
 
   CardsOptions({this.showAll = true, this.showRare = false});
 }
+
+class EmptyRequest extends Request {}

@@ -1,5 +1,3 @@
-import 'package:apptree_dart_sdk/apptree.dart';
-
 abstract class Template {
   final String id;
   bool isFormTemplate = false;
@@ -16,19 +14,17 @@ abstract class Template {
 }
 
 class Workbench extends Template {
-  final StringField title;
-  final StringField subtitle;
+  final String title;
+  final String subtitle;
 
-  Workbench({required this.title, required this.subtitle}) : super(id: "workbench");
+  Workbench({required this.title, required this.subtitle})
+    : super(id: "workbench");
 
   @override
   Map<String, dynamic> toDict() => {
-        'id': id,
-        'values': {
-          'title': title,
-          'subtitle': subtitle,
-        },
-      };
+    'id': id,
+    'values': {'title': title, 'subtitle': subtitle},
+  };
 
   @override
   String toFsx() => '''

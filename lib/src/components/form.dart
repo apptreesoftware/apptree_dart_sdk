@@ -1,5 +1,5 @@
 import "package:apptree_dart_sdk/apptree.dart";
-import "package:apptree_dart_sdk/src/models/expression.dart";
+import "package:apptree_dart_sdk/src/models/errors.dart";
 
 class Form<I extends Record> extends Feature {
   final FormToolbarBuilder<I>? toolbarBuilder;
@@ -18,8 +18,11 @@ class Form<I extends Record> extends Feature {
   BuildResult build(BuildContext context) {
     var fields = fieldsBuilder(context, record);
     var fieldMap = <String, Map<String, dynamic>>{};
+    var buildErrors = <BuildError>[];
     for (var field in fields) {
-      fieldMap[field.id] = field.build(context);
+      var buildResult = field.build(context);
+      fieldMap[field.id] = buildResult.featureData;
+      buildErrors.addAll(buildResult.errors);
     }
 
     var layouts = fields.map((field) => field.layoutInfo).toList();
@@ -36,6 +39,16 @@ class Form<I extends Record> extends Feature {
     return BuildResult(
       featureData: featureData,
       childFeatures: toolbar?.childFeatures ?? [],
+      errors:
+          buildErrors.isNotEmpty
+              ? [
+                BuildError(
+                  identifier: id,
+                  message: "Form has errors",
+                  childErrors: buildErrors,
+                ),
+              ]
+              : [],
     );
   }
 }
@@ -115,7 +128,7 @@ abstract class FormField {
   FormFieldLayoutInfo get layoutInfo =>
       FormFieldLayoutInfo(direction: layoutDirection, size: layoutSize, id: id);
 
-  Map<String, dynamic> build(BuildContext context);
+  BuildResult build(BuildContext context);
 }
 
 class FormFieldLayoutInfo {
@@ -162,24 +175,45 @@ class Header extends FormField {
   });
 
   @override
-  Map<String, dynamic> build(BuildContext context) {
-    return {
-      "header": {
-        "title": title,
-        if (visibleWhen != null) "visibleWhen": visibleWhen.toString(),
+  BuildResult build(BuildContext context) {
+    return BuildResult(
+      featureData: {
+        "header": {
+          "title": title,
+          if (visibleWhen != null) "visibleWhen": visibleWhen.toString(),
+        },
       },
-    };
+      childFeatures: [],
+    );
   }
 }
 
-class TextInput extends FormField {
+abstract class BindingFormField extends FormField {
+  final FieldBase bindTo;
+
+  BindingFormField({
+    required this.bindTo,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    required super.id,
+  });
+  (String?, BuildError?) buildBinding() {
+    try {
+      return (bindTo.bindingFieldPath, null);
+    } catch (e) {
+      return (null, BuildError(identifier: id, message: e.toString()));
+    }
+  }
+}
+
+class TextInput extends BindingFormField {
   final String title;
-  final Field bindTo;
   final bool required;
 
   TextInput({
     required this.title,
-    required this.bindTo,
+    required super.bindTo,
     required this.required,
     required super.id,
     super.visibleWhen,
@@ -188,15 +222,20 @@ class TextInput extends FormField {
   });
 
   @override
-  Map<String, dynamic> build(BuildContext context) {
-    return {
-      "textInput": {
-        "title": title,
-        "bindTo": bindTo.relativeFieldPath,
-        "required": required,
-        if (visibleWhen != null) "visibleWhen": visibleWhen.toString(),
+  BuildResult build(BuildContext context) {
+    var (bindingFieldPath, error) = buildBinding();
+    return BuildResult(
+      featureData: {
+        "textInput": {
+          "title": title,
+          "bindTo": bindingFieldPath,
+          "required": required,
+          if (visibleWhen != null) "visibleWhen": visibleWhen.toString(),
+        },
       },
-    };
+      childFeatures: [],
+      errors: error != null ? [error] : [],
+    );
   }
 }
 
@@ -214,14 +253,17 @@ class Text extends FormField {
   });
 
   @override
-  Map<String, dynamic> build(BuildContext context) {
-    return {
-      "text": {
-        "title": title,
-        "displayValue": displayValue,
-        if (visibleWhen != null) "visibleWhen": visibleWhen.toString(),
+  BuildResult build(BuildContext context) {
+    return BuildResult(
+      featureData: {
+        "text": {
+          "title": title,
+          "displayValue": displayValue,
+          if (visibleWhen != null) "visibleWhen": visibleWhen.toString(),
+        },
       },
-    };
+      childFeatures: [],
+    );
   }
 }
 

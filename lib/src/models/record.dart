@@ -1,9 +1,18 @@
 import 'dart:mirrors';
+import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:apptree_dart_sdk/src/constants.dart';
-import 'package:apptree_dart_sdk/src/models/expression.dart';
+
+/// Exception thrown when there's a type mismatch between a field and its ListEndpoint annotation
+class ListFieldTypeMismatchException implements Exception {
+  final String message;
+
+  ListFieldTypeMismatchException(this.message);
+
+  @override
+  String toString() => 'ListFieldTypeMismatchException: $message';
+}
 
 class FieldBase {
-  FieldScope scope = FieldScope.record;
   Record? parent;
   String? fullFieldPath;
   String? relativeFieldPath;
@@ -11,10 +20,14 @@ class FieldBase {
   List<FieldBase> fields = [];
   String? fieldName;
 
-  FieldBase({this.scope = FieldScope.record});
+  // Reference to the list endpoint if this field is annotated with @ListField
+  ListEndpoint? listEndpoint;
+  String? listKeyField;
 
-  dynamic toJson() {
-    return getPath();
+  FieldBase();
+
+  FieldScope get scope {
+    return parent?.scope ?? FieldScope.record;
   }
 
   String getScope() {
@@ -22,13 +35,39 @@ class FieldBase {
   }
 
   String get value {
-    return getPath();
+    return getPath(wrapped: false);
   }
 
-  String getPath() {
-    String prefix = '\$';
-    String recordPath = "$prefix{${getScope()}().$fullFieldPath}";
-    return recordPath;
+  String get bindingFieldPath {
+    var parentDepth = 0;
+    var currentParent = parent;
+    while (currentParent != null) {
+      parentDepth++;
+      currentParent = currentParent.parent;
+    }
+    if (parentDepth > 1) {
+      throw Exception('Can not bind to a nested field');
+    }
+    return fullFieldPath!;
+  }
+
+  String getPath({bool wrapped = true}) {
+    var path =
+        parent != null ? parent!.getPath(wrapped: false) : '${scope.name}()';
+    if (listKeyField != null) {
+      path = '$path.$listKeyField';
+    } else if (relativeFieldPath != null) {
+      path = '$path.$relativeFieldPath';
+    }
+
+    if (listEndpoint != null) {
+      path = 'getListItem("${listEndpoint!.id}", $path)';
+    }
+    //path = '';
+    if (wrapped) {
+      path = '\${$path}';
+    }
+    return path;
   }
 
   String getFormPath() {
@@ -38,12 +77,12 @@ class FieldBase {
 
   @override
   String toString() {
-    return getPath();
+    return getPath(wrapped: true);
   }
 }
 
 abstract class Field extends FieldBase {
-  Field({super.scope = FieldScope.record});
+  Field();
 
   String getFieldType();
 
@@ -53,7 +92,7 @@ abstract class Field extends FieldBase {
 }
 
 class IntField extends Field {
-  IntField({super.scope = FieldScope.record});
+  IntField();
 
   @override
   String getFieldType() {
@@ -66,7 +105,7 @@ class IntField extends Field {
 }
 
 class StringField extends Field {
-  StringField({super.scope = FieldScope.record});
+  StringField();
 
   @override
   String getFieldType() {
@@ -90,12 +129,16 @@ class StringField extends Field {
     fullFieldPath = '$fullFieldPath.toLower()';
     return this;
   }
+
+  dynamic toJson() {
+    return getPath(wrapped: true);
+  }
 }
 
 class BoolField extends Field {
   bool falseValue = false;
 
-  BoolField({super.scope = FieldScope.record});
+  BoolField();
 
   @override
   String getFieldType() {
@@ -107,9 +150,16 @@ class BoolField extends Field {
   }
 }
 
+abstract class ListRecord extends Record {
+  final String key;
+
+  ListRecord({required this.key});
+}
+
 abstract class Record extends FieldBase {
   void register() {
     buildMemberGraph();
+    processAnnotations();
     buildFieldPaths();
   }
 
@@ -138,6 +188,81 @@ abstract class Record extends FieldBase {
     });
   }
 
+  void processAnnotations() {
+    final instanceMirror = reflect(this);
+
+    instanceMirror.type.declarations.forEach((symbol, declaration) {
+      if (declaration is VariableMirror && !declaration.isStatic) {
+        // Look for ListField annotations on class members
+        for (final metadata in declaration.metadata) {
+          final metadataInstance = metadata.reflectee;
+          if (metadataInstance is ListField) {
+            final fieldInstance = instanceMirror.getField(symbol).reflectee;
+            if (fieldInstance is FieldBase) {
+              // Apply the ListField annotation info to the field
+              reflect(fieldInstance).setField(
+                const Symbol('listEndpoint'),
+                metadataInstance.endpoint,
+              );
+              reflect(
+                fieldInstance,
+              ).setField(const Symbol('listKeyField'), metadataInstance.key);
+
+              // Type checking: Verify the field type matches the ListEndpoint's record type
+              if (fieldInstance is Record) {
+                _verifyFieldTypeMatchesEndpoint(
+                  fieldName: MirrorSystem.getName(symbol),
+                  field: fieldInstance,
+                  endpoint: metadataInstance.endpoint,
+                );
+              }
+            }
+          }
+        }
+
+        // Process annotations for nested Record instances
+        final fieldInstance = instanceMirror.getField(symbol).reflectee;
+        if (fieldInstance is Record) {
+          fieldInstance.processAnnotations();
+        }
+      }
+    });
+  }
+
+  /// Verifies that a field's type matches the expected Record type from the ListEndpoint
+  void _verifyFieldTypeMatchesEndpoint({
+    required String fieldName,
+    required Record field,
+    required ListEndpoint endpoint,
+  }) {
+    final endpointMirror = reflect(endpoint).type;
+
+    if (endpointMirror.typeArguments.length >= 2) {
+      final expectedRecordType = endpointMirror.typeArguments[1];
+      final actualFieldType = reflect(field).type;
+
+      // Check if the field's type is compatible with the expected record type
+      if (!actualFieldType.isSubtypeOf(expectedRecordType)) {
+        final expectedTypeName = MirrorSystem.getName(
+          expectedRecordType.simpleName,
+        );
+        final actualTypeName = MirrorSystem.getName(actualFieldType.simpleName);
+
+        final errorMsg =
+            'Type mismatch error: Field "$fieldName" has type $actualTypeName '
+            'but should be $expectedTypeName to match ListEndpoint<_, $expectedTypeName>';
+
+        // In development mode, throw an exception to make the error obvious
+        assert(() {
+          throw ListFieldTypeMismatchException(errorMsg);
+        }());
+
+        // In production, log a warning
+        print('WARNING: $errorMsg');
+      }
+    }
+  }
+
   void buildFieldPaths() {
     final instanceMirror = reflect(this);
     /*Loop through all the fields and assign the full and relative field paths to each field. The full path is the path from the root of the object graph to the field. The relative path is the path from the parent of the field to the field.
@@ -148,11 +273,16 @@ abstract class Record extends FieldBase {
       if (declaration is VariableMirror && !declaration.isStatic) {
         final fieldInstance = instanceMirror.getField(symbol).reflectee;
         if (fieldInstance is FieldBase) {
-          final fieldName = MirrorSystem.getName(symbol);
+          var fieldName = MirrorSystem.getName(symbol);
+          if (fieldInstance.listKeyField != null) {
+            fieldName = '${fieldInstance.listKeyField}';
+          }
+
           fieldInstance.fullFieldPath =
               fieldInstance.parent?.parent != null
                   ? '${fieldInstance.parent!.fullFieldPath}.$fieldName'
                   : fieldName;
+
           fieldInstance.relativeFieldPath = fieldName;
           if (fieldInstance is Record) {
             fieldInstance.buildFieldPaths();

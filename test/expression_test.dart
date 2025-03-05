@@ -1,4 +1,3 @@
-import 'package:apptree_dart_sdk/src/constants.dart';
 import 'package:test/test.dart';
 import 'package:apptree_dart_sdk/src/models/expression.dart';
 import 'package:apptree_dart_sdk/src/models/record.dart';
@@ -20,7 +19,7 @@ class Test extends Record {
 }
 
 class User extends Record {
-  final StringField name = StringField(scope: FieldScope.user);
+  final StringField name = StringField();
 }
 
 void main() {
@@ -42,9 +41,7 @@ void main() {
             Or(
               record.assetName.contains('assetName2'),
               record.assetName.equals('assetName3'),
-            ).and(
-              user.name.equals('user1').or(user.name.equals('user2')),
-            ),
+            ).and(user.name.equals('user1').or(user.name.equals('user2'))),
           );
 
       expect(

@@ -1,8 +1,9 @@
 import 'package:apptree_dart_sdk/apptree.dart';
+import 'package:apptree_dart_sdk/src/models/errors.dart';
 
 typedef TemplateBuilder<I extends Record> =
     Template Function(BuildContext context, I record);
-    
+
 typedef OnItemSelectedBuilder<I extends Record> =
     NavigateTo Function(BuildContext context, I record);
 
@@ -24,8 +25,13 @@ class BuildContext {
 class BuildResult {
   final Map<String, dynamic> featureData;
   final List<Feature> childFeatures;
+  final List<BuildError> errors;
 
-  BuildResult({required this.featureData, required this.childFeatures});
+  BuildResult({
+    required this.featureData,
+    required this.childFeatures,
+    this.errors = const [],
+  });
 }
 
 abstract class Builder {
