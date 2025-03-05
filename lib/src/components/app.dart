@@ -42,7 +42,7 @@ class App {
     writeYaml(
       name,
       "template_merge",
-      YAMLWriter().write(app),
+      YamlWriter().write(app),
       extension: '.apptreemobile',
     );
   }
@@ -67,7 +67,7 @@ class App {
       writeTemplate(name, template.id, template.toFsx());
     }
 
-    writeConfigYaml(name, YAMLWriter().write(configDict));
+    writeConfigYaml(name, YamlWriter().write(configDict));
 
     // Initialize Menu Items
     Menu menu = Menu(menuItems: menuItems);
@@ -93,7 +93,7 @@ class App {
       }
     }
 
-    var yaml = YAMLWriter(
+    var yaml = YamlWriter(
       allowUnquotedStrings: true,
     ).write({"features": buildResult.featureData});
     writeYaml(name, feature.id, yaml);

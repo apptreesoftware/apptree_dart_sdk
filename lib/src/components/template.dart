@@ -1,3 +1,5 @@
+import 'package:apptree_dart_sdk/src/models/builder.dart';
+
 abstract class Template {
   final String id;
   bool isFormTemplate = false;
@@ -11,6 +13,10 @@ abstract class Template {
   Map<String, dynamic> toDict();
 
   String toFsx();
+
+  BuildResult build(BuildContext context) {
+    return BuildResult(featureData: toDict(), childFeatures: [], errors: []);
+  }
 }
 
 class Workbench extends Template {

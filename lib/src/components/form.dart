@@ -1,5 +1,4 @@
 import "package:apptree_dart_sdk/apptree.dart";
-import "package:apptree_dart_sdk/src/models/errors.dart";
 
 class Form<I extends Record> extends Feature {
   final FormToolbarBuilder<I>? toolbarBuilder;

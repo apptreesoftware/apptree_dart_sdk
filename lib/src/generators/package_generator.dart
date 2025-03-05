@@ -43,7 +43,7 @@ class PackageGenerator {
   }
 
   String getDatasourceFileName() {
-    return '${separateCapitalsWithUnderscore(datasourceName)}';
+    return separateCapitalsWithUnderscore(datasourceName);
   }
 
   void generateExport() {

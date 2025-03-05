@@ -22,6 +22,10 @@ abstract class ListEndpoint<I extends Request, R extends Record> {
   Map<String, dynamic> buildRequest(I request) {
     return {"url": '{{environment.url}}/list/$id', "data": request.toJson()};
   }
+
+  R get record {
+    return instantiateRecord();
+  }
 }
 
 abstract class CollectionEndpoint<I extends Request, R extends Record> {
@@ -47,7 +51,7 @@ abstract class CollectionEndpoint<I extends Request, R extends Record> {
   }
 
   String getModelYaml() {
-    return YAMLWriter().write(getModelDict());
+    return YamlWriter().write(getModelDict());
   }
 
   String getDataSourceInterface() {

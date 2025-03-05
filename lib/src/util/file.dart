@@ -16,35 +16,19 @@ void writeYaml(
   String yaml, {
   String? extension = '.yaml',
 }) {
-  FileUtil.writeFile(
-    'res/app_config/$dir',
-    "res/app_config/$dir/$fileName$extension",
-    yaml,
-  );
+  FileUtil.writeFile('res/app_config/$dir', "$fileName$extension", yaml);
 }
 
 void writeTemplate(String dir, String fileName, String fsx) {
-  FileUtil.writeFile(
-    'res/app_config/$dir/templates',
-    "res/app_config/$dir/templates/$fileName.fsx",
-    fsx,
-  );
+  FileUtil.writeFile('res/app_config/$dir/templates', "$fileName.fsx", fsx);
 }
 
 void writeModelYaml(String dir, String fileName, String yaml) {
-  FileUtil.writeFile(
-    'res/connector/models/$dir',
-    "res/connector/models/$dir/$fileName.yaml",
-    yaml,
-  );
+  FileUtil.writeFile('res/connector/models/$dir', "$fileName.yaml", yaml);
 }
 
 void writeConfigYaml(String dir, String yaml) {
-  FileUtil.writeFile(
-    'res/connector/config/$dir',
-    "res/connector/config/$dir/config.yaml",
-    yaml,
-  );
+  FileUtil.writeFile('res/connector/config/$dir', "config.yaml", yaml);
 }
 
 void writeModelDart(String dir, String fileName, String dart) {

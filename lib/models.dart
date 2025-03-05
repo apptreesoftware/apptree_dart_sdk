@@ -5,3 +5,4 @@ export 'src/models/request.dart';
 export 'src/models/user.dart';
 export 'src/models/expression.dart';
 export 'src/models/annotations.dart';
+export 'src/models/errors.dart';

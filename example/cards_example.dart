@@ -56,7 +56,30 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
       ),
   noResultsText: 'No results',
   showDivider: true,
-  topAccessoryViews: [],
+  topAccessoryView:
+      (context) => [
+        SegmentedControlAccessoryView(
+          defaultValue: 'all',
+          bindTo: 'activeFilter',
+          segments: [
+            SegmentItem(title: 'All', value: 'all'),
+            SegmentItem(title: 'Active', value: 'active'),
+            SegmentItem(title: 'Inactive', value: 'inactive'),
+          ],
+        ),
+        SelectListInputAccessoryView(
+          label: 'Filter',
+          bindTo: 'testFilter',
+          displayValue: 'test',
+          placeholderText: 'Choose filter',
+          listEndpoint: OwnersListEndpoint(),
+          template:
+              (context, record) => Workbench(
+                title: '${record.name}',
+                subtitle: '${record.ownerId}',
+              ),
+        ),
+      ],
   onItemSelected:
       (BuildContext context, Card record) => NavigateTo(
         feature: cardsForm,

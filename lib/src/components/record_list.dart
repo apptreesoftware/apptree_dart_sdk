@@ -6,7 +6,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
   final CollectionEndpoint<INPUT, RECORD> dataSource;
   final String noResultsText;
   final bool showDivider;
-  final List<TopAccessoryView> topAccessoryViews;
+  final TopAccessoryViewBuilder? topAccessoryView;
 
   final TemplateBuilder<RECORD> template;
   final OnItemSelectedBuilder<RECORD>? onItemSelected;
@@ -18,7 +18,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
     required this.dataSource,
     required this.noResultsText,
     required this.showDivider,
-    required this.topAccessoryViews,
+    this.topAccessoryView,
     required this.template,
     required this.onItemSelected,
     this.toolbar,
@@ -34,6 +34,18 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
     var toolbarResult = toolbar?.call(context);
     var builtToolbar = toolbarResult?.build(context);
     var request = onLoadRequest?.call(context);
+    var topAccessoryViewResult =
+        topAccessoryView?.call(context) ?? <AccessoryView>[];
+
+    var buildErrors = <BuildError>[];
+
+    var topAccessoryViews = [];
+    for (var view in topAccessoryViewResult) {
+      var accessoryViewResult = view.build(context);
+      topAccessoryViews.add(accessoryViewResult.featureData);
+      buildErrors.addAll(accessoryViewResult.errors);
+    }
+
     var navigateTo = navigation?.build(context);
 
     var templateData = template(context, dataSource.record).toDict();
@@ -45,8 +57,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
           "dataSource": dataSource.id,
           "noResultsText": noResultsText,
           "showDivider": showDivider,
-          "topAccessoryViews":
-              topAccessoryViews.map((view) => view.toDict()).toList(),
+          "topAccessoryViews": topAccessoryViews,
           "template": templateData,
           "onItemSelected":
               navigateTo != null

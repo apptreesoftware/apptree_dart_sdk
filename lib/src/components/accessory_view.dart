@@ -44,7 +44,6 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
   final String displayValue;
   final String placeholderText;
   final bool allowClear;
-  final bool multiSelect;
   final List<ListFilter>? filters;
   final String? sort;
   final TemplateBuilder<T> template;
@@ -56,10 +55,9 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
     required this.bindTo,
     required this.displayValue,
     required this.placeholderText,
-    required this.allowClear,
-    required this.multiSelect,
-    required this.filters,
-    required this.sort,
+    this.allowClear = true,
+    this.filters,
+    this.sort,
     required this.template,
     required this.listEndpoint,
   });
@@ -102,7 +100,6 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
           'label': label,
           if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
           'allowClear': allowClear,
-          'multiSelect': multiSelect,
           if (filters != null && filters!.isNotEmpty) 'filters': filterData,
           if (sort != null) 'sort': sort,
           'list': listEndpoint.id,
@@ -129,8 +126,23 @@ class SegmentedControlAccessoryView extends AccessoryView {
 
   @override
   BuildResult build(BuildContext context) {
+    var buildErrors = <BuildError>[];
+    var defaultIsValid = segments.any(
+      (segment) => segment.value == defaultValue,
+    );
+
+    if (!defaultIsValid) {
+      buildErrors.add(
+        BuildError(
+          message: 'defaultValue must be a valid segment',
+          identifier: 'SegmentedControlAccessoryView',
+        ),
+      );
+    }
+
     return BuildResult(
       childFeatures: [],
+      errors: buildErrors,
       featureData: {
         'segmentedControlInput': {
           if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),

@@ -1,5 +1,4 @@
 import 'package:apptree_dart_sdk/apptree.dart';
-import 'package:apptree_dart_sdk/src/models/errors.dart';
 
 typedef TemplateBuilder<I extends Record> =
     Template Function(BuildContext context, I record);
@@ -9,6 +8,9 @@ typedef OnItemSelectedBuilder<I extends Record> =
 
 typedef FormFieldsBuilder<I extends Record> =
     List<FormField> Function(BuildContext context, I record);
+
+typedef TopAccessoryViewBuilder =
+    List<AccessoryView> Function(BuildContext context);
 
 typedef ToolbarBuilder = Toolbar Function(BuildContext context);
 typedef RequestBuilder<I> = I Function(BuildContext context);
@@ -26,11 +28,13 @@ class BuildResult {
   final Map<String, dynamic> featureData;
   final List<Feature> childFeatures;
   final List<BuildError> errors;
+  final List<Template> templates;
 
   BuildResult({
     required this.featureData,
     required this.childFeatures,
     this.errors = const [],
+    this.templates = const [],
   });
 }
 
