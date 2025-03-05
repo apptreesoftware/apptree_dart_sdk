@@ -1,4 +1,4 @@
-import 'package:apptree_dart_sdk/models.dart';
+import 'package:apptree_dart_sdk/apptree.dart';
 
 abstract class AccessoryView {
   Conditional? visibleWhen;
@@ -20,9 +20,11 @@ abstract class AccessoryView {
         placeholderText: "Select to filter"
         filters:
           - when: context().woWorkbenchStatusFilter == 'todo'
-            statement: json_extract(record,'$.Status.ClosingStatusFlag') = ? AND ActiveFlag = 'TRUE'
+            statement: json_extract(record,'$.Status.ClosingStatusFlag') = ? AND ActiveFlag = ?
+            record.Status.ClosingStatusFlag.equals(false).and(record.ActiveFlag).equals('TRUE')
             values:
               - false
+              - 'TRUE'
           - when: context().woWorkbenchStatusFilter == 'complete' 
             statement: json_extract(record,'$.Status.ClosingStatusFlag') = ? AND ActiveFlag = 'TRUE'
             values:
@@ -35,24 +37,86 @@ abstract class AccessoryView {
             title: "{{Name}}"
 */
 
-// class SelectListInputAccessoryView extends AccessoryView {
-//   final String label;
-//   final StringField bindTo;
-//   final List<SegmentItem> segments;
-//   final StringField displayValue;
-//   final String placeholderText;
-//   final bool allowClear;
-//   final bool multiSelect;
-//   final List<Conditional> filters;
-//   final StringField sort;
-//   final StringField template;
+class SelectListInputAccessoryView<I extends Request, T extends Record>
+    extends AccessoryView {
+  final String label;
+  final String bindTo;
+  final String displayValue;
+  final String placeholderText;
+  final bool allowClear;
+  final bool multiSelect;
+  final List<ListFilter>? filters;
+  final String? sort;
+  final TemplateBuilder<T> template;
+  final ListEndpoint<I, T> listEndpoint;
 
-// }
+  SelectListInputAccessoryView({
+    super.visibleWhen,
+    required this.label,
+    required this.bindTo,
+    required this.displayValue,
+    required this.placeholderText,
+    required this.allowClear,
+    required this.multiSelect,
+    required this.filters,
+    required this.sort,
+    required this.template,
+    required this.listEndpoint,
+  });
+
+  @override
+  BuildResult build(BuildContext context) {
+    var filterResults = <BuildResult>[];
+    if (filters != null) {
+      filterResults = filters!.map((filter) => filter.build(context)).toList();
+    }
+    var filterErrors = filterResults.expand((result) => result.errors).toList();
+    var filterData = filterResults.map((result) => result.featureData).toList();
+
+    BuildError? rootBuildError;
+    List<BuildError> childBuildErrors = [];
+
+    if (filterErrors.isNotEmpty) {
+      childBuildErrors.addAll(filterErrors);
+    }
+
+    var templateResult = template(context, listEndpoint.record);
+    var templateBuildResult = templateResult.build(context);
+
+    childBuildErrors.addAll(templateBuildResult.errors);
+
+    if (childBuildErrors.isNotEmpty) {
+      rootBuildError = BuildError(
+        message: 'Filters contain errors',
+        identifier: 'SelectListInput bound to $bindTo',
+        childErrors: childBuildErrors,
+      );
+    }
+
+    return BuildResult(
+      childFeatures: [],
+      errors: rootBuildError != null ? [rootBuildError] : [],
+      templates: [templateResult],
+      featureData: {
+        'selectListInput': {
+          'label': label,
+          if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
+          'allowClear': allowClear,
+          'multiSelect': multiSelect,
+          if (filters != null && filters!.isNotEmpty) 'filters': filterData,
+          if (sort != null) 'sort': sort,
+          'list': listEndpoint.id,
+          'template': templateBuildResult.featureData,
+        },
+      },
+    );
+  }
+}
 
 class SegmentedControlAccessoryView extends AccessoryView {
   final List<SegmentItem> segments;
   final String defaultValue;
-  final StringField bindTo;
+  final String bindTo;
 
   SegmentedControlAccessoryView({
     required this.segments,
@@ -68,9 +132,12 @@ class SegmentedControlAccessoryView extends AccessoryView {
     return BuildResult(
       childFeatures: [],
       featureData: {
-        'segments': segments.map((segment) => segment.toJson()).toList(),
-        'defaultValue': defaultValue,
-        'bindTo': bindTo.value,
+        'segmentedControlInput': {
+          if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
+          'segments': segments.map((segment) => segment.toJson()).toList(),
+          'default': defaultValue,
+          'bindTo': bindTo,
+        },
       },
     );
   }

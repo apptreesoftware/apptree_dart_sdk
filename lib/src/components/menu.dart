@@ -7,11 +7,12 @@ class MenuItem {
   final int order;
   String id = "";
 
-  MenuItem(
-      {required this.title,
-      required this.icon,
-      required this.defaultItem,
-      required this.order});
+  MenuItem({
+    required this.title,
+    required this.icon,
+    required this.defaultItem,
+    required this.order,
+  });
 
   void setId(String id) {
     this.id = id;
@@ -25,9 +26,9 @@ class MenuItem {
       "order": order,
       "onSelected": [
         {
-          "navigateTo": {"id": id}
-        }
-      ]
+          "navigateTo": {"id": id},
+        },
+      ],
     };
   }
 }
@@ -40,12 +41,14 @@ class Menu {
   Map<String, dynamic> toDict() {
     return {
       "menu": {
-        "items": menuItems.map((key, menuItem) => MapEntry(key, menuItem.toDict())),
-      }
+        "items": menuItems.map(
+          (key, menuItem) => MapEntry(key, menuItem.toDict()),
+        ),
+      },
     };
   }
 
   String toYaml() {
-    return YAMLWriter().write(toDict());
+    return YamlWriter().write(toDict());
   }
 }

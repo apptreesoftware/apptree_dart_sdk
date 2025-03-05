@@ -9,7 +9,7 @@ abstract class Feature {
   BuildResult build(BuildContext context);
 
   String toYaml(BuildContext context) {
-    return YAMLWriter(
+    return YamlWriter(
       allowUnquotedStrings: true,
     ).write({"features": build(context)});
   }
