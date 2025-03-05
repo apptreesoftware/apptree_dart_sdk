@@ -27,6 +27,15 @@
       "request": "launch",
       "type": "dart",
       "program": "example_connector/bin/server.dart"
+    },
+    {
+      "name": "Generators",
+      "request": "launch",
+      "type": "dart",
+      "program": "example/generators.dart",
+      "env": {
+        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
+      }
     }
   ]
 }

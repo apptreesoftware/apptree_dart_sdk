@@ -1,4 +1,7 @@
 **/.dart_tool/
 
-res/
+res/app_config/
+res/connector/
+example_connector/
 /.idea/
+.env

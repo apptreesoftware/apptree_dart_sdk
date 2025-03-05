@@ -1,4 +1,4 @@
-name: example_connector
+name: PROJECT_NAME
 description: A server app using the shelf package and Docker.
 version: 1.0.0
 publish_to: none

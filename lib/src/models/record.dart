@@ -17,6 +17,8 @@ class FieldBase {
   String? fullFieldPath;
   String? relativeFieldPath;
   bool? primaryKey;
+  List<FieldBase> fields = [];
+  String? fieldName;
 
   // Reference to the list endpoint if this field is annotated with @ListField
   ListEndpoint? listEndpoint;
@@ -168,14 +170,19 @@ abstract class Record extends FieldBase {
     instanceMirror.type.declarations.forEach((symbol, declaration) {
       if (declaration is VariableMirror && !declaration.isStatic) {
         final fieldInstance = instanceMirror.getField(symbol).reflectee;
+        final fieldName = MirrorSystem.getName(symbol);
         // Assign metadata indicating that this field is a member of the current instance.
         if (fieldInstance is Field) {
           reflect(fieldInstance).setField(const Symbol('parent'), this);
+          fields.add(fieldInstance);
+          fieldInstance.fieldName = fieldName;
         }
         // If the field is a Record, recursively build its member graph.
         if (fieldInstance is Record) {
           reflect(fieldInstance).setField(const Symbol('parent'), this);
           fieldInstance.buildMemberGraph();
+          fields.add(fieldInstance);
+          fieldInstance.fieldName = fieldName;
         }
       }
     });

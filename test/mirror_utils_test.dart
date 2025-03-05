@@ -51,14 +51,14 @@ void main() {
     test('should instantiate a simple record', () {
       final record = instantiateRecord<SimpleRecord>();
       expect(record, isA<SimpleRecord>());
-      expect(record.name, isA<StringField>());
+      expect(record.fieldName, isA<StringField>());
       expect(record.age, isA<IntField>());
     });
 
     test('should instantiate a complex record with nested records', () {
       final record = instantiateRecord<ComplexRecord>();
       expect(record, isA<ComplexRecord>());
-      expect(record.name, isA<StringField>());
+      expect(record.fieldName, isA<StringField>());
       expect(record.nested, isA<SimpleRecord>());
       expect(record.records, isA<List<SimpleRecord>>());
       expect(record.listRecord, isA<ListRecord>());
