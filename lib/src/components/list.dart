@@ -13,8 +13,8 @@ import 'package:apptree_dart_sdk/models.dart';
 */
 
 class ListFilter {
-  final String? when;
-  final String statement;
+  final Conditional? when;
+  final Conditional statement;
   final List<dynamic> values;
 
   ListFilter({
@@ -42,8 +42,8 @@ class ListFilter {
     return BuildResult(
       childFeatures: [],
       featureData: {
-        if (when != null) 'when': when,
-        'statement': statement,
+        if (when != null) 'when': when?.toString(),
+        'statement': statement.setType(ConditionalType.sqlite).toString(),
         'values': values,
       },
       errors: errors,
