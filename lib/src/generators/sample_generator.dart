@@ -38,14 +38,18 @@ class SampleGenerator {
     return '${separateCapitalsWithUnderscore(getRequestName())}.dart';
   }
 
+  String getDataSourceFileName() {
+    return '${separateCapitalsWithUnderscore(dataSourceName)}.dart';
+  }
+
   String getFileName() {
     return '${separateCapitalsWithUnderscore(dataSourceName)}_sample';
   }
 
   String generateImports() {
-    return 'import \'package:$projectDir/generated/models/${getRecordFileName()}.dart\';\n'
-        'import \'package:$projectDir/generated/models/${getRequestFileName()}.dart\';\n'
-        'import \'package:$projectDir/generated/datasources/${getFileName()}.dart\';\n';
+    return 'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n'
+        'import \'package:$projectDir/generated/models/${getRequestFileName()}\';\n'
+        'import \'package:$projectDir/generated/datasources/${getDataSourceFileName()}\';\n';
   }
 
   Future<String> generateSampleData() async {
@@ -73,6 +77,7 @@ class SampleGenerator {
         The code should be formatted using Dart's formatting rules.
         The code should be a string representation of the objects in Dart declared with the name 'samples' as a list of the objects.
         Do not include any imports.
+        This will be declared as a static variable in the class.
         Output in JSON format with the following keys:
         - prefix: A brief explanation of the code
         - code: The Dart code snippet
@@ -108,16 +113,21 @@ class SampleGenerator {
     return res['code'];
   }
 
+  // TODO: Needs to be updated to return the correct object
+  String generateGetRecord() {
+    return '@override\n  Future<${getRecordName()}> getRecord(String id) async { return await samples[0]; }\n';
+  }
+
   // TODO: Implement Filters
   Future<String> generateSampleClass() async {
-    String res =
-        'class Sample$dataSourceName extends $dataSourceName {\n'
-        '  @override\n';
+    String res = 'class Sample$dataSourceName extends $dataSourceName {\n';
+    res += '  ${await generateSampleData()}\n';
+    '  @override\n';
     res +=
         '  Future<List<${getRecordName()}>> getCollection(${getRequestName()} request) async {\n';
-    res += '  ${await generateSampleData()}\n';
     res += '  return samples;\n';
     res += '  }\n';
+    res += generateGetRecord();
     res += '}\n';
     return res;
   }

@@ -45,7 +45,6 @@ class PackageGenerator {
   String getDatasourceFileName() {
     return '${separateCapitalsWithUnderscore(datasourceName)}';
   }
-  
 
   void generateExport() {
     String result =
@@ -68,15 +67,20 @@ class PackageGenerator {
     result += generateInitImport();
     result +=
         'void registerSamples(AppBase app) {\n'
-        '  app.register($datasourceName());\n'
+        '  app.register(Sample$datasourceName());\n'
         '}\n';
 
     writeGeneratedDart(projectDir, 'init', result);
   }
 
+  String generateAppImport() {
+    return 'import \'package:server/server.dart\';\n'
+        'import \'generated/generated.dart\';\n';
+  }
+
   void generateApp() {
     String result = '';
-    result += generateInitImport();
+    result += generateAppImport();
     result += 'class App extends AppBase {\n';
     result += '  App();\n\n';
     result += '  init() {\n';
@@ -91,17 +95,24 @@ class PackageGenerator {
   // TODO: Needs to account for multiple collections
   String generateAddCollectionRoute() {
     String result = '';
-    result += 'server.addCollectionRoute<${getRequestName()}, $datasourceName, ${getRecordName()}>(\n';
+    result +=
+        'server.addCollectionRoute<${getRequestName()}, $datasourceName, ${getRecordName()}>(\n';
     result += '   \'/$routeName\', \n';
     result += '   ${getRequestName()}.fromJson, \n';
     result += ' );\n';
-  
+
     return result;
+  }
+
+  String generateServerImport() {
+    return 'import \'package:server/server.dart\';\n'
+        'import \'package:example_connector/app.dart\';\n'
+        'import \'package:example_connector/generated/generated.dart\';\n';
   }
 
   void generateServer() {
     String result = '';
-    result += generateInitImport();
+    result += generateServerImport();
     result += 'void main() {\n';
     result += '  var app = App();\n';
     result += '  app.init();\n\n';
@@ -112,11 +123,10 @@ class PackageGenerator {
 
     writeServerDart(projectDir, 'server', result);
   }
-  
+
   void generatePubspec() async {
     final pubspec = await readPubspec(projectDir);
     final newPubspec = pubspec.replaceAll('PROJECT_NAME', projectDir);
     writePubspec(projectDir, newPubspec);
   }
-  
 }
