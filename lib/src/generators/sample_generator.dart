@@ -111,7 +111,7 @@ class SampleGenerator {
   // TODO: Implement Filters
   Future<String> generateSampleClass() async {
     String res =
-        'class Sample${getRecordName()}Collection extends $dataSourceName {\n'
+        'class Sample$dataSourceName extends $dataSourceName {\n'
         '  @override\n';
     res +=
         '  Future<List<${getRecordName()}>> getCollection(${getRequestName()} request) async {\n';

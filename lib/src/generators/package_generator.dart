@@ -1,15 +1,18 @@
 import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:apptree_dart_sdk/src/util/file.dart';
+import 'package:apptree_dart_sdk/src/util/dir.dart';
 import 'package:apptree_dart_sdk/src/util/strings.dart';
 import 'dart:mirrors';
 
 class PackageGenerator {
+  final String routeName;
   final String projectDir;
   final Record record;
   final Request request;
   final String datasourceName;
 
   PackageGenerator({
+    required this.routeName,
     required this.projectDir,
     required this.record,
     required this.request,
@@ -17,19 +20,32 @@ class PackageGenerator {
   }) {
     generateExport();
     generateInit();
+    generateApp();
+    generateServer();
+    copyBoilerplate(projectDir);
+    generatePubspec();
   }
 
   String getRecordFileName() {
     return '${separateCapitalsWithUnderscore(MirrorSystem.getName(reflect(record).type.simpleName))}.dart';
   }
 
+  String getRecordName() {
+    return MirrorSystem.getName(reflect(record).type.simpleName);
+  }
+
   String getRequestFileName() {
     return '${separateCapitalsWithUnderscore(MirrorSystem.getName(reflect(request).type.simpleName))}.dart';
   }
 
-  String getDatasourceFileName() {
-    return '$separateCapitalsWithUnderscore(datasourceName)';
+  String getRequestName() {
+    return MirrorSystem.getName(reflect(request).type.simpleName);
   }
+
+  String getDatasourceFileName() {
+    return '${separateCapitalsWithUnderscore(datasourceName)}';
+  }
+  
 
   void generateExport() {
     String result =
@@ -57,4 +73,50 @@ class PackageGenerator {
 
     writeGeneratedDart(projectDir, 'init', result);
   }
+
+  void generateApp() {
+    String result = '';
+    result += generateInitImport();
+    result += 'class App extends AppBase {\n';
+    result += '  App();\n\n';
+    result += '  init() {\n';
+    result += '    registerSamples(this);\n';
+    result += '    register<$datasourceName>(Sample$datasourceName());\n';
+    result += '  }\n';
+    result += '}\n';
+
+    writeAppDart(projectDir, 'app', result);
+  }
+
+  // TODO: Needs to account for multiple collections
+  String generateAddCollectionRoute() {
+    String result = '';
+    result += 'server.addCollectionRoute<${getRequestName()}, $datasourceName, ${getRecordName()}>(\n';
+    result += '   \'/$routeName\', \n';
+    result += '   ${getRequestName()}.fromJson, \n';
+    result += ' );\n';
+  
+    return result;
+  }
+
+  void generateServer() {
+    String result = '';
+    result += generateInitImport();
+    result += 'void main() {\n';
+    result += '  var app = App();\n';
+    result += '  app.init();\n\n';
+    result += '  var server = Server<App>(app);\n';
+    result += '  ${generateAddCollectionRoute()}\n';
+    result += '  server.start();\n';
+    result += '}\n';
+
+    writeServerDart(projectDir, 'server', result);
+  }
+  
+  void generatePubspec() async {
+    final pubspec = await readPubspec(projectDir);
+    final newPubspec = pubspec.replaceAll('PROJECT_NAME', projectDir);
+    writePubspec(projectDir, newPubspec);
+  }
+  
 }

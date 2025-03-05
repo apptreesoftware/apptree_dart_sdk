@@ -7,6 +7,7 @@ void main() {
   final env = DotEnv(includePlatformEnvironment: true)..load();
   final openAiApiKey = env['OPENAI_API_KEY'];
   final projectDir = 'example_connector';
+  final routeName = 'my-cards';
   final datasourceName = 'MyCardsCollection';
   final card = Card();
   final cardRequest = MyCardsRequest(owner: 'John Doe', filter: 'My Cards');
@@ -42,5 +43,6 @@ void main() {
     record: card,
     request: cardRequest,
     datasourceName: datasourceName,
+    routeName: routeName,
   );
 }
