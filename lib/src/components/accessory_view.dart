@@ -41,7 +41,7 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
     extends AccessoryView {
   final String label;
   final String bindTo;
-  final String displayValue;
+  final DisplayValueBuilder<T> displayValue;
   final String placeholderText;
   final bool allowClear;
   final List<ListFilter>? filters;
@@ -70,6 +70,7 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
     }
     var filterErrors = filterResults.expand((result) => result.errors).toList();
     var filterData = filterResults.map((result) => result.featureData).toList();
+    var displayValueFormat = displayValue(context, listEndpoint.record);
 
     BuildError? rootBuildError;
     List<BuildError> childBuildErrors = [];
@@ -98,6 +99,7 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
       featureData: {
         'selectListInput': {
           'label': label,
+          'displayValue': displayValueFormat,
           if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
           'allowClear': allowClear,
           if (filters != null && filters!.isNotEmpty) 'filters': filterData,

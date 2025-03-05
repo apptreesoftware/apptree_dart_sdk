@@ -49,37 +49,53 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
       ],
     );
   },
-  template:
-      (BuildContext context, Card record) => Workbench(
-        title: '${record.cardId}',
-        subtitle: '${record.owner.name} - ${record.description}',
+  template: (BuildContext context, Card record) {
+    return Workbench(
+      title: '${record.cardId}',
+      subtitle: '${record.owner.name} - ${record.description}',
+    );
+  },
+  mapSettings: (context, record) {
+    return MapSettings(
+      initialZoomMode: MapZoomMode.markers,
+      latitudeKey: '${record.latitude}',
+      longitudeKey: '${record.longitude}',
+      showCurrentLocation: true,
+      markerTitle: '${record.name}',
+      markerSummary: '${record.description}',
+      initialCameraPosition: CameraPosition(
+        latitude: 37.7749,
+        longitude: -122.4194,
       ),
+    );
+  },
   noResultsText: 'No results',
   showDivider: true,
-  topAccessoryView:
-      (context) => [
-        SegmentedControlAccessoryView(
-          defaultValue: 'all',
-          bindTo: 'activeFilter',
-          segments: [
-            SegmentItem(title: 'All', value: 'all'),
-            SegmentItem(title: 'Active', value: 'active'),
-            SegmentItem(title: 'Inactive', value: 'inactive'),
-          ],
-        ),
-        SelectListInputAccessoryView(
-          label: 'Filter',
-          bindTo: 'testFilter',
-          displayValue: 'test',
-          placeholderText: 'Choose filter',
-          listEndpoint: OwnersListEndpoint(),
-          template:
-              (context, record) => Workbench(
-                title: '${record.name}',
-                subtitle: '${record.ownerId}',
-              ),
-        ),
-      ],
+  topAccessoryView: (context) {
+    return [
+      SegmentedControlAccessoryView(
+        defaultValue: 'all',
+        bindTo: 'activeFilter',
+        segments: [
+          SegmentItem(title: 'All', value: 'all'),
+          SegmentItem(title: 'Active', value: 'active'),
+          SegmentItem(title: 'Inactive', value: 'inactive'),
+        ],
+      ),
+      SelectListInputAccessoryView(
+        label: 'Filter',
+        bindTo: 'testFilter',
+        displayValue: (context, record) => '${record.name}',
+        placeholderText: 'Choose filter',
+        listEndpoint: OwnersListEndpoint(),
+        template:
+            (context, record) => Workbench(
+              title: '${record.name}',
+              subtitle: '${record.ownerId}',
+            ),
+      ),
+    ];
+  },
   onItemSelected:
       (BuildContext context, Card record) => NavigateTo(
         feature: cardsForm,

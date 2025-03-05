@@ -17,6 +17,8 @@ class Card extends Record {
   final StringField rarity = StringField();
   final StringField type = StringField();
   final Attack attacks = Attack();
+  final FloatField latitude = FloatField();
+  final FloatField longitude = FloatField();
 }
 
 class Owner extends Record {
