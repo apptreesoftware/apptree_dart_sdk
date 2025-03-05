@@ -82,6 +82,17 @@ class App {
 
   void writeFeature(Feature feature, {required BuildContext buildContext}) {
     var buildResult = feature.build(buildContext);
+    print("Writing feature: ${feature.id}");
+
+    if (buildResult.errors.isNotEmpty) {
+      for (var error in buildResult.errors) {
+        print("Invalid feature: ${error.identifier} - ${error.message}");
+        for (var childError in error.childErrors) {
+          print("  - ${childError.identifier} - ${childError.message}");
+        }
+      }
+    }
+
     var yaml = YAMLWriter(
       allowUnquotedStrings: true,
     ).write({"features": buildResult.featureData});

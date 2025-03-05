@@ -1,4 +1,3 @@
-import 'package:apptree_dart_sdk/src/constants.dart';
 import 'package:test/test.dart';
 import 'package:apptree_dart_sdk/src/models/expression.dart';
 import 'package:apptree_dart_sdk/src/models/record.dart';
@@ -20,7 +19,7 @@ class Test extends Record {
 }
 
 class User extends Record {
-  final StringField name = StringField(scope: FieldScope.user);
+  final StringField name = StringField();
 }
 
 void main() {
@@ -36,15 +35,21 @@ void main() {
     });
 
     test('Expression equals test', () {
-      var expr = record.assetName.equals('assetName').and(Or(
+      var expr = record.assetName
+          .equals('assetName')
+          .and(
+            Or(
               record.assetName.contains('assetName2'),
-              record.assetName.equals('assetName3'))
-          .and(user.name.equals('user1').or(user.name.equals('user2'))));
+              record.assetName.equals('assetName3'),
+            ).and(user.name.equals('user1').or(user.name.equals('user2'))),
+          );
 
       expect(
-          expr.toString(),
-          equals(
-              'record().assetName == "assetName" && (record().assetName.contains("assetName2") || record().assetName == "assetName3") && user().name == "user1" || user().name == "user2"'));
+        expr.toString(),
+        equals(
+          'record().assetName == "assetName" && (record().assetName.contains("assetName2") || record().assetName == "assetName3") && user().name == "user1" || user().name == "user2"',
+        ),
+      );
     });
   });
 }

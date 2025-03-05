@@ -11,6 +11,9 @@ class ComplexRecord extends Record {
   final StringField name = StringField();
   final SimpleRecord nested = SimpleRecord();
   final List<SimpleRecord> records = [];
+
+  @ListField(endpoint: MyListEndpoint(), key: 'listRecordId')
+  final ListRecord listRecord = ListRecord();
 }
 
 class SimpleRequest extends Request {
@@ -18,6 +21,15 @@ class SimpleRequest extends Request {
   final int age;
 
   SimpleRequest({required this.name, required this.age});
+}
+
+class ListRecord extends Record {
+  final StringField name = StringField();
+  final IntField age = IntField();
+}
+
+class MyListEndpoint extends ListEndpoint<EmptyRequest, ListRecord> {
+  const MyListEndpoint() : super(id: 'listData');
 }
 
 class ComplexRequest extends Request {
@@ -49,6 +61,24 @@ void main() {
       expect(record.name, isA<StringField>());
       expect(record.nested, isA<SimpleRecord>());
       expect(record.records, isA<List<SimpleRecord>>());
+      expect(record.listRecord, isA<ListRecord>());
+      expect(record.listRecord.listEndpoint, isA<MyListEndpoint>());
+    });
+
+    test('should output correct field paths', () {
+      final record = instantiateRecord<ComplexRecord>();
+      expect(record, isA<ComplexRecord>());
+      expect(record.name.value, equals(r'record().name'));
+      expect(record.nested.value, equals(r'record().nested'));
+      expect(record.nested.age.value, equals(r'record().nested.age'));
+      expect(
+        record.listRecord.value,
+        equals(r'getListItem("listData", record().listRecordId)'),
+      );
+      expect(
+        record.listRecord.name.value,
+        equals(r'getListItem("listData", record().listRecordId).name'),
+      );
     });
 
     test('should register fields after instantiation', () {

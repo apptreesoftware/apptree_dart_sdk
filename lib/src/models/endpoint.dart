@@ -7,14 +7,31 @@ abstract class SubmissionEndpoint<I extends Request, R extends Record> {
   final I? request;
   final R record;
 
-  SubmissionEndpoint({required this.id, this.request, required this.record});
+  const SubmissionEndpoint({
+    required this.id,
+    this.request,
+    required this.record,
+  });
+}
+
+abstract class ListEndpoint<I extends Request, R extends Record> {
+  final String id;
+
+  const ListEndpoint({required this.id});
+
+  Map<String, dynamic> buildRequest(I request) {
+    return {"url": '{{environment.url}}/list/$id', "data": request.toJson()};
+  }
 }
 
 abstract class CollectionEndpoint<I extends Request, R extends Record> {
   final String id;
-  final R record;
 
-  CollectionEndpoint({required this.id}) : record = instantiateRecord();
+  const CollectionEndpoint({required this.id});
+
+  R get record {
+    return instantiateRecord();
+  }
 
   Map<String, dynamic> buildRequest(I request) {
     return {"url": '{{environment.url}}/$id', "data": request.toJson()};

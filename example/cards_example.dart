@@ -1,10 +1,6 @@
 import 'package:apptree_dart_sdk/apptree.dart';
 import 'models.dart';
 
-class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
-  MyCardsEndpoint() : super(id: 'MyCards');
-}
-
 var cardsForm = Form<Card>(
   id: 'CardsUpdateForm',
   toolbarBuilder: (context, record) => Toolbar(items: []),
@@ -42,7 +38,6 @@ var cardsForm = Form<Card>(
 var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
   id: 'MyCardsRecordList',
   dataSource: MyCardsEndpoint(),
-
   toolbar: (context) {
     return Toolbar(
       items: [
@@ -55,8 +50,10 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
     );
   },
   template:
-      (BuildContext context, Card record) =>
-          Workbench(title: record.cardId, subtitle: record.name),
+      (BuildContext context, Card record) => Workbench(
+        title: '${record.cardId}',
+        subtitle: '${record.owner.name} - ${record.description}',
+      ),
   noResultsText: 'No results',
   showDivider: true,
   topAccessoryViews: [],
@@ -66,32 +63,6 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
         data: {'user': context.user.appVersion},
       ),
 );
-
-// class CardRecordListBuilder extends RecordListBuilder<MyCardsRequest, Card> {
-//   CardRecordListBuilder()
-//     : super(id: 'MyCardsRecordList', endpoint: MyCardsEndpoint());
-
-//   @override
-//   RecordList build(Card record) {
-//     return RecordList(
-//       id: id,
-//       dataSource: MyCardsEndpoint(),
-//       templateBuilder: (BuildContext context, Card record) => Template(
-//         id: 'workbench',
-//         values: Values(
-//           values: {
-//             'title': Value(value: record.cardId),
-//             'subtitle': Value(value: record.name),
-//           },
-//         ),
-//       ),
-//       noResultsText: 'No results',
-//       showDivider: true,
-//       topAccessoryViews: [],
-//       onItemSelected: ,
-//     );
-//   }
-// }
 
 // class CardFormBuilder extends FormBuilder<MyCardsRequest, Card> {
 //   CardFormBuilder() : super(id: 'CardsUpdateForm', record: Card());

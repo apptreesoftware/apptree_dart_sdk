@@ -17,6 +17,12 @@
       "program": "test/expression_test.dart"
     },
     {
+      "name": "Record Tests",
+      "request": "launch",
+      "type": "dart",
+      "program": "test/mirror_utils_test.dart"
+    },
+    {
       "name": "Example Connector",
       "request": "launch",
       "type": "dart",
