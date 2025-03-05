@@ -26,18 +26,30 @@ void writeConfigYaml(String dir, String yaml) {
   FileUtil.writeFile('res/connector/config/$dir', "res/connector/config/$dir/config.yaml", yaml);
 }
 
-void writeModelDart(String fileName, String dart) {
-  FileUtil.writeFile('res/generated/models', "res/generated/models/$fileName.dart", dart);
+void writeModelDart(String dir, String fileName, String dart) {
+  FileUtil.writeFile('res/$dir/lib/generated/models', "res/$dir/lib/generated/models/$fileName.dart", dart);
 }
 
-String readModelDart(String fileName) {
-  return File('res/generated/models/$fileName.dart').readAsStringSync();
+void writeDatasourceDart(String dir, String fileName, String dart) {
+  FileUtil.writeFile('res/$dir/lib/generated/datasources', "res/$dir/lib/generated/datasources/$fileName.dart", dart);
 }
 
-void writeDatasourceDart(String fileName, String dart) {
-  FileUtil.writeFile('res/generated/datasources', "res/generated/datasources/$fileName.dart", dart);
+void writeSampleDart(String dir, String fileName, String dart) {
+  FileUtil.writeFile('res/$dir/lib/generated/samples', "res/$dir/lib/generated/samples/$fileName.dart", dart);
 }
 
-void writeSampleDart(String fileName, String dart) {
-  FileUtil.writeFile('res/generated/samples', "res/generated/samples/$fileName.dart", dart);
+void writeGeneratedDart(String dir, String fileName, String dart) {
+  FileUtil.writeFile('res/$dir/lib/generated', "res/$dir/lib/generated/$fileName.dart", dart);
+}
+
+Future<String> readModelDart(String dir, String fileName) async {
+  return await File('res/$dir/lib/generated/models/$fileName.dart').readAsString();
+}
+
+Future<String> readDatasourceDart(String dir, String fileName) async {
+  return await File('res/$dir/lib/generated/datasources/$fileName.dart').readAsString();
+}
+
+Future<String> readSampleDart(String dir, String fileName) async {
+  return await File('res/$dir/lib/generated/samples/$fileName.dart').readAsString();
 }

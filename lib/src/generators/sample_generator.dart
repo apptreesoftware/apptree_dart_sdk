@@ -1,32 +1,60 @@
 import 'package:langchain/langchain.dart';
 import 'package:langchain_openai/langchain_openai.dart';
 import 'package:apptree_dart_sdk/src/util/file.dart';
+import 'package:apptree_dart_sdk/src/util/strings.dart';
+import 'package:apptree_dart_sdk/apptree.dart';
+import 'dart:mirrors';
 
 class SampleGenerator {
-  final String className;
-  final String openaiApiKey;
-  final String requestName;
+  final Record record;
+  final Request request;
   final String dataSourceName;
+  final String projectDir;
+  final String openaiApiKey;
 
   SampleGenerator({
-    required this.className,
-    required this.openaiApiKey,
-    required this.requestName,
+    required this.record,
+    required this.request,
     required this.dataSourceName,
-  });
+    required this.projectDir,
+    required this.openaiApiKey,
+  }) {
+    generateSamples();
+  }
+
+  String getRecordName() {
+    return MirrorSystem.getName(reflect(record).type.simpleName);
+  }
+
+  String getRequestName() {
+    return MirrorSystem.getName(reflect(request).type.simpleName);
+  }
+
+  String getRecordFileName() {
+    return '${separateCapitalsWithUnderscore(getRecordName())}.dart';
+  }
+
+  String getRequestFileName() {
+    return '${separateCapitalsWithUnderscore(getRequestName())}.dart';
+  }
+
+  String getFileName() {
+    return '${separateCapitalsWithUnderscore(dataSourceName)}_sample';
+  }
 
   String generateImports() {
-    return 'import \'package:example_connector/generated/models/${className}.dart\';\n'
-        'import \'package:example_connector/generated/models/${requestName}.dart\';\n'
-        'import \'package:example_connector/generated/datasources/${dataSourceName}.dart\';\n';
+    return 'import \'package:$projectDir/generated/models/${getRecordFileName()}.dart\';\n'
+        'import \'package:$projectDir/generated/models/${getRequestFileName()}.dart\';\n'
+        'import \'package:$projectDir/generated/datasources/${getFileName()}.dart\';\n';
   }
 
   Future<String> generateSampleData() async {
     final vectorStore = MemoryVectorStore(
       embeddings: OpenAIEmbeddings(apiKey: openaiApiKey),
     );
+    final modelDart = await readModelDart(projectDir, getRecordName());
     await vectorStore.addDocuments(
-      documents: [Document(pageContent: readModelDart('Card'))],
+      documents: [Document(pageContent: modelDart)],
     );
 
     // 2. Define the retrieval chain
@@ -74,7 +102,7 @@ class SampleGenerator {
 
     // 5. Run the pipeline
     final res = await chain.invoke(
-      'Please produce 10 samples of the ${className} objects.',
+      'Please produce 10 samples of the ${getRecordName()} objects.',
     );
 
     return res['code'];
@@ -83,9 +111,10 @@ class SampleGenerator {
   // TODO: Implement Filters
   Future<String> generateSampleClass() async {
     String res =
-        'class Sample${className}Collection extends ${dataSourceName} {\n'
+        'class Sample${getRecordName()}Collection extends $dataSourceName {\n'
         '  @override\n';
-    res += '  Future<List<${className}>> getCollection(${requestName} request) async {\n';
+    res +=
+        '  Future<List<${getRecordName()}>> getCollection(${getRequestName()} request) async {\n';
     res += '  ${await generateSampleData()}\n';
     res += '  return samples;\n';
     res += '  }\n';
@@ -97,6 +126,7 @@ class SampleGenerator {
     String res = '';
     res += generateImports();
     res += await generateSampleClass();
-    writeSampleDart(className, res);
+
+    writeSampleDart(projectDir, getFileName(), res);
   }
 }

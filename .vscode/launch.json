@@ -26,13 +26,7 @@
       "name": "Generators",
       "request": "launch",
       "type": "dart",
-      "program": "example/generators.dart"
-    },
-    {
-      "name": "Langchain Example",
-      "program": "example/langchain.dart",
-      "request": "launch",
-      "type": "dart",
+      "program": "example/generators.dart",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
       }

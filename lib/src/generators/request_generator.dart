@@ -1,13 +1,18 @@
 import 'package:apptree_dart_sdk/apptree.dart';
-
+import 'package:apptree_dart_sdk/src/util/strings.dart';
 import 'package:apptree_dart_sdk/src/util/file.dart';
 
 class RequestGenerator {
   final Request request;
+  final String projectDir;
 
-  RequestGenerator({required this.request}) {
+  RequestGenerator({required this.request, required this.projectDir}) {
     request.register();
     generateRequest();
+  }
+
+  String getFileName() {
+    return separateCapitalsWithUnderscore(request.runtimeType.toString());
   }
 
   String generateImports() {
@@ -83,6 +88,6 @@ class RequestGenerator {
     );
     result += '}\n';
 
-    writeModelDart(request.runtimeType.toString(), result);
+    writeModelDart(projectDir, getFileName(), result);
   }
 }

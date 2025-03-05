@@ -1,13 +1,15 @@
 import 'dart:mirrors';
 import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:apptree_dart_sdk/src/util/file.dart';
-
+import 'package:apptree_dart_sdk/src/util/strings.dart';
 class ModelGenerator {
   final Record record;
   late String recordName;
   List<Record> records = [];
+  final String projectDir;
+  
+  ModelGenerator({required this.record, required this.projectDir}) {
 
-  ModelGenerator({required this.record}) {
     // Register the record
     record.register();
     records.add(record);
@@ -27,6 +29,10 @@ class ModelGenerator {
         records.add(field);
       }
     }
+  }
+  
+  String getFileName(Record record) {
+    return separateCapitalsWithUnderscore(MirrorSystem.getName(reflect(record).type.simpleName));
   }
 
   Map<String, dynamic> analyzeRecord(Record record) {
@@ -107,7 +113,6 @@ class ModelGenerator {
       result += '}\n\n';
     }
 
-    final recordName = MirrorSystem.getName(reflect(record).type.simpleName);
-    writeModelDart(recordName, result);
+    writeModelDart(projectDir, getFileName(record), result);
   }
 }
