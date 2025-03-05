@@ -15,16 +15,12 @@ import 'package:apptree_dart_sdk/models.dart';
 class ListFilter {
   final Conditional? when;
   final Conditional statement;
-  final List<dynamic> values;
 
-  ListFilter({
-    required this.when,
-    required this.statement,
-    required this.values,
-  });
+  ListFilter({required this.when, required this.statement});
 
   BuildResult build(BuildContext context) {
     //Validate values are type of string/bool/int. If not, include each one in the BuildResult.errors
+    List<dynamic> values = statement.getValues();
     List<BuildError> errors = [];
     var index = 0;
     for (var value in values) {
@@ -36,7 +32,6 @@ class ListFilter {
           ),
         );
       }
-      index++;
     }
 
     return BuildResult(
@@ -44,7 +39,7 @@ class ListFilter {
       featureData: {
         if (when != null) 'when': when?.toString(),
         'statement': statement.setType(ConditionalType.sqlite).toString(),
-        'values': values,
+        'values': statement.getValues(),
       },
       errors: errors,
     );

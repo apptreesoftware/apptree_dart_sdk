@@ -7,7 +7,6 @@ abstract class Operator {
 }
 
 class EQUALS extends Operator {
-  
   @override
   final String value = '==';
 
@@ -47,16 +46,13 @@ class OR extends Operator {
   String get sqlValue => 'OR';
 }
 
-enum ConditionalType {
-  apptree,
-  sqlite
-}
+enum ConditionalType { apptree, sqlite }
 
 abstract class Conditional {
   Operator operator;
   List<Conditional> conditions = [];
-  ConditionalType type = ConditionalType.apptree;
   List<dynamic> sqlValues = [];
+  ConditionalType type = ConditionalType.apptree;
 
   Conditional({required this.operator, required this.conditions});
 
@@ -68,15 +64,14 @@ abstract class Conditional {
     return Expression(operator: OR(), condition1: this, condition2: condition);
   }
 
-  Conditional setType(ConditionalType type) {
-    this.type = type;
-    return this;
-  }
+  Conditional setType(ConditionalType type);
+
+  List<dynamic> getValues();
 }
 
 class Or extends Conditional {
   Or(Conditional first, Conditional second, [List<Conditional>? additional])
-      : super(operator: OR(), conditions: [first, second, ...?additional]);
+    : super(operator: OR(), conditions: [first, second, ...?additional]);
 
   @override
   String toString() {
@@ -84,12 +79,30 @@ class Or extends Conditional {
       return '(${conditions.map((e) => e.toString()).join(' ${operator.sqlValue} ')})';
     }
     return '(${conditions.map((e) => e.toString()).join(' ${operator.value} ')})';
+  }
+
+  @override
+  Conditional setType(ConditionalType type) {
+    this.type = type;
+    for (var condition in conditions) {
+      condition.setType(type);
+    }
+    return this;
+  }
+
+  @override
+  List<dynamic> getValues() {
+    return conditions
+        .map((e) => e.getValues())
+        .toList()
+        .expand((x) => x)
+        .toList();
   }
 }
 
 class And extends Conditional {
   And(Conditional first, Conditional second, [List<Conditional>? additional])
-      : super(operator: AND(), conditions: [first, second, ...?additional]);
+    : super(operator: AND(), conditions: [first, second, ...?additional]);
 
   @override
   String toString() {
@@ -97,6 +110,20 @@ class And extends Conditional {
       return '(${conditions.map((e) => e.toString()).join(' ${operator.sqlValue} ')})';
     }
     return '(${conditions.map((e) => e.toString()).join(' ${operator.value} ')})';
+  }
+
+  @override
+  Conditional setType(ConditionalType type) {
+    this.type = type;
+    for (var condition in conditions) {
+      condition.setType(type);
+    }
+    return this;
+  }
+
+  @override
+  List<dynamic> getValues() {
+    return conditions.map((e) => e.getValues()).toList();
   }
 }
 
@@ -104,8 +131,11 @@ class Expression extends Conditional {
   final Conditional condition1;
   final Conditional condition2;
 
-  Expression({required this.condition1, required this.condition2, required super.operator})
-      : super(conditions: []);
+  Expression({
+    required this.condition1,
+    required this.condition2,
+    required super.operator,
+  }) : super(conditions: []);
 
   @override
   String toString() {
@@ -114,6 +144,19 @@ class Expression extends Conditional {
     }
     return '${condition1.toString()} ${operator.value} ${condition2.toString()}';
   }
+
+  @override
+  Conditional setType(ConditionalType type) {
+    this.type = type;
+    condition1.setType(type);
+    condition2.setType(type);
+    return this;
+  }
+
+  @override
+  List<dynamic> getValues() {
+    return condition1.getValues() + condition2.getValues();
+  }
 }
 
 class Contains extends Conditional {
@@ -121,14 +164,25 @@ class Contains extends Conditional {
   final String value;
 
   Contains(this.field1, this.value)
-      : super(operator: CONTAINS(), conditions: []);
+    : super(operator: CONTAINS(), conditions: []);
 
   @override
   String toString() {
     if (type == ConditionalType.sqlite) {
-      return '${field1.getSqlPath()} LIKE "%$value%"';
+      return '${field1.getSqlPath()} LIKE ?';
     }
     return '${field1.getFormPath()}.${operator.value}("$value")';
+  }
+
+  @override
+  Conditional setType(ConditionalType type) {
+    this.type = type;
+    return this;
+  }
+
+  @override
+  List<dynamic> getValues() {
+    return [value];
   }
 }
 
@@ -137,14 +191,25 @@ class StringEquals extends Conditional {
   final String value;
 
   StringEquals(this.field1, this.value)
-      : super(operator: EQUALS(), conditions: []);
+    : super(operator: EQUALS(), conditions: []);
 
   @override
   String toString() {
     if (type == ConditionalType.sqlite) {
-      return '${field1.getSqlPath()} ${operator.sqlValue} "$value"';
+      return '${field1.getSqlPath()} ${operator.sqlValue} ?';
     }
     return '${field1.getFormPath()} ${operator.value} "$value"';
+  }
+
+  @override
+  Conditional setType(ConditionalType type) {
+    this.type = type;
+    return this;
+  }
+
+  @override
+  List<dynamic> getValues() {
+    return [value];
   }
 }
 
@@ -153,15 +218,25 @@ class IntEquals extends Conditional {
   final int value;
 
   IntEquals(this.field1, this.value)
-      : super(operator: EQUALS(), conditions: []);
+    : super(operator: EQUALS(), conditions: []);
 
-    
   @override
   String toString() {
     if (type == ConditionalType.sqlite) {
-      return '${field1.getSqlPath()} ${operator.sqlValue} $value';
+      return '${field1.getSqlPath()} ${operator.sqlValue} ?';
     }
     return '${field1.getFormPath()} ${operator.value} $value';
+  }
+
+  @override
+  Conditional setType(ConditionalType type) {
+    this.type = type;
+    return this;
+  }
+
+  @override
+  List<dynamic> getValues() {
+    return [value];
   }
 }
 
@@ -170,13 +245,24 @@ class BoolEquals extends Conditional {
   final bool value;
 
   BoolEquals(this.field1, this.value)
-      : super(operator: EQUALS(), conditions: []);
+    : super(operator: EQUALS(), conditions: []);
 
   @override
   String toString() {
     if (type == ConditionalType.sqlite) {
-      return '${field1.getSqlPath()} ${operator.sqlValue} $value';
+      return '${field1.getSqlPath()} ${operator.sqlValue} ?';
     }
     return '${field1.getFormPath()} ${operator.value} $value';
+  }
+
+  @override
+  Conditional setType(ConditionalType type) {
+    this.type = type;
+    return this;
+  }
+
+  @override
+  List<dynamic> getValues() {
+    return [value];
   }
 }
