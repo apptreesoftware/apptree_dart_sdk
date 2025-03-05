@@ -12,6 +12,9 @@ typedef FormFieldsBuilder<I extends Record> =
 typedef TopAccessoryViewBuilder =
     List<AccessoryView> Function(BuildContext context);
 
+typedef DisplayValueBuilder<I extends Record> =
+    String Function(BuildContext context, I record);
+
 typedef ToolbarBuilder = Toolbar Function(BuildContext context);
 typedef RequestBuilder<I> = I Function(BuildContext context);
 
