@@ -4,16 +4,14 @@ import 'package:apptree_dart_sdk/src/models/expression.dart';
 import 'package:apptree_dart_sdk/src/models/record.dart';
 
 class Card extends Record {
-  @override
-  final StringField fieldName = StringField();
+  final StringField name = StringField();
   final StringField rarity = StringField();
   final StringField type = StringField();
   final Attack attacks = Attack();
 }
 
 class Attack extends Record {
-  @override
-  final StringField fieldName = StringField();
+  final StringField name = StringField();
   final IntField damage = IntField();
 }
 
@@ -22,8 +20,7 @@ class Test extends Record {
 }
 
 class User extends Record {
-  @override
-  final StringField fieldName = StringField(scope: FieldScope.user);
+  final StringField name = StringField(scope: FieldScope.user);
 }
 
 void main() {
@@ -33,7 +30,7 @@ void main() {
     var user = User()..register();
 
     test('StringField contains expression test', () {
-      var expr = cardModel.fieldName.contains('test');
+      var expr = cardModel.name.contains('test');
 
       expect(expr.toString(), equals('record().name.contains("test")'));
     });
@@ -46,7 +43,7 @@ void main() {
               record.assetName.contains('assetName2'),
               record.assetName.equals('assetName3'),
             ).and(
-              user.fieldName.equals('user1').or(user.fieldName.equals('user2')),
+              user.name.equals('user1').or(user.name.equals('user2')),
             ),
           );
 

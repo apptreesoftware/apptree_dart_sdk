@@ -28,7 +28,7 @@ class PackageGenerator {
   }
 
   String getDatasourceFileName() {
-    return '${separateCapitalsWithUnderscore(datasourceName)}';
+    return '$separateCapitalsWithUnderscore(datasourceName)';
   }
 
   void generateExport() {
@@ -44,7 +44,7 @@ class PackageGenerator {
 
   String generateInitImport() {
     return 'import \'package:server/server.dart\';\n'
-        'import \'generated.dart\';\n\n';
+        'import \'generated.dart\';\n';
   }
 
   void generateInit() {
