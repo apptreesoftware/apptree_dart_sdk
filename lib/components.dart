@@ -9,3 +9,4 @@ export 'src/components/app.dart';
 export 'src/components/menu.dart';
 export 'src/components/accessory_view.dart';
 export 'src/components/list.dart';
+export 'src/components/map.dart';

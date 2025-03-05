@@ -12,6 +12,8 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
   final OnItemSelectedBuilder<RECORD>? onItemSelected;
   final ToolbarBuilder? toolbar;
   final RequestBuilder<INPUT>? onLoadRequest;
+  final ListFilterBuilder<RECORD>? filters;
+  final MapSettingsBuilder<RECORD>? mapSettings;
 
   RecordList({
     required super.id,
@@ -23,6 +25,8 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
     required this.onItemSelected,
     this.toolbar,
     this.onLoadRequest,
+    this.filters,
+    this.mapSettings,
   });
 
   @override
@@ -36,7 +40,8 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
     var request = onLoadRequest?.call(context);
     var topAccessoryViewResult =
         topAccessoryView?.call(context) ?? <AccessoryView>[];
-
+    var filtersResult = filters?.call(context, dataSource.record);
+    var mapSettingsResult = mapSettings?.call(context, dataSource.record);
     var buildErrors = <BuildError>[];
 
     var topAccessoryViews = [];
@@ -50,6 +55,12 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
 
     var templateData = template(context, dataSource.record).toDict();
 
+    // Process map settings if available
+    Map<String, dynamic>? mapSettingsData;
+    if (mapSettingsResult != null) {
+      mapSettingsData = mapSettingsResult.toDict();
+    }
+
     var featureData = {
       id: {
         "recordList": {
@@ -59,6 +70,8 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
           "showDivider": showDivider,
           "topAccessoryViews": topAccessoryViews,
           "template": templateData,
+          if (filtersResult != null) "filters": filtersResult,
+          if (mapSettingsData != null) "mapSettings": mapSettingsData,
           "onItemSelected":
               navigateTo != null
                   ? [
@@ -83,43 +96,3 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
     return template(context, dataSource.record);
   }
 }
-
-// class FormRecordList extends Feature {
-//   final bool showHeader;
-//   final String headerText;
-//   final bool collapsed;
-//   final bool collapsible;
-//   final String placeholderText;
-//   final String sort;
-//   final String bindTo;
-//   final Template template;
-//   final OnItemSelectedForm onItemSelected;
-//   FormRecordList({
-//     required super.id,
-//     required this.bindTo,
-//     required this.template,
-//     required this.showHeader,
-//     required this.headerText,
-//     required this.collapsed,
-//     required this.collapsible,
-//     required this.placeholderText,
-//     required this.sort,
-//     required this.onItemSelected,
-//   });
-
-//   @override
-//   Map<String, dynamic> toDict() {
-//     template.setIsFormTemplate(true);
-//     return {
-//       "showHeader": showHeader,
-//       "headerText": headerText,
-//       "collapsed": collapsed,
-//       "collapsible": collapsible,
-//       "placeholderText": placeholderText,
-//       "sort": sort,
-//       "bindTo": bindTo,
-//       "template": template.toDict(),
-//       "onItemSelected": onItemSelected.toDict(),
-//     };
-//   }
-// }

@@ -55,6 +55,20 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
       subtitle: '${record.owner.name} - ${record.description}',
     );
   },
+  mapSettings: (context, record) {
+    return MapSettings(
+      initialZoomMode: MapZoomMode.markers,
+      latitudeKey: '${record.latitude}',
+      longitudeKey: '${record.longitude}',
+      showCurrentLocation: true,
+      markerTitle: '${record.name}',
+      markerSummary: '${record.description}',
+      initialCameraPosition: CameraPosition(
+        latitude: 37.7749,
+        longitude: -122.4194,
+      ),
+    );
+  },
   noResultsText: 'No results',
   showDivider: true,
   topAccessoryView: (context) {

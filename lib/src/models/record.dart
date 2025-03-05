@@ -104,6 +104,15 @@ class IntField extends Field {
   }
 }
 
+class FloatField extends Field {
+  FloatField();
+
+  @override
+  String getFieldType() {
+    return 'float';
+  }
+}
+
 class StringField extends Field {
   StringField();
 
