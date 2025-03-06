@@ -45,4 +45,6 @@ void main() {
     datasourceName: datasourceName,
     routeName: routeName,
   );
+
+  runFlutterPubGet(projectDir);
 }
