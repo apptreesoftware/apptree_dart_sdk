@@ -186,6 +186,37 @@ class Contains extends Conditional {
   }
 }
 
+class RecordContains extends Conditional {
+  final Field field;
+  final Record record;
+
+  RecordContains(this.field, this.record)
+    : super(operator: CONTAINS(), conditions: []) {}
+
+  String getFieldName() {
+    return field.fieldName ?? field.relativeFieldPath ?? '';
+  }
+
+  @override
+  String toString() {
+    if (type == ConditionalType.sqlite) {
+      return '${field.getSqlPath()} IN ?';
+    }
+    return '${field.getFormPath()}.${operator.value}()';
+  }
+
+  @override
+  Conditional setType(ConditionalType type) {
+    this.type = type;
+    return this;
+  }
+
+  @override
+  List<dynamic> getValues() {
+    return ['${record.value}.map(\'${getFieldName()}\')'];
+  }
+}
+
 class StringEquals extends Conditional {
   final Field field1;
   final String value;

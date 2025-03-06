@@ -61,6 +61,10 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
         when: record.owner.name.contains('John'),
         statement: record.description.equals('Card').and(record.owner.name.equals('John')),
       ),
+      ListFilter(
+        when: record.owner.name.contains('John'),
+        statement: record.contains(record.owner.name),
+      ),
     ];
   },
   mapSettings: (context, record) {
