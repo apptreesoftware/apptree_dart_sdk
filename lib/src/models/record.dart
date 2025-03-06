@@ -75,6 +75,10 @@ class FieldBase {
     return recordPath;
   }
 
+  String getSqlPath() {
+    return 'json_extract(record, "\$.$fullFieldPath")';
+  }
+
   @override
   String toString() {
     return getPath(wrapped: true);

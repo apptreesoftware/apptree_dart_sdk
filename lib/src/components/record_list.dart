@@ -12,7 +12,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
   final OnItemSelectedBuilder<RECORD>? onItemSelected;
   final ToolbarBuilder? toolbar;
   final RequestBuilder<INPUT>? onLoadRequest;
-  final ListFilterBuilder<RECORD>? filters;
+  final ListFilterBuilder<RECORD>? filter;
   final MapSettingsBuilder<RECORD>? mapSettings;
 
   RecordList({
@@ -25,12 +25,13 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
     required this.onItemSelected,
     this.toolbar,
     this.onLoadRequest,
-    this.filters,
+    this.filter,
     this.mapSettings,
   });
 
   @override
   BuildResult build(BuildContext context) {
+    var buildErrors = <BuildError>[];
     var navigation =
         onItemSelected != null
             ? onItemSelected!(context, dataSource.record)
@@ -38,12 +39,24 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
     var toolbarResult = toolbar?.call(context);
     var builtToolbar = toolbarResult?.build(context);
     var request = onLoadRequest?.call(context);
+
+    // Process filters if available
+    var filters = [];
+    var filterResult = filter?.call(context, dataSource.record);
+    if (filterResult != null) {
+      for (var filter in filterResult) {
+        var filterResult = filter.build(context);
+        filters.add(filterResult.featureData);
+        buildErrors.addAll(filterResult.errors);
+      }
+    }
+  
+    // Process map settings if available
+    var mapSettingsResult = mapSettings?.call(context, dataSource.record);
+
+    // Process top accessory views if available
     var topAccessoryViewResult =
         topAccessoryView?.call(context) ?? <AccessoryView>[];
-    var filtersResult = filters?.call(context, dataSource.record);
-    var mapSettingsResult = mapSettings?.call(context, dataSource.record);
-    var buildErrors = <BuildError>[];
-
     var topAccessoryViews = [];
     for (var view in topAccessoryViewResult) {
       var accessoryViewResult = view.build(context);
@@ -51,8 +64,10 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
       buildErrors.addAll(accessoryViewResult.errors);
     }
 
+    // Process navigation if available
     var navigateTo = navigation?.build(context);
 
+    // Process Template Data
     var templateData = template(context, dataSource.record).toDict();
 
     // Process map settings if available
@@ -70,7 +85,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
           "showDivider": showDivider,
           "topAccessoryViews": topAccessoryViews,
           "template": templateData,
-          if (filtersResult != null) "filters": filtersResult,
+          if (filterResult != null) "filters": filters,
           if (mapSettingsData != null) "mapSettings": mapSettingsData,
           "onItemSelected":
               navigateTo != null

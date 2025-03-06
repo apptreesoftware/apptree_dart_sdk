@@ -55,6 +55,14 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
       subtitle: '${record.owner.name} - ${record.description}',
     );
   },
+  filter: (context, record) {
+    return [
+      ListFilter(
+        when: record.owner.name.contains('John'),
+        statement: record.description.equals('Card').and(record.owner.name.equals('John')),
+      ),
+    ];
+  },
   mapSettings: (context, record) {
     return MapSettings(
       initialZoomMode: MapZoomMode.markers,
