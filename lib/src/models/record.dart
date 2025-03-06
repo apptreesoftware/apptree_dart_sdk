@@ -329,4 +329,8 @@ abstract class Record extends FieldBase {
       MirrorSystem.getName(reflect(this).type.simpleName): getFieldTypes(),
     };
   }
+
+  Conditional contains(Field field) {
+    return RecordContains(field, this);
+  }
 }
