@@ -11,6 +11,7 @@ class SampleGenerator {
   final String dataSourceName;
   final String projectDir;
   final String openaiApiKey;
+  final bool overwrite;
 
   SampleGenerator({
     required this.record,
@@ -18,6 +19,7 @@ class SampleGenerator {
     required this.dataSourceName,
     required this.projectDir,
     required this.openaiApiKey,
+    this.overwrite = false,
   }) {
     generateSamples();
   }
@@ -53,6 +55,13 @@ class SampleGenerator {
   }
 
   Future<String> generateSampleData() async {
+    // 1 Attempt to read in existing samples
+    final existingSamples = await readSampleDart(projectDir, getFileName());
+    if (existingSamples.isNotEmpty && !overwrite) {
+      return existingSamples;
+    }
+
+    // 2. Generate new samples
     final vectorStore = MemoryVectorStore(
       embeddings: OpenAIEmbeddings(apiKey: openaiApiKey),
     );
@@ -61,7 +70,7 @@ class SampleGenerator {
       documents: [Document(pageContent: modelDart)],
     );
 
-    // 2. Define the retrieval chain
+    // 3. Define the retrieval chain
     final retriever = vectorStore.asRetriever();
     final setupAndRetrieval = Runnable.fromMap<String>({
       'context': retriever.pipe(
@@ -84,13 +93,13 @@ class SampleGenerator {
         {context}
       ''';
 
-    // 3. Construct a RAG prompt template
+    // 4. Construct a RAG prompt template
     final promptTemplate = ChatPromptTemplate.fromPromptMessages([
       SystemChatMessagePromptTemplate.fromTemplate(systemPrompt),
       HumanChatMessagePromptTemplate.fromTemplate('{code_request}'),
     ]);
 
-    // 4. Define the final chain
+    // 5. Define the final chain
     final model = ChatOpenAI(
       apiKey: openaiApiKey,
       defaultOptions: ChatOpenAIOptions(
@@ -105,7 +114,7 @@ class SampleGenerator {
         .pipe(model)
         .pipe(outputParser);
 
-    // 5. Run the pipeline
+    // 6. Run the pipeline
     final res = await chain.invoke(
       'Please produce 10 samples of the ${getRecordName()} objects.',
     );
