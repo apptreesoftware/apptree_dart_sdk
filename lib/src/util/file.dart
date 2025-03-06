@@ -43,6 +43,10 @@ void writeSampleDart(String dir, String fileName, String dart) {
   FileUtil.writeFile('$dir/lib/generated/samples', '$fileName.dart', dart);
 }
 
+void writeSamplePartialDart(String dir, String fileName, String dart) {
+  FileUtil.writeFile('res/generated/samples/$dir', '$fileName.dart', dart);
+}
+
 void writeGeneratedDart(String dir, String fileName, String dart) {
   FileUtil.writeFile('$dir/lib/generated', '$fileName.dart', dart);
 }
@@ -75,4 +79,12 @@ Future<String> readSampleDart(String dir, String fileName) async {
 
 Future<String> readPubspec(String dir) async {
   return await File('$dir/pubspec.yaml').readAsString();
+}
+
+Future<String> readSamplePartialDart(String dir, String fileName) async {
+  final file = File('res/generated/samples/$dir/$fileName.dart');
+  if (await file.exists()) {
+    return await file.readAsString();
+  }
+  return '';
 }

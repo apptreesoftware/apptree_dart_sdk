@@ -56,8 +56,8 @@ class SampleGenerator {
 
   Future<String> generateSampleData() async {
     // 1 Attempt to read in existing samples
-    final existingSamples = await readSampleDart(projectDir, getFileName());
-    if (existingSamples.isNotEmpty && !overwrite) {
+    final existingSamples = await readSamplePartialDart(projectDir, getFileName());
+    if (existingSamples.isNotEmpty && overwrite) {
       return existingSamples;
     }
 
@@ -119,6 +119,8 @@ class SampleGenerator {
       'Please produce 10 samples of the ${getRecordName()} objects.',
     );
 
+    // 7. Write the samples to the file
+    writeSamplePartialDart(projectDir, getFileName(), res['code']);
     return res['code'];
   }
 
