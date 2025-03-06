@@ -8,7 +8,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
   final bool showDivider;
   final TopAccessoryViewBuilder? topAccessoryView;
 
-  final TemplateBuilder<RECORD> template;
+  final RecordTemplateBuilder<RECORD> template;
   final OnItemSelectedBuilder<RECORD>? onItemSelected;
   final ToolbarBuilder? toolbar;
   final RequestBuilder<INPUT>? onLoadRequest;
@@ -50,7 +50,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
         buildErrors.addAll(filterResult.errors);
       }
     }
-  
+
     // Process map settings if available
     var mapSettingsResult = mapSettings?.call(context, dataSource.record);
 
