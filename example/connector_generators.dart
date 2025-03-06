@@ -7,10 +7,9 @@ void main() {
   final env = DotEnv(includePlatformEnvironment: true)..load();
   final openAiApiKey = env['OPENAI_API_KEY'];
   final projectDir = 'example_connector';
-  final routeName = 'my-cards';
-  final datasourceName = 'MyCardsCollection';
   final card = Card();
   final cardRequest = MyCardsRequest(owner: 'John Doe', filter: 'My Cards');
+  final myCardsEndpoint = MyCardsEndpoint();
 
   if (openAiApiKey == null) {
     stderr.writeln(
@@ -20,32 +19,41 @@ void main() {
     exit(1);
   }
 
+  PackageGenerator(
+    projectDir: projectDir,
+    record: card,
+    request: cardRequest,
+    datasourceName: myCardsEndpoint.getDatasourceName(),
+    routeName: myCardsEndpoint.getRouteName(),
+  );
+
+  runFlutterPubGet(projectDir);
+}
+
+void GenerateServerEndpoint(
+  String projectDir,
+  CollectionEndpoint endpoint,
+  Record record,
+  Request request,
+) {
+
   ModelGenerator(record: card, projectDir: projectDir);
 
   DatasourceGenerator(
-    datasourceName: datasourceName,
+    datasourceName: myCardsEndpoint.getDatasourceName(),
     record: card,
     request: cardRequest,
     projectDir: projectDir,
   );
-  
+
   RequestGenerator(request: cardRequest, projectDir: projectDir);
 
   SampleGenerator(
     record: card,
     request: cardRequest,
-    dataSourceName: datasourceName,
+    dataSourceName: myCardsEndpoint.getDatasourceName(),
     openaiApiKey: openAiApiKey,
     projectDir: projectDir,
   );
 
-  PackageGenerator(
-    projectDir: projectDir,
-    record: card,
-    request: cardRequest,
-    datasourceName: datasourceName,
-    routeName: routeName,
-  );
-
-  runFlutterPubGet(projectDir);
 }

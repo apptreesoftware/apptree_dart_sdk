@@ -1,6 +1,6 @@
 import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:yaml_writer/yaml_writer.dart';
-import 'dart:mirrors';
+import 'package:apptree_dart_sdk/src/util/strings.dart';
 
 abstract class SubmissionEndpoint<I extends Request, R extends Record> {
   final String id;
@@ -54,19 +54,14 @@ abstract class CollectionEndpoint<I extends Request, R extends Record> {
     return YamlWriter().write(getModelDict());
   }
 
-  String getDataSourceInterface() {
-    var recordType = reflect(this.record).reflectee.runtimeType.toString();
-    var requestName = getRequestName<I>();
-    return '''
-      Future<List<$recordType>> getRecords($requestName request) async {
-        // TODO: implement getRecords
-      }
-      and
-      $recordType getRecord(String id) async {
-        // TODO: implement getRecord
-      }
-    ''';
+  String getRouteName() {
+    return seperateCapitalsWithHyphens(id);
   }
+
+  String getDatasourceName() {
+    return '${id}Collection';
+  }
+
 }
 
 class CollectionEndpointRequest {
