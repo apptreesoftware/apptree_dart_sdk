@@ -191,10 +191,10 @@ class RecordContains extends Conditional {
   final Record record;
 
   RecordContains(this.field, this.record)
-    : super(operator: CONTAINS(), conditions: []) {}
+    : super(operator: CONTAINS(), conditions: []);
 
   String getFieldName() {
-    return field.fieldName ?? field.relativeFieldPath ?? '';
+    return field.fieldName ?? field.bindingFieldPath ?? '';
   }
 
   @override
@@ -213,7 +213,7 @@ class RecordContains extends Conditional {
 
   @override
   List<dynamic> getValues() {
-    return ['${record.value}.map(\'${getFieldName()}\')'];
+    return ["${record.value}.map('${getFieldName()}')"];
   }
 }
 

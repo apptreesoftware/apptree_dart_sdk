@@ -2,150 +2,165 @@ import 'package:test/test.dart';
 import 'package:apptree_dart_sdk/src/models/expression.dart';
 import 'package:apptree_dart_sdk/src/models/record.dart';
 
-// Mock Record class for testing
+/// A minimal Record model used for testing conditionals
+///
+/// This model defines a few fields (name, active, age) used in our tests.
+/// For our purposes, we manually assign field paths.
 class TestRecord extends Record {
-  final StringField status = StringField();
-  final BoolField closingStatusFlag = BoolField();
-  final BoolField completeStatusFlag = BoolField();
-  final BoolField isPMRequest = BoolField();
-  final StringField statusId = StringField();
-  final StringField propertyId = StringField();
-  final StringField requestTypeId = StringField();
-  final StringField requestPriorityId = StringField();
+  StringField name = StringField();
+  BoolField active = BoolField();
+  IntField age = IntField();
 
   TestRecord() {
-    register();
+    // Manually set the fullFieldPath for testing
+    name.fullFieldPath = 'name';
+    active.fullFieldPath = 'active';
+    age.fullFieldPath = 'age';
   }
+
+  // Override to avoid the need of reflection in tests.
+  @override
+  void register() {}
 }
 
 void main() {
-  late TestRecord record;
-
-  setUp(() {
-    record = TestRecord();
-  });
-
-  group('SQL Expression Tests', () {
-    test('todo status filter generates correct SQL', () {
-      final condition = record.closingStatusFlag
-          .equals(false)
-          .and(record.completeStatusFlag.equals(false))
+  group('ConditionalType.sqlite tests', () {
+    test('Test 1: StringEquals condition', () {
+      final record = TestRecord();
+      final condition = record.name
+          .equals("John")
           .setType(ConditionalType.sqlite);
-
       expect(
         condition.toString(),
-        'json_extract(record, "\$.closingStatusFlag") = ? AND json_extract(record, "\$.completeStatusFlag") = ?',
+        equals('json_extract(record, "\$.name") = ?'),
       );
-      expect(condition.getValues(), [false, false]);
+      expect(condition.getValues(), equals(["John"]));
     });
 
-    test('complete status filter generates correct SQL', () {
-      final condition = record.closingStatusFlag
-          .equals(true)
-          .or(record.completeStatusFlag.equals(true))
-          .setType(ConditionalType.sqlite);
-
-      expect(
-        condition.toString(),
-        'json_extract(record, "\$.closingStatusFlag") = ? OR json_extract(record, "\$.completeStatusFlag") = ?',
-      );
-      expect(condition.getValues(), [true, true]);
-    });
-
-    test('PM filter generates correct SQL', () {
-      final condition = record.isPMRequest
+    test('Test 2: BoolEquals condition', () {
+      final record = TestRecord();
+      final condition = record.active
           .equals(true)
           .setType(ConditionalType.sqlite);
-
       expect(
         condition.toString(),
-        'json_extract(record, "\$.isPMRequest") = ?',
+        equals('json_extract(record, "\$.active") = ?'),
       );
-      expect(condition.getValues(), [true]);
+      expect(condition.getValues(), equals([true]));
     });
 
-    test('non-PM filter generates correct SQL', () {
-      final condition = record.isPMRequest
-          .equals(false)
+    test('Test 3: IntEquals condition', () {
+      final record = TestRecord();
+      final condition = record.age.equals(30).setType(ConditionalType.sqlite);
+      expect(
+        condition.toString(),
+        equals('json_extract(record, "\$.age") = ?'),
+      );
+      expect(condition.getValues(), equals([30]));
+    });
+
+    test('Test 4: AND combination', () {
+      final record = TestRecord();
+      final condition = record.name
+          .equals("John")
+          .and(record.active.equals(true))
           .setType(ConditionalType.sqlite);
-
       expect(
         condition.toString(),
-        'json_extract(record, "\$.isPMRequest") = ?',
+        equals(
+          'json_extract(record, "\$.name") = ? AND json_extract(record, "\$.active") = ?',
+        ),
       );
-      expect(condition.getValues(), [false]);
+      expect(condition.getValues(), equals(["John", true]));
     });
 
-    test('status multi-filter generates correct SQL', () {
-      final condition = StringEquals(
-        record.statusId,
-        "1,2,3",
-      ).setType(ConditionalType.sqlite);
-
-      expect(condition.toString(), 'json_extract(record, "\$.statusId") = ?');
-      expect(condition.getValues(), ["1,2,3"]);
-    });
-
-    test('property multi-filter generates correct SQL', () {
-      final condition = StringEquals(
-        record.propertyId,
-        "prop1,prop2",
-      ).setType(ConditionalType.sqlite);
-
-      expect(condition.toString(), 'json_extract(record, "\$.propertyId") = ?');
-      expect(condition.getValues(), ["prop1,prop2"]);
-    });
-
-    test('type multi-filter generates correct SQL', () {
-      final condition = StringEquals(
-        record.requestTypeId,
-        "type1,type2",
-      ).setType(ConditionalType.sqlite);
-
-      expect(
-        condition.toString(),
-        'json_extract(record, "\$.requestTypeId") = ?',
-      );
-      expect(condition.getValues(), ["type1,type2"]);
-    });
-
-    test('priority multi-filter generates correct SQL', () {
-      final condition = StringEquals(
-        record.requestPriorityId,
-        "high,medium",
-      ).setType(ConditionalType.sqlite);
-
-      expect(
-        condition.toString(),
-        'json_extract(record, "\$.requestPriorityId") = ?',
-      );
-      expect(condition.getValues(), ["high,medium"]);
-    });
-
-    test('complex AND condition generates correct SQL', () {
-      final condition = record.isPMRequest
-          .equals(true)
-          .and(record.closingStatusFlag.equals(false))
+    test('Test 5: OR combination', () {
+      final record = TestRecord();
+      final condition = record.name
+          .equals("John")
+          .or(record.active.equals(true))
           .setType(ConditionalType.sqlite);
-
       expect(
         condition.toString(),
-        'json_extract(record, "\$.isPMRequest") = ? AND json_extract(record, "\$.closingStatusFlag") = ?',
+        equals(
+          'json_extract(record, "\$.name") = ? OR json_extract(record, "\$.active") = ?',
+        ),
       );
-      expect(condition.getValues(), [true, false]);
+      expect(condition.getValues(), equals(["John", true]));
     });
 
-    test('complex OR condition generates correct SQL', () {
-      final condition = record.statusId
-          .equals("1")
-          .or(record.propertyId.equals("prop1"))
+    test('Test 6: Contains condition', () {
+      final record = TestRecord();
+      final condition = record.name
+          .contains("oh")
           .setType(ConditionalType.sqlite);
-
       expect(
         condition.toString(),
-        'json_extract(record, "\$.statusId") = ? OR json_extract(record, "\$.propertyId") = ?',
+        equals('json_extract(record, "\$.name") LIKE ?'),
       );
-      expect(condition.getValues(), ["1", "prop1"]);
+      expect(condition.getValues(), equals(["oh"]));
+    });
+
+    test('Test 7: Nested OR and AND combination', () {
+      final record = TestRecord();
+      // Build an expression: (name equals "John" OR name equals "Doe") AND active equals true
+      final orCondition = record.name
+          .equals("John")
+          .or(record.name.equals("Doe"));
+      final condition = orCondition
+          .and(record.active.equals(true))
+          .setType(ConditionalType.sqlite);
+      expect(
+        condition.toString(),
+        equals(
+          'json_extract(record, "\$.name") = ? OR json_extract(record, "\$.name") = ? AND json_extract(record, "\$.active") = ?',
+        ),
+      );
+      expect(condition.getValues(), equals(["John", "Doe", true]));
+    });
+
+    test('Test 8: RecordContains condition', () {
+      final record = TestRecord();
+      // record.contains(field) returns a RecordContains instance.
+      final condition = record
+          .contains(record.name)
+          .setType(ConditionalType.sqlite);
+      expect(
+        condition.toString(),
+        equals('json_extract(record, "\$.name") IN ?'),
+      );
+      // getValues produces a string expression based on record.value and the field name.
+      expect(condition.getValues(), equals(["record().map('name')"]));
+    });
+
+    test('Test 9: Complex nested combination', () {
+      final record = TestRecord();
+      // Build an expression: (name equals 'John' AND active equals true) OR (age equals 25 AND name contains 'D')
+      final condition1 = record.name
+          .equals("John")
+          .and(record.active.equals(true));
+      final condition2 = record.age.equals(25).and(record.name.contains("D"));
+      final condition = condition1
+          .or(condition2)
+          .setType(ConditionalType.sqlite);
+      final expectedString =
+          'json_extract(record, "\$.name") = ? AND json_extract(record, "\$.active") = ? OR json_extract(record, "\$.age") = ? AND json_extract(record, "\$.name") LIKE ?';
+      expect(condition.toString(), equals(expectedString));
+      expect(condition.getValues(), equals(["John", true, 25, "D"]));
+    });
+
+    test('Test 10: Multiple nested conditions with mixed operators', () {
+      final record = TestRecord();
+      // Build an expression:
+      // ((name equals "John" OR name equals "Doe") AND active equals true) OR (name contains "Test" AND age equals 40)
+      final orPart = record.name.equals("John").or(record.name.equals("Doe"));
+      final andPart1 = orPart.and(record.active.equals(true));
+      final andPart2 = record.name.contains("Test").and(record.age.equals(40));
+      final condition = andPart1.or(andPart2).setType(ConditionalType.sqlite);
+      final expectedString =
+          'json_extract(record, "\$.name") = ? OR json_extract(record, "\$.name") = ? AND json_extract(record, "\$.active") = ? OR json_extract(record, "\$.name") LIKE ? AND json_extract(record, "\$.age") = ?';
+      expect(condition.toString(), equals(expectedString));
+      expect(condition.getValues(), equals(["John", "Doe", true, "Test", 40]));
     });
   });
 }

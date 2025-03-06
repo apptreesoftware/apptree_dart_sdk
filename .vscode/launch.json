@@ -36,6 +36,12 @@
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
       }
+    },
+    {
+      "name": "SQL Expression Test",
+      "request": "launch",
+      "type": "dart",
+      "program": "test/sql_expression_test.dart"
     }
   ]
 }
