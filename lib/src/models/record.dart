@@ -185,6 +185,8 @@ class ListField<T extends Record> extends Field {
 }
 
 abstract class Record extends FieldBase {
+  String? pkFieldName;
+
   void register() {
     buildMemberGraph();
     processAnnotations();
@@ -246,12 +248,23 @@ abstract class Record extends FieldBase {
               }
             }
           }
+          if (metadataInstance is PkField) {
+            final fieldInstance = instanceMirror.getField(symbol).reflectee;
+            if (fieldInstance is Field) {
+              fieldInstance.primaryKey = true;
+              pkFieldName = MirrorSystem.getName(symbol);
+            }
+          }
         }
 
         // Process annotations for nested Record instances
         final fieldInstance = instanceMirror.getField(symbol).reflectee;
         if (fieldInstance is Record) {
           fieldInstance.processAnnotations();
+        }
+
+        if (pkFieldName == null) {
+          throw Exception('No primary key found for record ${instanceMirror.type.simpleName}');
         }
       }
     });
