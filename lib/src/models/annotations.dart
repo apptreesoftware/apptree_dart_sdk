@@ -21,3 +21,7 @@ class ExternalField {
   /// Returns the endpoint ID for this list field.
   String get endpointId => endpoint.id;
 }
+
+class PkField {
+  const PkField();
+}

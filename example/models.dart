@@ -9,6 +9,7 @@ class OwnersListEndpoint extends ListEndpoint<EmptyRequest, Owner> {
 }
 
 class Card extends Record {
+  @PkField()
   final StringField cardId = StringField();
   final StringField name = StringField();
   @ExternalField(endpoint: OwnersListEndpoint(), key: 'ownerId')
@@ -22,17 +23,20 @@ class Card extends Record {
 }
 
 class Owner extends Record {
+  @PkField()
   final StringField ownerId = StringField();
   final StringField name = StringField();
 }
 
 class Attack extends Record {
+  @PkField()
   final StringField attackId = StringField();
   final StringField name = StringField();
   final IntField damage = IntField();
 }
 
 class CustomUserData extends Record {
+  @PkField()
   final StringField externalId = StringField();
 }
 
