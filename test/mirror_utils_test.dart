@@ -12,7 +12,7 @@ class ComplexRecord extends Record {
   final SimpleRecord nested = SimpleRecord();
   final List<SimpleRecord> records = [];
 
-  @ListField(endpoint: MyListEndpoint(), key: 'listRecordId')
+  @ExternalField(endpoint: MyListEndpoint(), key: 'listRecordId')
   final ListRecord listRecord = ListRecord();
 }
 

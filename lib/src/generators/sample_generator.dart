@@ -87,6 +87,7 @@ class SampleGenerator {
         The code should be a string representation of the objects in Dart declared with the name 'samples' as a list of the objects.
         Do not include any imports.
         This will be declared as a static variable in the class.
+        Any string fields should be wrapped in double quotes.
         Output in JSON format with the following keys:
         - prefix: A brief explanation of the code
         - code: The Dart code snippet
