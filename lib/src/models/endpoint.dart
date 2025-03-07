@@ -58,20 +58,6 @@ abstract class CollectionEndpoint<I extends Request, R extends Record> {
   String getModelYaml() {
     return YamlWriter().write(getModelDict());
   }
-
-  String getDataSourceInterface() {
-    var recordType = reflect(this.record).reflectee.runtimeType.toString();
-    var requestName = getRequestName<I>();
-    return '''
-      Future<List<$recordType>> getRecords($requestName request) async {
-        // TODO: implement getRecords
-      }
-      and
-      $recordType getRecord(String id) async {
-        // TODO: implement getRecord
-      }
-    ''';
-  }
 }
 
 class CollectionEndpointRequest {
