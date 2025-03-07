@@ -59,7 +59,9 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
     return [
       ListFilter(
         when: record.owner.name.contains('John'),
-        statement: record.description.equals('Card').and(record.owner.name.equals('John')),
+        statement: record.description
+            .equals('Card')
+            .and(record.owner.name.equals('John')),
       ),
       ListFilter(
         when: record.owner.name.contains('John'),
@@ -85,6 +87,13 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
   showDivider: true,
   topAccessoryView: (context) {
     return [
+      TemplateAccessoryView(
+        template:
+            (context) => Workbench(
+              title: r'''Count: ${recordCount()}''',
+              subtitle: 'No results',
+            ),
+      ),
       SegmentedControlAccessoryView(
         defaultValue: 'all',
         bindTo: 'activeFilter',
@@ -108,11 +117,12 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
       ),
     ];
   },
-  onItemSelected:
-      (BuildContext context, Card record) => NavigateTo(
-        feature: cardsForm,
-        data: {'user': context.user.appVersion},
-      ),
+  onItemSelected: (BuildContext context, Card record) {
+    return NavigateTo(
+      feature: cardsForm,
+      data: {'user': context.user.appVersion},
+    );
+  },
 );
 
 // class CardFormBuilder extends FormBuilder<MyCardsRequest, Card> {

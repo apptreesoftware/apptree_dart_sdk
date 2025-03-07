@@ -8,35 +8,6 @@ abstract class AccessoryView {
   BuildResult build(BuildContext context);
 }
 
-/*
-    - selectListInput:
-        allowClear: true
-        label: "Status"
-        list: requestStatuses
-        displayValue: "${context().woWorkbenchStatusMultiFilter.map('Name').join(', ')}"
-        # displayValue: Name
-        value: Name
-        bindTo: woWorkbenchStatusMultiFilter
-        placeholderText: "Select to filter"
-        filters:
-          - when: context().woWorkbenchStatusFilter == 'todo'
-            statement: json_extract(record,'$.Status.ClosingStatusFlag') = ? AND ActiveFlag = ?
-            record.Status.ClosingStatusFlag.equals(false).and(record.ActiveFlag).equals('TRUE')
-            values:
-              - false
-              - 'TRUE'
-          - when: context().woWorkbenchStatusFilter == 'complete' 
-            statement: json_extract(record,'$.Status.ClosingStatusFlag') = ? AND ActiveFlag = 'TRUE'
-            values:
-              - true
-        sort: TabOrder ASC
-        multiSelect: true
-        template:
-          id: title
-          vars:
-            title: "{{Name}}"
-*/
-
 class SelectListInputAccessoryView<I extends Request, T extends Record>
     extends AccessoryView {
   final String label;
@@ -46,7 +17,7 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
   final bool allowClear;
   final List<ListFilter>? filters;
   final String? sort;
-  final TemplateBuilder<T> template;
+  final RecordTemplateBuilder<T> template;
   final ListEndpoint<I, T> listEndpoint;
 
   SelectListInputAccessoryView({
@@ -121,6 +92,7 @@ class SegmentedControlAccessoryView extends AccessoryView {
     required this.segments,
     required this.defaultValue,
     required this.bindTo,
+    super.visibleWhen,
   }) : assert(
          segments.any((segment) => segment.value == defaultValue),
          'defaultValue must be a valid segment',
@@ -165,5 +137,38 @@ class SegmentItem {
 
   Map<String, dynamic> toJson() {
     return {'title': title, 'value': value};
+  }
+}
+
+class TemplateAccessoryView extends AccessoryView {
+  final TemplateBuilder template;
+
+  TemplateAccessoryView({required this.template, super.visibleWhen});
+
+  @override
+  BuildResult build(BuildContext context) {
+    var templateResult = template(context);
+    var templateBuildResult = templateResult.build(context);
+
+    var childBuildErrors = templateBuildResult.errors;
+    BuildError? rootBuildError;
+
+    if (childBuildErrors.isNotEmpty) {
+      rootBuildError = BuildError(
+        message: 'Template contains errors',
+        identifier: 'TemplateAccessoryView',
+        childErrors: childBuildErrors,
+      );
+    }
+
+    return BuildResult(
+      childFeatures: [],
+      templates: [templateResult],
+      errors: rootBuildError != null ? [rootBuildError] : [],
+      featureData: {
+        'template': templateBuildResult.featureData,
+        if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
+      },
+    );
   }
 }
