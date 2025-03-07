@@ -166,8 +166,10 @@ class TemplateAccessoryView extends AccessoryView {
       templates: [templateResult],
       errors: rootBuildError != null ? [rootBuildError] : [],
       featureData: {
-        'template': templateBuildResult.featureData,
-        if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
+        'dynamic': {
+          'template': templateBuildResult.featureData,
+          if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
+        },
       },
     );
   }

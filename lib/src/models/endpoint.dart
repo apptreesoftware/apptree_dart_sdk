@@ -2,18 +2,6 @@ import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 import 'dart:mirrors';
 
-abstract class SubmissionEndpoint<I extends Request, R extends Record> {
-  final String id;
-  final I? request;
-  final R record;
-
-  const SubmissionEndpoint({
-    required this.id,
-    this.request,
-    required this.record,
-  });
-}
-
 abstract class ListEndpoint<I extends Request, R extends Record> {
   final String id;
 
@@ -25,6 +13,23 @@ abstract class ListEndpoint<I extends Request, R extends Record> {
 
   R get record {
     return instantiateRecord();
+  }
+}
+
+abstract class SubmissionEndpoint<I extends Request, R extends Record> {
+  final String id;
+
+  const SubmissionEndpoint({required this.id});
+
+  R get record {
+    return instantiateRecord();
+  }
+
+  Map<String, dynamic> buildRequest(I? request) {
+    return {
+      "url": '{{environment.url}}/$id',
+      "data": request != null ? request.toJson() : {},
+    };
   }
 }
 

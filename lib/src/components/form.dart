@@ -52,45 +52,6 @@ class Form<I extends Record> extends Feature {
   }
 }
 
-abstract class ToolbarAction {
-  Map<String, dynamic> toDict();
-}
-
-class SubmitFormAction extends ToolbarAction {
-  final String url;
-  final String title;
-
-  SubmitFormAction({required this.url, required this.title});
-
-  @override
-  Map<String, dynamic> toDict() {
-    return {
-      "submitForm": {"url": url, "title": title},
-    };
-  }
-}
-
-// class FormFields {
-//   final Map<String, FormField> fields;
-//   //List<RecordListFormField> recordListFields = [];
-
-//   FormFields({required this.fields}) {
-//     for (var field in fields.values) {
-//       // if (field is RecordListFormField) {
-//       //   recordListFields.add(field);
-//       // }
-//     }
-//   }
-
-//   // List<RecordListFormField> getRecordListFields() {
-//   //   return recordListFields;
-//   // }
-
-//   Map<String, dynamic> toDict() {
-//     return fields.map((key, value) => MapEntry(key, value.toDict()));
-//   }
-// }
-
 enum LayoutDirection { vertical, horizontal }
 
 class FormFieldLayoutSize {

@@ -8,6 +8,15 @@ class OwnersListEndpoint extends ListEndpoint<EmptyRequest, Owner> {
   const OwnersListEndpoint() : super(id: 'Owners');
 }
 
+class CreateCardEndpoint
+    extends SubmissionEndpoint<CardSubmissionRequest, Card> {
+  const CreateCardEndpoint() : super(id: 'CreateCard');
+}
+
+class CreateOwnerEndpoint extends SubmissionEndpoint<EmptyRequest, Owner> {
+  const CreateOwnerEndpoint() : super(id: 'CreateOwner');
+}
+
 class Card extends Record {
   final StringField cardId = StringField();
   final StringField name = StringField();
@@ -37,10 +46,16 @@ class CustomUserData extends Record {
 }
 
 class MyCardsRequest extends Request {
-  final String owner;
-  final String filter;
+  final String? owner;
+  final String? filter;
 
   MyCardsRequest({required this.owner, required this.filter});
+}
+
+class CardSubmissionRequest extends Request {
+  final String appVersion;
+
+  CardSubmissionRequest({required this.appVersion});
 }
 
 class MyCardsVariables {
@@ -56,5 +71,3 @@ class CardsOptions {
 
   CardsOptions({this.showAll = true, this.showRare = false});
 }
-
-class EmptyRequest extends Request {}

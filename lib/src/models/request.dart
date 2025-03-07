@@ -3,7 +3,6 @@ import 'dart:mirrors';
 import 'package:apptree_dart_sdk/src/util/object_extensions.dart';
 
 abstract class Request {
-
   void register() {}
 
   Map<String, dynamic> toJson() {
@@ -19,17 +18,13 @@ abstract class Request {
         // if fieldInstance is String, add "string" to dataDict for the field name
         if (fieldInstance.runtimeType == String) {
           dataDict[MirrorSystem.getName(symbol)] = 'String';
-        }
-        else if (fieldInstance.runtimeType == int) {
+        } else if (fieldInstance.runtimeType == int) {
           dataDict[MirrorSystem.getName(symbol)] = 'int';
-        }
-        else if (fieldInstance.runtimeType == bool) {
+        } else if (fieldInstance.runtimeType == bool) {
           dataDict[MirrorSystem.getName(symbol)] = 'bool';
-        }
-        else if (fieldInstance.runtimeType == double) {
+        } else if (fieldInstance.runtimeType == double) {
           dataDict[MirrorSystem.getName(symbol)] = 'double';
-        }
-        else if (fieldInstance.runtimeType == DateTime) {
+        } else if (fieldInstance.runtimeType == DateTime) {
           dataDict[MirrorSystem.getName(symbol)] = 'datetime';
         } else {
           throw Exception(
@@ -45,3 +40,5 @@ abstract class Request {
     return getFieldTypes();
   }
 }
+
+class EmptyRequest extends Request {}
