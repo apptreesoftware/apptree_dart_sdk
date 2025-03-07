@@ -28,6 +28,10 @@ class ModelGenerator {
         buildRecordGraph(field);
         records.add(field);
       }
+      if (field is ListField) {
+        buildRecordGraph(field.record);
+        records.add(field.record);
+      }
     }
   }
   
@@ -48,6 +52,10 @@ class ModelGenerator {
         result[field.fieldName!] = {"type": 'int', "validationType": 'int'};
       } else if (field is BoolField) {
         result[field.fieldName!] = {"type": 'bool', "validationType": 'bool'};
+      } else if (field is FloatField) {
+        result[field.fieldName!] = {"type": 'double', "validationType": 'double'};
+      } else if (field is ListField) {
+        result[field.fieldName!] = {"type": '${field.getFieldType()}', "validationType": '${field.getFieldType()}'};
       } else if (field is Record) {
         // Use reflection to get the name of the record
         final recordName = MirrorSystem.getName(reflect(field).type.simpleName);

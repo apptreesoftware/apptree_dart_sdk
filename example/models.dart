@@ -11,12 +11,12 @@ class OwnersListEndpoint extends ListEndpoint<EmptyRequest, Owner> {
 class Card extends Record {
   final StringField cardId = StringField();
   final StringField name = StringField();
-  @ListField(endpoint: OwnersListEndpoint(), key: 'ownerId')
+  @ExternalField(endpoint: OwnersListEndpoint(), key: 'ownerId')
   final Owner owner = Owner();
   final StringField description = StringField();
   final StringField rarity = StringField();
   final StringField type = StringField();
-  final Attack attacks = Attack();
+  final ListField<Attack> attacks = ListField(record: Attack());
   final FloatField latitude = FloatField();
   final FloatField longitude = FloatField();
 }
