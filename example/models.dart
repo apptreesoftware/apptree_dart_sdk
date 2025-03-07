@@ -18,30 +18,34 @@ class CreateOwnerEndpoint extends SubmissionEndpoint<EmptyRequest, Owner> {
 }
 
 class Card extends Record {
+  @PkField()
   final StringField cardId = StringField();
   final StringField name = StringField();
-  @ListField(endpoint: OwnersListEndpoint(), key: 'ownerId')
+  @ExternalField(endpoint: OwnersListEndpoint(), key: 'ownerId')
   final Owner owner = Owner();
   final StringField description = StringField();
   final StringField rarity = StringField();
   final StringField type = StringField();
-  final Attack attacks = Attack();
+  final ListField<Attack> attacks = ListField(record: Attack());
   final FloatField latitude = FloatField();
   final FloatField longitude = FloatField();
 }
 
 class Owner extends Record {
+  @PkField()
   final StringField ownerId = StringField();
   final StringField name = StringField();
 }
 
 class Attack extends Record {
+  @PkField()
   final StringField attackId = StringField();
   final StringField name = StringField();
   final IntField damage = IntField();
 }
 
 class CustomUserData extends Record {
+  @PkField()
   final StringField externalId = StringField();
 }
 

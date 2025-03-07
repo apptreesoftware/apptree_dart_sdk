@@ -163,13 +163,30 @@ class BoolField extends Field {
   }
 }
 
-abstract class ListRecord extends Record {
-  final String key;
+class ListField<T extends Record> extends Field {
+  final Record record;
 
-  ListRecord({required this.key});
+  ListField({required this.record}) {
+    record.register();
+  }
+
+  @override
+  String getFieldType() {
+    return 'List<${getGenericFieldType()}>';
+  }
+
+  String getGenericFieldType() {
+    return T.toString();
+  }
+
+  Record getRecord() {
+    return record;
+  }
 }
 
 abstract class Record extends FieldBase {
+  String? pkFieldName;
+
   void register() {
     buildMemberGraph();
     processAnnotations();
@@ -209,7 +226,7 @@ abstract class Record extends FieldBase {
         // Look for ListField annotations on class members
         for (final metadata in declaration.metadata) {
           final metadataInstance = metadata.reflectee;
-          if (metadataInstance is ListField) {
+          if (metadataInstance is ExternalField) {
             final fieldInstance = instanceMirror.getField(symbol).reflectee;
             if (fieldInstance is FieldBase) {
               // Apply the ListField annotation info to the field
@@ -231,12 +248,23 @@ abstract class Record extends FieldBase {
               }
             }
           }
+          if (metadataInstance is PkField) {
+            final fieldInstance = instanceMirror.getField(symbol).reflectee;
+            if (fieldInstance is Field) {
+              fieldInstance.primaryKey = true;
+              pkFieldName = MirrorSystem.getName(symbol);
+            }
+          }
         }
 
         // Process annotations for nested Record instances
         final fieldInstance = instanceMirror.getField(symbol).reflectee;
         if (fieldInstance is Record) {
           fieldInstance.processAnnotations();
+        }
+
+        if (pkFieldName == null) {
+          throw Exception('No primary key found for record ${instanceMirror.type.simpleName}');
         }
       }
     });
@@ -333,4 +361,10 @@ abstract class Record extends FieldBase {
   Conditional contains(Field field) {
     return RecordContains(field, this);
   }
+}
+
+abstract class ExternalRecord extends Record {
+  final String key;
+
+  ExternalRecord({required this.key});
 }
