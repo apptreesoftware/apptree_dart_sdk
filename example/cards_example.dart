@@ -3,7 +3,24 @@ import 'models.dart';
 
 var cardsForm = Form<Card>(
   id: 'CardsUpdateForm',
-  toolbarBuilder: (context, record) => Toolbar(items: []),
+  toolbarBuilder:
+      (context, record) => Toolbar(
+        items: [
+          ToolbarItem(
+            title: 'Submit',
+            actions: [
+              SubmitFormAction<CardSubmissionRequest, Card>(
+                endpoint: CreateCardEndpoint(),
+                submissionTitle: (context, record) => 'Saving ${record.name}',
+                request:
+                    (context) => CardSubmissionRequest(
+                      appVersion: '${context.user.appVersion}',
+                    ),
+              ),
+            ],
+          ),
+        ],
+      ),
   fieldsBuilder:
       (context, record) => [
         Header(title: 'Card', id: 'Header'),
@@ -37,6 +54,13 @@ var cardsForm = Form<Card>(
 
 var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
   id: 'MyCardsRecordList',
+  onLoadRequest: (context) {
+    return MyCardsRequest(
+      owner: '${context.user.uid}',
+      filter:
+          r'''${context.activeFilter}''', //TODO: How do we do this in a type safe way?
+    );
+  },
   dataSource: MyCardsEndpoint(),
   toolbar: (context) {
     return Toolbar(

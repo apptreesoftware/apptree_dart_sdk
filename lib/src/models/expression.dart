@@ -194,7 +194,7 @@ class RecordContains extends Conditional {
     : super(operator: CONTAINS(), conditions: []);
 
   String getFieldName() {
-    return field.fieldName ?? field.bindingFieldPath ?? '';
+    return field.fieldName ?? field.bindingFieldPath;
   }
 
   @override

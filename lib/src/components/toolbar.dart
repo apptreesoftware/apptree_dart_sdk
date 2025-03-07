@@ -42,10 +42,10 @@ class ToolbarItem {
     var builtActions = actions.map((action) => action.build(context)).toList();
     return BuildResult(
       featureData: {
-        "title": title,
-        "icon": icon?.id,
-        "actions": builtActions.map((action) => action.featureData).toList(),
+        if (title != null) "title": title,
+        if (icon != null) "icon": icon?.id,
         if (visibleWhen != null) "visibleWhen": visibleWhen?.toString(),
+        "actions": builtActions.map((action) => action.featureData).toList(),
       },
       childFeatures:
           builtActions.expand((action) => action.childFeatures).toList(),
