@@ -40,12 +40,13 @@ class BuildResult {
   final List<Feature> childFeatures;
   final List<BuildError> errors;
   final List<Template> templates;
-
+  final List<Endpoint> endpoints;
   BuildResult({
     required this.featureData,
     required this.childFeatures,
     this.errors = const [],
     this.templates = const [],
+    this.endpoints = const [],
   });
 }
 

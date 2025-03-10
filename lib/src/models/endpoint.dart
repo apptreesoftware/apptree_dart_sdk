@@ -20,7 +20,8 @@ abstract class ListEndpoint<I extends Request, R extends Record> extends Endpoin
   Map<String, dynamic> buildRequest(I request) {
     return {"url": '{{environment.url}}/list/$id', "data": request.toJson()};
   }
-  
+
+  // TODO: Implement getModelDict and getModelYaml
 }
 
 abstract class SubmissionEndpoint<I extends Request, R extends Record> extends Endpoint<R> {
@@ -33,6 +34,8 @@ abstract class SubmissionEndpoint<I extends Request, R extends Record> extends E
       "data": request != null ? request.toJson() : {},
     };
   }
+
+  // TODO: Implement getModelDict and getModelYaml
 }
 
 abstract class CollectionEndpoint<I extends Request, R extends Record> extends Endpoint<R> {
@@ -50,6 +53,10 @@ abstract class CollectionEndpoint<I extends Request, R extends Record> extends E
         "Model": record.toModelDict(),
       },
     };
+  }
+
+  String getModelYaml() {
+    return YamlWriter().write(getModelDict());
   }
 }
 

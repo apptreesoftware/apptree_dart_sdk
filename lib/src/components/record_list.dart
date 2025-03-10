@@ -104,6 +104,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
         if (navigateTo != null) ...navigateTo.childFeatures,
         if (builtToolbar != null) ...builtToolbar.childFeatures,
       ],
+      endpoints: [dataSource],
     );
   }
 

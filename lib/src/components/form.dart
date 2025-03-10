@@ -48,6 +48,7 @@ class Form<I extends Record> extends Feature {
                 ),
               ]
               : [],
+      endpoints: [],
     );
   }
 }
@@ -144,6 +145,7 @@ class Header extends FormField {
         },
       },
       childFeatures: [],
+      endpoints: [],
     );
   }
 }
@@ -195,6 +197,7 @@ class TextInput extends BindingFormField {
       },
       childFeatures: [],
       errors: error != null ? [error] : [],
+      endpoints: [],
     );
   }
 }
@@ -223,6 +226,7 @@ class Text extends FormField {
         },
       },
       childFeatures: [],
+      endpoints: [],
     );
   }
 }

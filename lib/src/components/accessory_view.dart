@@ -79,6 +79,7 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
           'template': templateBuildResult.featureData,
         },
       },
+      endpoints: [listEndpoint],
     );
   }
 }
@@ -125,6 +126,7 @@ class SegmentedControlAccessoryView extends AccessoryView {
           'bindTo': bindTo,
         },
       },
+      endpoints: [],
     );
   }
 }
@@ -171,6 +173,7 @@ class TemplateAccessoryView extends AccessoryView {
           if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
         },
       },
+      endpoints:[],
     );
   }
 }

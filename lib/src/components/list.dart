@@ -42,6 +42,7 @@ class ListFilter {
         'values': statement.getValues(),
       },
       errors: errors,
+      endpoints: [],
     );
   }
 }
