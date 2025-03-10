@@ -1,16 +1,76 @@
-import 'dart:io';
-
+import 'package:apptree_dart_sdk/src/util/file.dart';
 import 'package:langchain/langchain.dart';
 import 'package:langchain_openai/langchain_openai.dart';
 
-void generateSamples(String openAiApiKey) async {
 
-  final llm = ChatOpenAI(apiKey: openAiApiKey);
+Future<String> generateSampleDataLLM(String codeRequest, String fileName, String recordName, String projectDir, String openaiApiKey, bool overwrite) async {
+    // 1. Attempt to read in existing samples
+    final existingSamples = await readSamplePartialDart(
+      projectDir,
+      fileName,
+    );
+    if (existingSamples.isNotEmpty && overwrite) {
+      return existingSamples;
+    }
 
-  stdout.writeln('How can I help you?');
+    // 2. Generate new samples
+    final vectorStore = MemoryVectorStore(
+      embeddings: OpenAIEmbeddings(apiKey: openaiApiKey),
+    );
+    final modelDart = await readModelDart(projectDir, recordName);
+    await vectorStore.addDocuments(
+      documents: [Document(pageContent: modelDart)],
+    );
 
-  final query = "Write me a haiku about a cat";
-  final humanMessage = ChatMessage.humanText(query);
-  final aiMessage = await llm.call([humanMessage]);
-  stdout.writeln(aiMessage.content.trim());
-}
+    // 3. Define the retrieval chain
+    final retriever = vectorStore.asRetriever();
+    final setupAndRetrieval = Runnable.fromMap<String>({
+      'context': retriever.pipe(
+        Runnable.mapInput((docs) => docs.map((d) => d.pageContent).join('\n')),
+      ),
+      'code_request': Runnable.passthrough(),
+    });
+
+    const String systemPrompt = '''
+        You are a Dart developer.
+        You are given a code request and a context.
+        You need to generate a Dart code snippet that implements the code request.
+        The code should be formatted using Dart's formatting rules.
+        The code should be a string representation of the objects in Dart declared with the name 'samples' as a list of the objects.
+        Do not include any imports.
+        This will be declared as a static variable in the class.
+        Any string fields should be wrapped in double quotes.
+        Output in JSON format with the following keys:
+        - prefix: A brief explanation of the code
+        - code: The Dart code snippet
+        {context}
+      ''';
+
+    // 4. Construct a RAG prompt template
+    final promptTemplate = ChatPromptTemplate.fromPromptMessages([
+      SystemChatMessagePromptTemplate.fromTemplate(systemPrompt),
+      HumanChatMessagePromptTemplate.fromTemplate('{code_request}'),
+    ]);
+
+    // 5. Define the final chain
+    final model = ChatOpenAI(
+      apiKey: openaiApiKey,
+      defaultOptions: ChatOpenAIOptions(
+        model: 'gpt-4o-mini',
+        temperature: 0,
+        responseFormat: ChatOpenAIResponseFormat.jsonObject,
+      ),
+    );
+    final outputParser = JsonOutputParser<ChatResult>();
+    final chain = setupAndRetrieval
+        .pipe(promptTemplate)
+        .pipe(model)
+        .pipe(outputParser);
+
+    // 6. Run the pipeline
+    final res = await chain.invoke(codeRequest);
+
+    // 7. Write the samples to the file
+    writeSamplePartialDart(projectDir, fileName, res['code']);
+    return res['code'];
+  }

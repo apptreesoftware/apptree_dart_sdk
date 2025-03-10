@@ -61,8 +61,8 @@ class ModelGenerator {
         };
       } else if (field is ListField) {
         result[field.fieldName!] = {
-          "type": '${field.getFieldType()}',
-          "validationType": '${field.getFieldType()}',
+          "type": field.getFieldType(),
+          "validationType": field.getFieldType(),
         };
       } else if (field is Record) {
         // Use reflection to get the name of the record
@@ -125,13 +125,13 @@ class ModelGenerator {
     result += '  Map<String, dynamic> toJson() {\n';
     result += '    final Map<String, dynamic> data = {};\n';
     if (pkFieldName != null) {
-      result += '    data[\'_pk\'] = ${pkFieldName}.toString();\n';
+      result += '    data[\'_pk\'] = $pkFieldName.toString();\n';
     } else {
       throw Exception('No primary key found for record $recordName');
     }
     for (final entry in recordMap.entries) {
       result +=
-          '    data[\'${entry.key}\'] = ${entry.value["type"] == "String" ? '${entry.key}.toString()' : '${entry.key}'};\n';
+          '    data[\'${entry.key}\'] = ${entry.value["type"] == "String" ? '${entry.key}.toString()' : entry.key};\n';
     }
     result += '    return data;\n';
     result += '  }\n';
