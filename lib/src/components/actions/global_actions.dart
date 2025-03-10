@@ -28,6 +28,7 @@ class NavigateTo extends Action {
   @override
   BuildResult build(BuildContext context) {
     return BuildResult(
+      buildIdentifier: 'NavigateTo',
       featureData: {
         'id': feature.id,
         if (data != null) 'navigationContext': data,

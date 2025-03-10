@@ -35,19 +35,88 @@ class BuildContext {
   BuildContext({required this.user});
 }
 
+class BuildResultBuilder {
+  final List<BuildError> errors = [];
+  final List<Template> templates = [];
+  final List<Endpoint> endpoints = [];
+  final List<Feature> childFeatures = [];
+
+  void addEndpoint(Endpoint endpoint) {
+    endpoints.add(endpoint);
+  }
+
+  BuildResult? addResult(BuildResult? result) {
+    if (result == null) return null;
+    if (result.errors.isNotEmpty) {
+      errors.addAll(result.errors);
+    }
+    if (result.templates.isNotEmpty) {
+      templates.addAll(result.templates);
+    }
+    if (result.endpoints.isNotEmpty) {
+      endpoints.addAll(result.endpoints);
+    }
+    if (result.childFeatures.isNotEmpty) {
+      childFeatures.addAll(result.childFeatures);
+    }
+    return result;
+  }
+
+  List<BuildResult> addResults(List<BuildResult> results) {
+    for (var result in results) {
+      addResult(result);
+    }
+    return results;
+  }
+
+  void addError(BuildError error) {
+    errors.add(error);
+  }
+
+  BuildResult build(Map<String, dynamic> featureData, String identifier) {
+    return BuildResult(
+      buildIdentifier: identifier,
+      errors: errors,
+      templates: templates,
+      endpoints: endpoints,
+      childFeatures: childFeatures,
+      featureData: featureData,
+    );
+  }
+}
+
 class BuildResult {
   final Map<String, dynamic> featureData;
   final List<Feature> childFeatures;
   final List<BuildError> errors;
   final List<Template> templates;
   final List<Endpoint> endpoints;
+  final String buildIdentifier;
   BuildResult({
+    required this.buildIdentifier,
     required this.featureData,
     required this.childFeatures,
     this.errors = const [],
     this.templates = const [],
     this.endpoints = const [],
   });
+
+  BuildResult? addResult(BuildResult? result) {
+    if (result == null) return null;
+    if (result.errors.isNotEmpty) {
+      errors.addAll(result.errors);
+    }
+    if (result.templates.isNotEmpty) {
+      templates.addAll(result.templates);
+    }
+    if (result.endpoints.isNotEmpty) {
+      endpoints.addAll(result.endpoints);
+    }
+    if (result.childFeatures.isNotEmpty) {
+      childFeatures.addAll(result.childFeatures);
+    }
+    return this;
+  }
 }
 
 abstract class Builder {

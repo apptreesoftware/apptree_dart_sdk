@@ -8,6 +8,7 @@ class App {
   List<Feature> features = [];
   Map<String, MenuItem> menuItems = {};
   List<Template> templates = [];
+
   App({required this.name, required this.configVersion});
 
   void addFeature(Feature feature, {required MenuItem menuItem}) {
@@ -51,18 +52,6 @@ class App {
     Map<String, dynamic> configDict = {};
     var buildContext = BuildContext(user: User());
 
-    for (var feature in features) {
-      if (feature is RecordList) {
-        configDict[feature.dataSource.id] = {"output": true, "skip": false};
-        writeModelYaml(
-          name,
-          feature.dataSource.id,
-          feature.dataSource.getModelYaml(),
-        );
-        templates.add(feature.getTemplate(buildContext));
-      }
-    }
-
     for (var template in templates) {
       writeTemplate(name, template.id, template.toFsx());
     }
@@ -76,17 +65,22 @@ class App {
     for (var feature in features) {
       writeFeature(feature, buildContext: buildContext);
     }
-
     toYaml();
   }
 
-  void writeFeature(Feature feature, {required BuildContext buildContext}) {
+  BuildResult writeFeature(
+    Feature feature, {
+    required BuildContext buildContext,
+  }) {
     var buildResult = feature.build(buildContext);
     print("Writing feature: ${feature.id}");
 
     if (buildResult.errors.isNotEmpty) {
+      print("Error in ${buildResult.buildIdentifier}");
       for (var error in buildResult.errors) {
-        print("Invalid feature: ${error.identifier} - ${error.message}");
+        print(
+          "\tInvalid configuration: ${error.identifier} - ${error.message}",
+        );
         for (var childError in error.childErrors) {
           print("  - ${childError.identifier} - ${childError.message}");
         }
@@ -101,5 +95,7 @@ class App {
     for (var childFeature in buildResult.childFeatures) {
       writeFeature(childFeature, buildContext: buildContext);
     }
+
+    return buildResult;
   }
 }

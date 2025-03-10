@@ -4,6 +4,8 @@ import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:apptree_dart_sdk/src/constants.dart';
 
 class User extends Record {
+  @PkField()
+  final StringField uid = StringField();
   final StringField app = StringField();
   final StringField appVersion = StringField();
   final StringField appVersionNumber = StringField();
@@ -17,7 +19,6 @@ class User extends Record {
   final StringField osVersion = StringField();
   final StringField patchVersion = StringField();
   final StringField status = StringField();
-  final StringField uid = StringField();
   final StringField username = StringField();
   Record? data;
 
@@ -30,7 +31,5 @@ class User extends Record {
     return FieldScope.user;
   }
 }
-
-
 
 // TODO: Need Way of Dynamically Populate User Model with User Data and Debug Flags

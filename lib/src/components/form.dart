@@ -17,15 +17,18 @@ class Form<I extends Record> extends Feature {
   BuildResult build(BuildContext context) {
     var fields = fieldsBuilder(context, record);
     var fieldMap = <String, Map<String, dynamic>>{};
-    var buildErrors = <BuildError>[];
+
+    var builder = BuildResultBuilder();
     for (var field in fields) {
       var buildResult = field.build(context);
       fieldMap[field.id] = buildResult.featureData;
-      buildErrors.addAll(buildResult.errors);
+      builder.addResult(buildResult);
     }
 
     var layouts = fields.map((field) => field.layoutInfo).toList();
-    var toolbar = toolbarBuilder?.call(context, record).build(context);
+    var toolbar = builder.addResult(
+      toolbarBuilder?.call(context, record).build(context),
+    );
     var featureData = {
       id: {
         "form": {
@@ -35,21 +38,8 @@ class Form<I extends Record> extends Feature {
         },
       },
     };
-    return BuildResult(
-      featureData: featureData,
-      childFeatures: toolbar?.childFeatures ?? [],
-      errors:
-          buildErrors.isNotEmpty
-              ? [
-                BuildError(
-                  identifier: id,
-                  message: "Form has errors",
-                  childErrors: buildErrors,
-                ),
-              ]
-              : [],
-      endpoints: [],
-    );
+
+    return builder.build(featureData, 'Form: $id');
   }
 }
 
@@ -138,6 +128,7 @@ class Header extends FormField {
   @override
   BuildResult build(BuildContext context) {
     return BuildResult(
+      buildIdentifier: 'Header: $id',
       featureData: {
         "header": {
           "title": title,
@@ -187,6 +178,7 @@ class TextInput extends BindingFormField {
   BuildResult build(BuildContext context) {
     var (bindingFieldPath, error) = buildBinding();
     return BuildResult(
+      buildIdentifier: 'TextInput: $id',
       featureData: {
         "textInput": {
           "title": title,
@@ -218,6 +210,7 @@ class Text extends FormField {
   @override
   BuildResult build(BuildContext context) {
     return BuildResult(
+      buildIdentifier: 'Text: $id',
       featureData: {
         "text": {
           "title": title,

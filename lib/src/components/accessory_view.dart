@@ -36,51 +36,40 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
   @override
   BuildResult build(BuildContext context) {
     var filterResults = <BuildResult>[];
+    var builder = BuildResultBuilder();
     if (filters != null) {
-      filterResults = filters!.map((filter) => filter.build(context)).toList();
-    }
-    var filterErrors = filterResults.expand((result) => result.errors).toList();
-    var filterData = filterResults.map((result) => result.featureData).toList();
-    var displayValueFormat = displayValue(context, listEndpoint.record);
-
-    BuildError? rootBuildError;
-    List<BuildError> childBuildErrors = [];
-
-    if (filterErrors.isNotEmpty) {
-      childBuildErrors.addAll(filterErrors);
-    }
-
-    var templateResult = template(context, listEndpoint.record);
-    var templateBuildResult = templateResult.build(context);
-
-    childBuildErrors.addAll(templateBuildResult.errors);
-
-    if (childBuildErrors.isNotEmpty) {
-      rootBuildError = BuildError(
-        message: 'Filters contain errors',
-        identifier: 'SelectListInput bound to $bindTo',
-        childErrors: childBuildErrors,
+      filterResults = builder.addResults(
+        filters!.map((filter) => filter.build(context)).toList(),
       );
     }
 
-    return BuildResult(
-      childFeatures: [],
-      errors: rootBuildError != null ? [rootBuildError] : [],
-      templates: [templateResult],
-      featureData: {
-        'selectListInput': {
-          'label': label,
-          'displayValue': displayValueFormat,
-          if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
-          'allowClear': allowClear,
-          if (filters != null && filters!.isNotEmpty) 'filters': filterData,
-          if (sort != null) 'sort': sort,
-          'list': listEndpoint.id,
-          'template': templateBuildResult.featureData,
-        },
+    var filterData = filterResults.map((result) => result.featureData).toList();
+    var displayValueFormat = displayValue(context, listEndpoint.record);
+
+    var templateResult = template(context, listEndpoint.record);
+    var templateBuildResult = builder.addResult(templateResult.build(context));
+    if (bindTo.isEmpty) {
+      builder.addError(
+        BuildError(
+          message: 'bindTo cannot be empty',
+          identifier: 'SelectListInputAccessoryView',
+        ),
+      );
+    }
+    //childBuildErrors.addAll(templateBuildResult.errors);
+
+    return builder.build({
+      'selectListInput': {
+        'label': label,
+        'displayValue': displayValueFormat,
+        if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
+        'allowClear': allowClear,
+        if (filters != null && filters!.isNotEmpty) 'filters': filterData,
+        if (sort != null) 'sort': sort,
+        'list': listEndpoint.id,
+        'template': templateBuildResult?.featureData,
       },
-      endpoints: [listEndpoint],
-    );
+    }, 'SelectListInput bound to $bindTo');
   }
 }
 
@@ -94,10 +83,7 @@ class SegmentedControlAccessoryView extends AccessoryView {
     required this.defaultValue,
     required this.bindTo,
     super.visibleWhen,
-  }) : assert(
-         segments.any((segment) => segment.value == defaultValue),
-         'defaultValue must be a valid segment',
-       );
+  });
 
   @override
   BuildResult build(BuildContext context) {
@@ -114,8 +100,16 @@ class SegmentedControlAccessoryView extends AccessoryView {
         ),
       );
     }
-
+    if (segments.length < 2) {
+      buildErrors.add(
+        BuildError(
+          message: 'At least 2 segments are required',
+          identifier: 'SegmentedControlAccessoryView',
+        ),
+      );
+    }
     return BuildResult(
+      buildIdentifier: 'SegmentedControlAccessoryView bound to $bindTo',
       childFeatures: [],
       errors: buildErrors,
       featureData: {
@@ -150,6 +144,7 @@ class TemplateAccessoryView extends AccessoryView {
   @override
   BuildResult build(BuildContext context) {
     var templateResult = template(context);
+
     var templateBuildResult = templateResult.build(context);
 
     var childBuildErrors = templateBuildResult.errors;
@@ -164,6 +159,7 @@ class TemplateAccessoryView extends AccessoryView {
     }
 
     return BuildResult(
+      buildIdentifier: 'TemplateAccessoryView',
       childFeatures: [],
       templates: [templateResult],
       errors: rootBuildError != null ? [rootBuildError] : [],
@@ -173,7 +169,7 @@ class TemplateAccessoryView extends AccessoryView {
           if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
         },
       },
-      endpoints:[],
+      endpoints: [],
     );
   }
 }

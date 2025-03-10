@@ -10,6 +10,7 @@ class ShowSortDialogAction extends RecordListAction {
   @override
   BuildResult build(BuildContext context) {
     return BuildResult(
+      buildIdentifier: 'ShowSortDialogAction',
       featureData: {
         'sort': {if (analytics != null) 'analytics': analytics?.build(context)},
       },
@@ -28,6 +29,7 @@ class ShowMapAction extends RecordListAction {
         'map': {if (analytics != null) 'analytics': analytics?.build(context)},
       },
       childFeatures: [],
+      buildIdentifier: 'ShowMapAction',
     );
   }
 }

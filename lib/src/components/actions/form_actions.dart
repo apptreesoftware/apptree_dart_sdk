@@ -27,6 +27,7 @@ class SubmitFormAction<I extends Request, R extends Record> extends FormAction {
     var request = endpoint.buildRequest(submitRequest);
 
     return BuildResult(
+      buildIdentifier: 'SubmitFormAction',
       featureData: {
         "submitForm": {
           ...request,
@@ -38,6 +39,7 @@ class SubmitFormAction<I extends Request, R extends Record> extends FormAction {
             "dependsOnSubmission": dependsOnSubmission,
         },
       },
+      endpoints: [endpoint],
       childFeatures: [],
     );
   }

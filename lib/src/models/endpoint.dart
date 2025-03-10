@@ -1,32 +1,41 @@
 import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
-
-class Endpoint<R extends Record> {
+abstract class Endpoint<R extends Record> {
   final String id;
 
   const Endpoint({required this.id});
-  
+
   R get record {
     return instantiateRecord();
   }
-  
+
+  Map<String, dynamic> getModelDict();
+
+  String getModelYaml() {
+    return YamlWriter().write(getModelDict());
+  }
 }
 
-abstract class ListEndpoint<I extends Request, R extends Record> extends Endpoint<R> {
-
-  ListEndpoint({required super.id});
+abstract class ListEndpoint<I extends Request, R extends Record>
+    extends Endpoint<R> {
+  const ListEndpoint({required super.id});
 
   Map<String, dynamic> buildRequest(I request) {
     return {"url": '{{environment.url}}/list/$id', "data": request.toJson()};
   }
 
-  // TODO: Implement getModelDict and getModelYaml
+  @override
+  Map<String, dynamic> getModelDict() {
+    return {
+      id: {"Model": record.toModelDict()},
+    };
+  }
 }
 
-abstract class SubmissionEndpoint<I extends Request, R extends Record> extends Endpoint<R> {
-
-  SubmissionEndpoint({required super.id});
+abstract class SubmissionEndpoint<I extends Request, R extends Record>
+    extends Endpoint<R> {
+  const SubmissionEndpoint({required super.id});
 
   Map<String, dynamic> buildRequest(I? request) {
     return {
@@ -35,17 +44,7 @@ abstract class SubmissionEndpoint<I extends Request, R extends Record> extends E
     };
   }
 
-  // TODO: Implement getModelDict and getModelYaml
-}
-
-abstract class CollectionEndpoint<I extends Request, R extends Record> extends Endpoint<R> {
-
-  CollectionEndpoint({required super.id});
-
-  Map<String, dynamic> buildRequest(I request) {
-    return {"url": '{{environment.url}}/$id', "data": request.toJson()};
-  }
-
+  @override
   Map<String, dynamic> getModelDict() {
     return {
       id: {
@@ -54,9 +53,23 @@ abstract class CollectionEndpoint<I extends Request, R extends Record> extends E
       },
     };
   }
-
-  String getModelYaml() {
-    return YamlWriter().write(getModelDict());
-  }
 }
 
+abstract class CollectionEndpoint<I extends Request, R extends Record>
+    extends Endpoint<R> {
+  const CollectionEndpoint({required super.id});
+
+  Map<String, dynamic> buildRequest(I request) {
+    return {"url": '{{environment.url}}/$id', "data": request.toJson()};
+  }
+
+  @override
+  Map<String, dynamic> getModelDict() {
+    return {
+      id: {
+        "RequestParams": describeRequest<I>(),
+        "Model": record.toModelDict(),
+      },
+    };
+  }
+}

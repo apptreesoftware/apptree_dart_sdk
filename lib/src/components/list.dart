@@ -35,6 +35,7 @@ class ListFilter {
     }
 
     return BuildResult(
+      buildIdentifier: 'ListFilter',
       childFeatures: [],
       featureData: {
         if (when != null) 'when': when?.toString(),

@@ -12,10 +12,11 @@ var cardsForm = Form<Card>(
               SubmitFormAction<CardSubmissionRequest, Card>(
                 endpoint: CreateCardEndpoint(),
                 submissionTitle: (context, record) => 'Saving ${record.name}',
-                request:
-                    (context) => CardSubmissionRequest(
-                      appVersion: '${context.user.appVersion}',
-                    ),
+                request: (context) {
+                  return CardSubmissionRequest(
+                    appVersion: '${context.user.appVersion}',
+                  );
+                },
               ),
             ],
           ),
@@ -55,11 +56,7 @@ var cardsForm = Form<Card>(
 var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
   id: 'MyCardsRecordList',
   onLoadRequest: (context) {
-    return MyCardsRequest(
-      owner: '${context.user.uid}',
-      filter:
-          r'''${context.activeFilter}''', //TODO: How do we do this in a type safe way?
-    );
+    return MyCardsRequest(owner: '${context.user.uid}', filter: 'active');
   },
   dataSource: MyCardsEndpoint(),
   toolbar: (context) {
@@ -129,7 +126,7 @@ var cardRecordList = RecordList<MyCardsRequest, Card, MyCardsVariables>(
       ),
       SelectListInputAccessoryView(
         label: 'Filter',
-        bindTo: 'testFilter',
+        bindTo: 'filter',
         displayValue: (context, record) => '${record.name}',
         placeholderText: 'Choose filter',
         listEndpoint: OwnersListEndpoint(),

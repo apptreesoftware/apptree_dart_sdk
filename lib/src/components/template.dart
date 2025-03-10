@@ -15,7 +15,13 @@ abstract class Template {
   String toFsx();
 
   BuildResult build(BuildContext context) {
-    return BuildResult(featureData: toDict(), childFeatures: [], errors: [], endpoints: []);
+    return BuildResult(
+      buildIdentifier: 'Template: $id',
+      featureData: toDict(),
+      childFeatures: [],
+      errors: [],
+      endpoints: [],
+    );
   }
 }
 

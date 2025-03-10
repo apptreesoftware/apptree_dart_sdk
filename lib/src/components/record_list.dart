@@ -31,13 +31,14 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
 
   @override
   BuildResult build(BuildContext context) {
-    var buildErrors = <BuildError>[];
+    var builder = BuildResultBuilder();
+
     var navigation =
         onItemSelected != null
             ? onItemSelected!(context, dataSource.record)
             : null;
     var toolbarResult = toolbar?.call(context);
-    var builtToolbar = toolbarResult?.build(context);
+    var builtToolbar = builder.addResult(toolbarResult?.build(context));
     var request = onLoadRequest?.call(context);
 
     // Process filters if available
@@ -47,7 +48,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
       for (var filter in filterResult) {
         var filterResult = filter.build(context);
         filters.add(filterResult.featureData);
-        buildErrors.addAll(filterResult.errors);
+        builder.addResult(filterResult);
       }
     }
 
@@ -61,11 +62,11 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
     for (var view in topAccessoryViewResult) {
       var accessoryViewResult = view.build(context);
       topAccessoryViews.add(accessoryViewResult.featureData);
-      buildErrors.addAll(accessoryViewResult.errors);
+      builder.addResult(accessoryViewResult);
     }
 
     // Process navigation if available
-    var navigateTo = navigation?.build(context);
+    var navigateTo = builder.addResult(navigation?.build(context));
 
     // Process Template Data
     var templateData = template(context, dataSource.record).toDict();
@@ -75,6 +76,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
     if (mapSettingsResult != null) {
       mapSettingsData = mapSettingsResult.toDict();
     }
+    builder.addEndpoint(dataSource);
 
     var featureData = {
       id: {
@@ -98,14 +100,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
       },
     };
 
-    return BuildResult(
-      featureData: featureData,
-      childFeatures: [
-        if (navigateTo != null) ...navigateTo.childFeatures,
-        if (builtToolbar != null) ...builtToolbar.childFeatures,
-      ],
-      endpoints: [dataSource],
-    );
+    return builder.build(featureData, 'RecordList: $id');
   }
 
   Template getTemplate(BuildContext context) {

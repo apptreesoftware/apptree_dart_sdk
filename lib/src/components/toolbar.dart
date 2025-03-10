@@ -6,13 +6,14 @@ class Toolbar {
   Toolbar({required this.items});
 
   BuildResult build(BuildContext context) {
-    var builtItems = items.map((item) => item.build(context)).toList();
-    return BuildResult(
-      featureData: {
-        "items": builtItems.map((item) => item.featureData).toList(),
-      },
-      childFeatures: builtItems.expand((item) => item.childFeatures).toList(),
+    var builder = BuildResultBuilder();
+    var builtItems = builder.addResults(
+      items.map((item) => item.build(context)).toList(),
     );
+
+    return builder.build({
+      "items": builtItems.map((item) => item.featureData).toList(),
+    }, 'Toolbar');
   }
 }
 
@@ -39,16 +40,15 @@ class ToolbarItem {
        );
 
   BuildResult build(BuildContext context) {
-    var builtActions = actions.map((action) => action.build(context)).toList();
-    return BuildResult(
-      featureData: {
-        if (title != null) "title": title,
-        if (icon != null) "icon": icon?.id,
-        if (visibleWhen != null) "visibleWhen": visibleWhen?.toString(),
-        "actions": builtActions.map((action) => action.featureData).toList(),
-      },
-      childFeatures:
-          builtActions.expand((action) => action.childFeatures).toList(),
+    var builder = BuildResultBuilder();
+    var builtActions = builder.addResults(
+      actions.map((action) => action.build(context)).toList(),
     );
+    return builder.build({
+      if (title != null) "title": title,
+      if (icon != null) "icon": icon?.id,
+      if (visibleWhen != null) "visibleWhen": visibleWhen?.toString(),
+      "actions": builtActions.map((action) => action.featureData).toList(),
+    }, 'ToolbarItem: ${title ?? icon?.id}');
   }
 }
