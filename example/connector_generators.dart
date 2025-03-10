@@ -22,7 +22,7 @@ void generateConnector(
 
   RequestGenerator(request: request, projectDir: projectDir);
 
-  SampleGenerator(
+  CollectionSampleGenerator(
     record: record,
     request: request,
     dataSourceName: datasourceName,
@@ -36,7 +36,6 @@ void generateListConnector(
   datasourceName,
   routeName,
   projectDir,
-  request,
   openAiApiKey,
 ) {
   ModelGenerator(record: record, projectDir: projectDir);
@@ -44,6 +43,13 @@ void generateListConnector(
   ListDatasourceGenerator(
     datasourceName: datasourceName,
     record: record,
+    projectDir: projectDir,
+  );
+
+  ListSampleGenerator(
+    record: record,
+    dataSourceName: datasourceName,
+    openaiApiKey: openAiApiKey,
     projectDir: projectDir,
   );
 }
@@ -66,20 +72,19 @@ void main() {
   }
 
   generateConnector(
-    card,
-    datasourceName,
-    routeName,
+    Card(),
+    'MyCardsCollection',
+    'my-cards',
     projectDir,
-    cardRequest,
+    MyCardsRequest(owner: 'John Doe', filter: 'My Cards'),
     openAiApiKey,
   );
 
   generateListConnector(
-    card,
-    datasourceName,
-    routeName,
+    Owner(),
+    'Owners',
+    'owners',
     projectDir,
-    cardRequest,
     openAiApiKey,
   );
 

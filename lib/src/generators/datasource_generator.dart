@@ -79,7 +79,6 @@ class CollectionDatasourceGenerator extends DatasourceGenerator {
     return result;
   }
 
-  @override
   String generateGetRecord() {
     String result =
         '  @override\n  Future<${getRecordName()}> getRecord(String id);\n';

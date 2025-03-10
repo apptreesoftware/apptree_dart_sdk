@@ -5,9 +5,8 @@ import 'package:apptree_dart_sdk/src/util/strings.dart';
 import 'package:apptree_dart_sdk/apptree.dart';
 import 'dart:mirrors';
 
-class SampleGenerator {
+abstract class SampleGenerator {
   final Record record;
-  final Request request;
   final String dataSourceName;
   final String projectDir;
   final String openaiApiKey;
@@ -15,7 +14,6 @@ class SampleGenerator {
 
   SampleGenerator({
     required this.record,
-    required this.request,
     required this.dataSourceName,
     required this.projectDir,
     required this.openaiApiKey,
@@ -28,16 +26,8 @@ class SampleGenerator {
     return MirrorSystem.getName(reflect(record).type.simpleName);
   }
 
-  String getRequestName() {
-    return MirrorSystem.getName(reflect(request).type.simpleName);
-  }
-
   String getRecordFileName() {
     return '${separateCapitalsWithUnderscore(getRecordName())}.dart';
-  }
-
-  String getRequestFileName() {
-    return '${separateCapitalsWithUnderscore(getRequestName())}.dart';
   }
 
   String getDataSourceFileName() {
@@ -48,15 +38,20 @@ class SampleGenerator {
     return '${separateCapitalsWithUnderscore(dataSourceName)}_sample';
   }
 
-  String generateImports() {
-    return 'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n'
-        'import \'package:$projectDir/generated/models/${getRequestFileName()}\';\n'
-        'import \'package:$projectDir/generated/datasources/${getDataSourceFileName()}\';\n';
-  }
+  String generateImports();
 
-  Future<String> generateSampleData() async {
-    // 1 Attempt to read in existing samples
-    final existingSamples = await readSamplePartialDart(projectDir, getFileName());
+  Future<String> generateSampleData();
+
+  Future<String> generateSampleClass();
+
+  Future<void> generateSamples();
+
+  Future<String> _generateSampleDataLLM(String codeRequest) async {
+    // 1. Attempt to read in existing samples
+    final existingSamples = await readSamplePartialDart(
+      projectDir,
+      getFileName(),
+    );
     if (existingSamples.isNotEmpty && overwrite) {
       return existingSamples;
     }
@@ -116,13 +111,48 @@ class SampleGenerator {
         .pipe(outputParser);
 
     // 6. Run the pipeline
-    final res = await chain.invoke(
-      'Please produce 10 samples of the ${getRecordName()} objects.',
-    );
+    final res = await chain.invoke(codeRequest);
 
     // 7. Write the samples to the file
     writeSamplePartialDart(projectDir, getFileName(), res['code']);
     return res['code'];
+  }
+}
+
+class CollectionSampleGenerator extends SampleGenerator {
+  final Request request;
+
+  CollectionSampleGenerator({
+    required super.record,
+    required this.request,
+    required super.dataSourceName,
+    required super.projectDir,
+    required super.openaiApiKey,
+    super.overwrite = false,
+  }) {
+    generateSamples();
+  }
+
+  String getRequestName() {
+    return MirrorSystem.getName(reflect(request).type.simpleName);
+  }
+
+  String getRequestFileName() {
+    return '${separateCapitalsWithUnderscore(getRequestName())}.dart';
+  }
+
+  @override
+  String generateImports() {
+    return 'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n'
+        'import \'package:$projectDir/generated/models/${getRequestFileName()}\';\n'
+        'import \'package:$projectDir/generated/datasources/${getDataSourceFileName()}\';\n';
+  }
+
+  @override
+  Future<String> generateSampleData() async {
+    return await _generateSampleDataLLM(
+      'Please produce 10 samples of the ${getRecordName()} objects.',
+    );
   }
 
   // TODO: Needs to be updated to return the correct object
@@ -131,6 +161,7 @@ class SampleGenerator {
   }
 
   // TODO: Implement Filters
+  @override
   Future<String> generateSampleClass() async {
     String res = 'class Sample$dataSourceName extends $dataSourceName {\n';
     res += '  ${await generateSampleData()}\n';
@@ -144,6 +175,49 @@ class SampleGenerator {
     return res;
   }
 
+  @override
+  Future<void> generateSamples() async {
+    String res = '';
+    res += generateImports();
+    res += await generateSampleClass();
+
+    writeSampleDart(projectDir, getFileName(), res);
+  }
+}
+
+class ListSampleGenerator extends SampleGenerator {
+  ListSampleGenerator({
+    required super.record,
+    required super.dataSourceName,
+    required super.projectDir,
+    required super.openaiApiKey,
+  });
+
+  @override
+  String generateImports() {
+    return 'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n';
+  }
+
+  @override
+  Future<String> generateSampleData() async {
+    return await _generateSampleDataLLM(
+      'Please produce 10 samples of the ${getRecordName()} objects.',
+    );
+  }
+
+  @override
+  Future<String> generateSampleClass() async {
+    String res = 'class Sample$dataSourceName extends $dataSourceName {\n';
+    res += '  ${await generateSampleData()}\n';
+    res += '  @override\n';
+    res += '  Future<List<${getRecordName()}>> getList() async {\n';
+    res += '  return samples;\n';
+    res += '  }\n';
+    res += '}\n';
+    return res;
+  }
+
+  @override
   Future<void> generateSamples() async {
     String res = '';
     res += generateImports();
