@@ -3,6 +3,57 @@ import 'models.dart';
 import 'dart:io';
 import 'package:dotenv/dotenv.dart';
 
+void generateConnector(
+  record,
+  datasourceName,
+  routeName,
+  projectDir,
+  request,
+  openAiApiKey,
+) {
+  ModelGenerator(record: record, projectDir: projectDir);
+
+  CollectionDatasourceGenerator(
+    datasourceName: datasourceName,
+    record: record,
+    request: request,
+    projectDir: projectDir,
+  );
+
+  RequestGenerator(request: request, projectDir: projectDir);
+
+  CollectionSampleGenerator(
+    record: record,
+    request: request,
+    dataSourceName: datasourceName,
+    openaiApiKey: openAiApiKey,
+    projectDir: projectDir,
+  );
+}
+
+void generateListConnector(
+  record,
+  datasourceName,
+  routeName,
+  projectDir,
+  openAiApiKey,
+) {
+  ModelGenerator(record: record, projectDir: projectDir);
+
+  ListDatasourceGenerator(
+    datasourceName: datasourceName,
+    record: record,
+    projectDir: projectDir,
+  );
+
+  ListSampleGenerator(
+    record: record,
+    dataSourceName: datasourceName,
+    openaiApiKey: openAiApiKey,
+    projectDir: projectDir,
+  );
+}
+
 void main() {
   final env = DotEnv(includePlatformEnvironment: true)..load();
   final openAiApiKey = env['OPENAI_API_KEY'];
@@ -20,23 +71,21 @@ void main() {
     exit(1);
   }
 
-  ModelGenerator(record: card, projectDir: projectDir);
-
-  DatasourceGenerator(
-    datasourceName: datasourceName,
-    record: card,
-    request: cardRequest,
-    projectDir: projectDir,
+  generateConnector(
+    Card(),
+    'MyCardsCollection',
+    'my-cards',
+    projectDir,
+    MyCardsRequest(owner: 'John Doe', filter: 'My Cards'),
+    openAiApiKey,
   );
-  
-  RequestGenerator(request: cardRequest, projectDir: projectDir);
 
-  SampleGenerator(
-    record: card,
-    request: cardRequest,
-    dataSourceName: datasourceName,
-    openaiApiKey: openAiApiKey,
-    projectDir: projectDir,
+  generateListConnector(
+    Owner(),
+    'Owners',
+    'owners',
+    projectDir,
+    openAiApiKey,
   );
 
   PackageGenerator(
