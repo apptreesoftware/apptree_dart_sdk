@@ -75,7 +75,7 @@ class CollectionDatasourceGenerator extends DatasourceGenerator {
   @override
   String generateGetRecords() {
     String result =
-        '  @override\n  Future<List<${getRecordName()}> getCollection(${getRequestName()} request);\n\n';
+        '  @override\n  Future<List<${getRecordName()}>> getCollection(${getRequestName()} request);\n\n';
     return result;
   }
 
@@ -103,7 +103,12 @@ class ListDatasourceGenerator extends DatasourceGenerator {
     required super.datasourceName,
     required super.record,
     required super.projectDir,
-  });
+  }) {
+    // Register the record
+    record.register();
+    // Generate the datasource
+    generateDatasource();
+  }
 
   @override
   String generateImports() {
@@ -119,7 +124,7 @@ class ListDatasourceGenerator extends DatasourceGenerator {
   @override
   String generateGetRecords() {
     String result =
-        '  @override\n  Future<List<${getRecordName()}> getList();\n\n';
+        '  @override\n  Future<List<${getRecordName()}>> getList();\n\n';
     return result;
   }
 

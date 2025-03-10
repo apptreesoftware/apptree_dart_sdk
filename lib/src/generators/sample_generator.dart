@@ -195,7 +195,8 @@ class ListSampleGenerator extends SampleGenerator {
 
   @override
   String generateImports() {
-    return 'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n';
+    return 'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n'
+        'import \'package:$projectDir/generated/datasources/${getDataSourceFileName()}\';\n';
   }
 
   @override
