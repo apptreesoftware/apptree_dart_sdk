@@ -12,9 +12,7 @@ abstract class DatasourceGenerator {
     required this.datasourceName,
     required this.record,
     required this.projectDir,
-  }) {
-    record.register();
-  }
+  });
 
   String getRecordName() {
     return MirrorSystem.getName(reflect(record).type.simpleName);
@@ -31,8 +29,6 @@ abstract class DatasourceGenerator {
   String generateImports();
 
   String generateSignature();
-
-  String generateGetRecords();
 
   void generateDatasource();
 }
@@ -70,7 +66,6 @@ class CollectionDatasourceGenerator extends DatasourceGenerator {
     return 'abstract class $datasourceName extends CollectionDataSource<${getRequestName()}, ${getRecordName()}> {\n';
   }
 
-  @override
   String generateGetRecords() {
     String result =
         '  @override\n  Future<List<${getRecordName()}>> getCollection(${getRequestName()} request);\n\n';
@@ -102,8 +97,6 @@ class ListDatasourceGenerator extends DatasourceGenerator {
     required super.record,
     required super.projectDir,
   }) {
-    // Register the record
-    record.register();
     // Generate the datasource
     generateDatasource();
   }
@@ -119,7 +112,6 @@ class ListDatasourceGenerator extends DatasourceGenerator {
     return 'abstract class $datasourceName extends ListDataSource<${getRecordName()}> {\n';
   }
 
-  @override
   String generateGetRecords() {
     String result =
         '  @override\n  Future<List<${getRecordName()}>> getList();\n\n';
@@ -132,6 +124,68 @@ class ListDatasourceGenerator extends DatasourceGenerator {
     result += generateImports();
     result += generateSignature();
     result += generateGetRecords();
+    result += '}\n';
+
+    writeDatasourceDart(projectDir, getFileName(), result);
+  }
+}
+
+enum SubmissionType { create, update }
+
+class SubmissionDatasourceGenerator extends DatasourceGenerator {
+  final String requestName;
+  final SubmissionType submissionType;
+  
+  SubmissionDatasourceGenerator({
+    required super.datasourceName,
+    required super.record,
+    required this.requestName,
+    required this.submissionType,
+    required super.projectDir,
+  }) {
+    // Generate the datasource
+    generateDatasource();
+  }
+
+  @override
+  String generateImports() {
+    return 'import \'package:server/server.dart\';\n\n'
+        'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n';
+  }
+
+  @override
+  String generateSignature() {
+    return 'abstract class $datasourceName extends SubmissionDataSource<${getRecordName()}> {\n';
+  }
+
+  String generateUpdate() {
+    return '''
+    @override
+    Future<${getRecordName()}> submit(${getRequestName()} request) {
+      return request;
+    }
+    ''';
+  }
+
+  String generateCreate() {
+    return '''
+    @override
+    Future<${getRecordName()}> submit(${getRequestName()} request) {
+      return request;
+    }
+    ''';
+  }
+
+  @override
+  void generateDatasource() {
+    String result = '';
+    result += generateImports();
+    result += generateSignature();
+    if (submissionType == SubmissionType.create) {
+      result += generateCreate();
+    } else {
+      result += generateUpdate();
+    }
     result += '}\n';
 
     writeDatasourceDart(projectDir, getFileName(), result);

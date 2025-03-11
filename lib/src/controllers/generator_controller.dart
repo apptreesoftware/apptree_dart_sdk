@@ -84,6 +84,25 @@ class GeneratorController {
   }
 
   void generateSubmissionConnector(SubmissionEndpoint endpoint) {
-    print('Implement Submission Connector');
+    var requestParams = endpoint.getRequestParams();
+    var requestName = requestParams.keys.first;
+    var requestMap = requestParams[requestName];
+
+    ModelGenerator(record: endpoint.record, projectDir: app.name);
+
+    SubmissionDatasourceGenerator(
+      datasourceName: endpoint.id,
+      record: endpoint.record,
+      requestName: requestName,
+      submissionType: endpoint.submissionType,
+      projectDir: app.name,
+    );
+
+    RequestGenerator(
+      requestName: requestName,
+      requestMap: requestMap,
+      projectDir: app.name,
+    );
+
   }
 }
