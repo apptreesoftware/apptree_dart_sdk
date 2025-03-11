@@ -721,10 +721,9 @@ class HierarchicalSelectListInput<I extends Record> extends SelectListInput<I> {
 }
 
 class FormRecordList<I extends Record> extends BindingFormField {
-  final TemplateBuilder template;
+  final RecordTemplateBuilder<I> template;
   final String? placeholderText;
   final bool showHeader;
-  final String? headerText;
   final bool collapsible;
   final bool collapsed;
   final String? addButtonTitle;
@@ -742,7 +741,6 @@ class FormRecordList<I extends Record> extends BindingFormField {
     required super.bindTo,
     this.placeholderText,
     this.showHeader = true,
-    this.headerText,
     this.collapsible = false,
     this.collapsed = false,
     this.addButtonTitle,
@@ -752,7 +750,7 @@ class FormRecordList<I extends Record> extends BindingFormField {
 
   @override
   BuildResult build(BuildContext context) {
-    var template = this.template(context);
+    var template = this.template(context, instantiateRecord<I>());
     var builder = BuildResultBuilder();
     var errors = <BuildError>[];
 
@@ -783,11 +781,11 @@ class FormRecordList<I extends Record> extends BindingFormField {
           "template": templateResult?.featureData,
           if (placeholderText != null) "placeholderText": placeholderText,
           "showHeader": showHeader,
-          if (headerText != null) "headerText": headerText,
+          "headerText": title,
           if (collapsible) "collapsible": collapsible,
           if (collapsed) "collapsed": collapsed,
           if (addButtonTitle != null) "addButtonTitle": addButtonTitle,
-          "bindTo": bindTo,
+          "bindTo": bindTo.bindingFieldPath,
           if (enabledIf != null) "enabledIf": enabledIf.toString(),
           if (onItemSelectedResultData != null)
             "onItemSelected": onItemSelectedResultData.featureData,

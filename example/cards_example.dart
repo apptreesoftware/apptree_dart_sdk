@@ -53,6 +53,16 @@ var cardsForm = Form<Card>(
         DurationInput(bindTo: record.cardId, id: 'Duration', title: 'Duration'),
         DateInput(bindTo: record.cardId, id: 'Date', title: 'Date'),
         NumberInput(bindTo: record.cardId, id: 'Number', title: 'Number'),
+        FormRecordList<Attack>(
+          id: 'Attacks',
+          bindTo: record.attacks,
+          title: 'Attacks',
+          template:
+              (context, attack) => Workbench(
+                title: '${attack.attackId}',
+                subtitle: '${attack.name}',
+              ),
+        ),
       ],
 );
 
