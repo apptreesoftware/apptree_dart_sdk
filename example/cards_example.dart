@@ -50,6 +50,9 @@ var cardsForm = Form<Card>(
           bindTo: record.description,
           required: true,
         ),
+        DurationInput(bindTo: record.cardId, id: 'Duration', title: 'Duration'),
+        DateInput(bindTo: record.cardId, id: 'Date', title: 'Date'),
+        NumberInput(bindTo: record.cardId, id: 'Number', title: 'Number'),
       ],
 );
 

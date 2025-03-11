@@ -68,18 +68,30 @@ abstract class FormField {
   final LayoutDirection layoutDirection;
   final FormFieldLayoutSize layoutSize;
   final String id;
+  final bool showBorder;
+  final String title;
 
-  FormField({
+  const FormField({
     this.visibleWhen,
     required this.id,
     this.layoutDirection = LayoutDirection.vertical,
     this.layoutSize = FormFieldLayoutSize.defaultSize,
+    this.showBorder = true,
+    required this.title,
   });
 
   FormFieldLayoutInfo get layoutInfo =>
       FormFieldLayoutInfo(direction: layoutDirection, size: layoutSize, id: id);
 
   BuildResult build(BuildContext context);
+
+  Map<String, dynamic> get baseData {
+    return {
+      if (showBorder) "showBorder": showBorder,
+      "title": title,
+      if (visibleWhen != null) "visibleWhen": visibleWhen.toString(),
+    };
+  }
 }
 
 class FormFieldLayoutInfo {
@@ -115,10 +127,8 @@ class FormFieldLayoutInfo {
 }
 
 class Header extends FormField {
-  final String title;
-
   Header({
-    required this.title,
+    required super.title,
     super.visibleWhen,
     super.layoutDirection,
     super.layoutSize,
@@ -127,14 +137,10 @@ class Header extends FormField {
 
   @override
   BuildResult build(BuildContext context) {
+    var baseData = super.baseData;
     return BuildResult(
       buildIdentifier: 'Header: $id',
-      featureData: {
-        "header": {
-          "title": title,
-          if (visibleWhen != null) "visibleWhen": visibleWhen.toString(),
-        },
-      },
+      featureData: {"header": baseData},
       childFeatures: [],
       endpoints: [],
     );
@@ -144,12 +150,14 @@ class Header extends FormField {
 abstract class BindingFormField extends FormField {
   final FieldBase bindTo;
 
-  BindingFormField({
+  const BindingFormField({
+    required super.id,
+    required super.title,
     required this.bindTo,
     super.visibleWhen,
     super.layoutDirection,
     super.layoutSize,
-    required super.id,
+    super.showBorder,
   });
   (String?, BuildError?) buildBinding() {
     try {
@@ -158,20 +166,104 @@ abstract class BindingFormField extends FormField {
       return (null, BuildError(identifier: id, message: e.toString()));
     }
   }
+
+  @override
+  Map<String, dynamic> get baseData {
+    var baseData = super.baseData;
+    baseData["bindTo"] = bindTo.bindingFieldPath;
+    return baseData;
+  }
 }
 
-class TextInput extends BindingFormField {
-  final String title;
+abstract class FormInputField extends BindingFormField {
   final bool required;
+  final bool editable;
+  final Conditional? requiredWhen;
+  final Conditional? enabledWhen;
+  final List<FormAction>? onValueChanged;
 
-  TextInput({
-    required this.title,
+  const FormInputField({
     required super.bindTo,
-    required this.required,
     required super.id,
+    required super.title,
+    super.showBorder,
     super.visibleWhen,
     super.layoutDirection,
     super.layoutSize,
+    this.required = false,
+    this.editable = true,
+    this.requiredWhen,
+    this.enabledWhen,
+    this.onValueChanged,
+  });
+
+  @override
+  Map<String, dynamic> get baseData {
+    var baseData = super.baseData;
+    baseData["title"] = title;
+    baseData["required"] = required;
+    baseData["editable"] = editable;
+    if (requiredWhen != null) {
+      baseData["requiredWhen"] = requiredWhen.toString();
+    }
+    if (enabledWhen != null) {
+      baseData["enabledWhen"] = enabledWhen.toString();
+    }
+    if (visibleWhen != null) {
+      baseData["visibleWhen"] = visibleWhen.toString();
+    }
+    return baseData;
+  }
+}
+
+enum TextCapitalization {
+  /// Defaults to an uppercase keyboard for the first letter of each word.
+  ///
+  /// Corresponds to `InputType.TYPE_TEXT_FLAG_CAP_WORDS` on Android, and
+  /// `UITextAutocapitalizationTypeWords` on iOS.
+  words,
+
+  /// Defaults to an uppercase keyboard for the first letter of each sentence.
+  ///
+  /// Corresponds to `InputType.TYPE_TEXT_FLAG_CAP_SENTENCES` on Android, and
+  /// `UITextAutocapitalizationTypeSentences` on iOS.
+  sentences,
+
+  /// Defaults to an uppercase keyboard for each character.
+  ///
+  /// Corresponds to `InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS` on Android, and
+  /// `UITextAutocapitalizationTypeAllCharacters` on iOS.
+  characters,
+
+  /// Defaults to a lowercase keyboard.
+  none,
+}
+
+class TextInput extends FormInputField {
+  final int? minLength;
+  final int? maxLength;
+  final bool barcodeScanEnabled;
+  final TextCapitalization textCapitalization;
+  final bool isMultiline;
+
+  const TextInput({
+    required super.id,
+    required super.title,
+    required super.bindTo,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    super.showBorder,
+    super.onValueChanged,
+    super.requiredWhen,
+    super.enabledWhen,
+    super.required,
+    super.editable,
+    this.minLength,
+    this.maxLength,
+    this.barcodeScanEnabled = false,
+    this.textCapitalization = TextCapitalization.none,
+    this.isMultiline = false,
   });
 
   @override
@@ -181,10 +273,12 @@ class TextInput extends BindingFormField {
       buildIdentifier: 'TextInput: $id',
       featureData: {
         "textInput": {
-          "title": title,
-          "bindTo": bindingFieldPath,
-          "required": required,
-          if (visibleWhen != null) "visibleWhen": visibleWhen.toString(),
+          ...baseData,
+          "isMultiline": isMultiline,
+          "textCapitalization": textCapitalization.name,
+          "barcodeScanEnabled": barcodeScanEnabled,
+          if (minLength != null) "minLength": minLength,
+          if (maxLength != null) "maxLength": maxLength,
         },
       },
       childFeatures: [],
@@ -195,11 +289,10 @@ class TextInput extends BindingFormField {
 }
 
 class Text extends FormField {
-  final String title;
   final String displayValue;
 
   Text({
-    required this.title,
+    required super.title,
     required this.displayValue,
     super.visibleWhen,
     super.layoutDirection,
@@ -209,14 +302,11 @@ class Text extends FormField {
 
   @override
   BuildResult build(BuildContext context) {
+    var baseData = super.baseData;
     return BuildResult(
       buildIdentifier: 'Text: $id',
       featureData: {
-        "text": {
-          "title": title,
-          "displayValue": displayValue,
-          if (visibleWhen != null) "visibleWhen": visibleWhen.toString(),
-        },
+        "text": {...baseData, "displayValue": displayValue},
       },
       childFeatures: [],
       endpoints: [],
@@ -224,22 +314,495 @@ class Text extends FormField {
   }
 }
 
-// class RecordListFormField extends FormField {
-//   final String title;
-//   final FormRecordListBuilder builder;
+class DurationInput extends FormInputField {
+  final int minuteInterval;
+  final int maxDuration;
+  final String? minuteIntervalBinding;
 
-//   RecordListFormField({
-//     required this.title,
-//     required this.builder,
-//     super.visibleWhen,
-//   });
+  const DurationInput({
+    this.minuteInterval = 1,
+    this.maxDuration = 3600,
+    this.minuteIntervalBinding,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    required super.bindTo,
+    required super.id,
+    required super.title,
+    super.required = false,
+    super.editable = true,
+  });
 
-//   @override
-//   Map<String, dynamic> toDict() {
-//     Feature feature = builder.build();
-//     return {
-//       "recordList": feature.toDict(),
-//       "visibleWhen": visibleWhen == null ? "" : visibleWhen.toString(),
-//     };
-//   }
-// }
+  @override
+  BuildResult build(BuildContext context) {
+    var (bindingFieldPath, error) = buildBinding();
+    return BuildResult(
+      buildIdentifier: 'FormDurationInputField: $id',
+      featureData: {
+        "durationInput": {
+          ...baseData,
+          "minuteInterval": minuteInterval,
+          "maxDuration": maxDuration,
+          if (minuteIntervalBinding != null)
+            "minuteIntervalBinding": minuteIntervalBinding,
+        },
+      },
+      childFeatures: [],
+      errors: error != null ? [error] : [],
+      endpoints: [],
+    );
+  }
+}
+
+class DateInput extends FormInputField {
+  const DateInput({
+    required super.id,
+    required super.title,
+    required super.bindTo,
+    super.required,
+    super.editable,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    super.showBorder,
+    super.onValueChanged,
+    super.requiredWhen,
+    super.enabledWhen,
+  });
+
+  @override
+  BuildResult build(BuildContext context) {
+    var (bindingFieldPath, error) = buildBinding();
+    return BuildResult(
+      buildIdentifier: 'FormDateInputField: $id',
+      featureData: {
+        "dateInput": {...baseData},
+      },
+      childFeatures: [],
+      errors: error != null ? [error] : [],
+      endpoints: [],
+    );
+  }
+}
+
+class TimeInput extends FormInputField {
+  const TimeInput({
+    required super.id,
+    required super.title,
+    required super.bindTo,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    super.showBorder,
+    super.onValueChanged,
+    super.requiredWhen,
+    super.enabledWhen,
+  });
+
+  @override
+  BuildResult build(BuildContext context) {
+    var (bindingFieldPath, error) = buildBinding();
+    return BuildResult(
+      buildIdentifier: 'FormTimeInputField: $id',
+      featureData: {
+        "timeInput": {...baseData},
+      },
+      childFeatures: [],
+      errors: error != null ? [error] : [],
+      endpoints: [],
+    );
+  }
+}
+
+enum NumberInputFormat { none, decimal, currency }
+
+class NumberInput extends FormInputField {
+  final NumberInputFormat numberFormat;
+
+  const NumberInput({
+    required super.id,
+    required super.title,
+    required super.bindTo,
+    super.required,
+    super.editable,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    super.showBorder,
+    super.onValueChanged,
+    super.requiredWhen,
+    super.enabledWhen,
+    this.numberFormat = NumberInputFormat.none,
+  });
+
+  @override
+  BuildResult build(BuildContext context) {
+    var (bindingFieldPath, error) = buildBinding();
+    return BuildResult(
+      buildIdentifier: 'FormNumberInputField: $id',
+      featureData: {
+        "numberInput": {...baseData, "numberFormat": numberFormat.name},
+      },
+      childFeatures: [],
+      errors: error != null ? [error] : [],
+      endpoints: [],
+    );
+  }
+}
+
+class BarcodeInput extends FormInputField {
+  const BarcodeInput({
+    required super.id,
+    required super.title,
+    required super.bindTo,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    super.showBorder,
+    super.onValueChanged,
+    super.requiredWhen,
+    super.enabledWhen,
+  });
+
+  @override
+  BuildResult build(BuildContext context) {
+    var (bindingFieldPath, error) = buildBinding();
+    return BuildResult(
+      buildIdentifier: 'FormBarcodeInputField: $id',
+      featureData: {
+        "barcodeInput": {...baseData},
+      },
+      childFeatures: [],
+      errors: error != null ? [error] : [],
+      endpoints: [],
+    );
+  }
+}
+
+class SignatureInput extends FormInputField {
+  final String? placeholderText;
+  const SignatureInput({
+    required super.id,
+    required super.title,
+    required super.bindTo,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    super.showBorder,
+    super.onValueChanged,
+    super.requiredWhen,
+    super.enabledWhen,
+    this.placeholderText,
+  });
+
+  @override
+  BuildResult build(BuildContext context) {
+    var (bindingFieldPath, error) = buildBinding();
+    return BuildResult(
+      buildIdentifier: 'FormSignatureInputField: $id',
+      featureData: {
+        "signatureInput": {
+          ...baseData,
+          if (placeholderText != null) "placeholderText": placeholderText,
+        },
+      },
+      childFeatures: [],
+      errors: error != null ? [error] : [],
+      endpoints: [],
+    );
+  }
+}
+
+class StarRatingInput extends FormInputField {
+  final Color? color;
+  final int starCount;
+  const StarRatingInput({
+    required super.id,
+    required super.title,
+    required super.bindTo,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    super.showBorder,
+    super.onValueChanged,
+    super.requiredWhen,
+    super.enabledWhen,
+    this.color,
+    this.starCount = 5,
+  });
+
+  @override
+  BuildResult build(BuildContext context) {
+    var (bindingFieldPath, error) = buildBinding();
+    return BuildResult(
+      buildIdentifier: 'FormStarRatingInputField: $id',
+      featureData: {
+        "starRatingInput": {
+          ...baseData,
+          if (color != null) "color": color?.hex,
+          "starCount": starCount,
+        },
+      },
+      childFeatures: [],
+      errors: error != null ? [error] : [],
+      endpoints: [],
+    );
+  }
+}
+
+class MapInputField extends FormInputField {
+  final MapSettings mapSettings;
+
+  MapInputField({
+    required super.bindTo,
+    required super.id,
+    required super.title,
+    super.showBorder,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    super.required,
+    super.editable,
+    super.requiredWhen,
+    super.enabledWhen,
+    super.onValueChanged,
+    required this.mapSettings,
+  });
+
+  @override
+  BuildResult build(BuildContext context) {
+    var (bindingFieldPath, error) = buildBinding();
+    return BuildResult(
+      buildIdentifier: 'FormMapInputField: $id',
+      featureData: {
+        "mapInput": {...baseData, "mapSettings": mapSettings.toDict()},
+      },
+      childFeatures: [],
+      errors: error != null ? [error] : [],
+      endpoints: [],
+    );
+  }
+}
+
+class SelectListInput<I extends Record> extends FormInputField {
+  final ListEndpoint<I> endpoint;
+  final String displayFormat;
+  final TemplateBuilder template;
+  final bool barcodeScanEnabled;
+  final bool allowClear;
+  final bool multiSelect;
+  final int minimumSearchLength;
+
+  const SelectListInput({
+    required super.id,
+    required super.title,
+    required super.bindTo,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    super.required,
+    super.editable,
+    super.requiredWhen,
+    super.enabledWhen,
+    super.onValueChanged,
+    required this.endpoint,
+    required this.displayFormat,
+    required this.template,
+    this.barcodeScanEnabled = false,
+    this.allowClear = true,
+    this.multiSelect = false,
+    this.minimumSearchLength = 3,
+  });
+
+  @override
+  BuildResult build(BuildContext context) {
+    var template = this.template(context);
+    var builder = BuildResultBuilder();
+    var errors = <BuildError>[];
+
+    var templateResult = builder.addResult(template.build(context));
+    if (templateResult?.errors != null) {
+      errors.addAll(templateResult!.errors);
+    }
+
+    var (bindingFieldPath, error) = buildBinding();
+    if (error != null) {
+      errors.add(error);
+    }
+    var baseData = super.baseData;
+
+    return BuildResult(
+      buildIdentifier: 'FormSelectListInputField: $id',
+      featureData: {
+        "selectListInput": {
+          ...baseData,
+          "list": endpoint.id,
+          "displayFormat": displayFormat,
+          "template": templateResult?.featureData,
+          if (barcodeScanEnabled) "barcodeScanEnabled": barcodeScanEnabled,
+          if (allowClear) "allowClear": allowClear,
+          if (multiSelect) "multiSelect": multiSelect,
+          if (minimumSearchLength != 3)
+            "minimumSearchLength": minimumSearchLength,
+        },
+      },
+      childFeatures: [],
+      errors: errors,
+      endpoints: [],
+    );
+  }
+}
+
+class HierarchicalSelectListInput<I extends Record> extends SelectListInput<I> {
+  final String parentKeyField;
+  final String? breadcrumbKey;
+  final String? initialSelectionPk;
+
+  const HierarchicalSelectListInput({
+    required super.id,
+    required super.title,
+    required super.bindTo,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    super.required,
+    super.editable,
+    super.requiredWhen,
+    super.enabledWhen,
+    super.onValueChanged,
+    required super.endpoint,
+    required super.displayFormat,
+    required super.template,
+    required this.parentKeyField,
+    required this.breadcrumbKey,
+    required this.initialSelectionPk,
+  });
+
+  @override
+  BuildResult build(BuildContext context) {
+    var template = this.template(context);
+    var builder = BuildResultBuilder();
+    var errors = <BuildError>[];
+
+    var templateResult = builder.addResult(template.build(context));
+    if (templateResult?.errors != null) {
+      errors.addAll(templateResult!.errors);
+    }
+
+    var (bindingFieldPath, error) = buildBinding();
+    if (error != null) {
+      errors.add(error);
+    }
+    var baseData = super.baseData;
+
+    return BuildResult(
+      buildIdentifier: 'FormHierarchicalSelectListInputField: $id',
+      featureData: {
+        "hierarchicalSelectListInput": {
+          ...baseData,
+          "list": endpoint.id,
+          "displayFormat": displayFormat,
+          "template": templateResult?.featureData,
+          "parentKeyField": parentKeyField,
+          "breadcrumbKey": breadcrumbKey,
+          "initialSelectionPk": initialSelectionPk,
+          if (barcodeScanEnabled) "barcodeScanEnabled": barcodeScanEnabled,
+          if (allowClear) "allowClear": allowClear,
+          if (multiSelect) "multiSelect": multiSelect,
+          if (minimumSearchLength != 3)
+            "minimumSearchLength": minimumSearchLength,
+        },
+      },
+      childFeatures: [],
+      errors: errors,
+      endpoints: [],
+    );
+  }
+}
+
+class FormRecordList<I extends Record> extends BindingFormField {
+  final TemplateBuilder template;
+  final String? placeholderText;
+  final bool showHeader;
+  final String? headerText;
+  final bool collapsible;
+  final bool collapsed;
+  final String? addButtonTitle;
+  final Conditional? enabledIf;
+  final OnItemSelectedBuilder? onItemSelected;
+
+  FormRecordList({
+    required super.id,
+    required super.title,
+    required this.template,
+    super.visibleWhen,
+    super.layoutDirection,
+    super.layoutSize,
+    super.showBorder,
+    required super.bindTo,
+    this.placeholderText,
+    this.showHeader = true,
+    this.headerText,
+    this.collapsible = false,
+    this.collapsed = false,
+    this.addButtonTitle,
+    this.enabledIf,
+    this.onItemSelected,
+  });
+
+  @override
+  BuildResult build(BuildContext context) {
+    var template = this.template(context);
+    var builder = BuildResultBuilder();
+    var errors = <BuildError>[];
+
+    var templateResult = builder.addResult(template.build(context));
+    if (templateResult?.errors != null) {
+      errors.addAll(templateResult!.errors);
+    }
+
+    var (bindingFieldPath, error) = buildBinding();
+    if (error != null) {
+      errors.add(error);
+    }
+    var record = instantiateRecord<I>();
+    var onItemSelectedResult = onItemSelected?.call(context, record);
+
+    var onItemSelectedResultData = onItemSelectedResult?.build(context);
+    if (onItemSelectedResultData != null) {
+      errors.addAll(onItemSelectedResultData.errors);
+    }
+
+    var baseData = super.baseData;
+
+    return BuildResult(
+      buildIdentifier: 'FormRecordList: $id',
+      featureData: {
+        "recordList": {
+          ...baseData,
+          "template": templateResult?.featureData,
+          if (placeholderText != null) "placeholderText": placeholderText,
+          "showHeader": showHeader,
+          if (headerText != null) "headerText": headerText,
+          if (collapsible) "collapsible": collapsible,
+          if (collapsed) "collapsed": collapsed,
+          if (addButtonTitle != null) "addButtonTitle": addButtonTitle,
+          "bindTo": bindTo,
+          if (enabledIf != null) "enabledIf": enabledIf.toString(),
+          if (onItemSelectedResultData != null)
+            "onItemSelected": onItemSelectedResultData.featureData,
+        },
+      },
+      templates: [
+        if (onItemSelectedResultData != null)
+          ...(onItemSelectedResultData.templates),
+        template,
+      ],
+      childFeatures: [
+        if (onItemSelectedResultData != null)
+          ...(onItemSelectedResultData.childFeatures),
+      ],
+      errors: errors,
+    );
+  }
+}
