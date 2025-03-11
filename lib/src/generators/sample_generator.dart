@@ -47,21 +47,21 @@ abstract class SampleGenerator {
 }
 
 class CollectionSampleGenerator extends SampleGenerator {
-  final Request request;
+  final String requestName;
 
   CollectionSampleGenerator({
     required super.record,
-    required this.request,
     required super.dataSourceName,
     required super.projectDir,
     required super.openaiApiKey,
+    required this.requestName,
     super.overwrite = false,
   }) {
     generateSamples();
   }
 
   String getRequestName() {
-    return MirrorSystem.getName(reflect(request).type.simpleName);
+    return requestName;
   }
 
   String getRequestFileName() {

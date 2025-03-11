@@ -38,26 +38,24 @@ abstract class DatasourceGenerator {
 }
 
 class CollectionDatasourceGenerator extends DatasourceGenerator {
-  final Request request;
+  final String requestName;
 
   CollectionDatasourceGenerator({
     required super.datasourceName,
     required super.record,
-    required this.request,
+    required this.requestName,
     required super.projectDir,
   }) {
-    // Register the request
-    request.register();
     // Generate the datasource
     generateDatasource();
   }
 
   String getRequestName() {
-    return MirrorSystem.getName(reflect(request).type.simpleName);
+    return requestName;
   }
 
   String getRequestFileName() {
-    return '${separateCapitalsWithUnderscore(getRequestName())}.dart';
+    return '${separateCapitalsWithUnderscore(requestName)}.dart';
   }
 
   @override

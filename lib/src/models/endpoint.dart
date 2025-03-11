@@ -63,13 +63,14 @@ abstract class CollectionEndpoint<I extends Request, R extends Record>
     return {"url": '{{environment.url}}/$id', "data": request.toJson()};
   }
 
+  Map<String, dynamic> getRequestParams() {
+    return describeRequest<I>();
+  }
+
   @override
   Map<String, dynamic> getModelDict() {
     return {
-      id: {
-        "RequestParams": describeRequest<I>(),
-        "Model": record.toModelDict(),
-      },
+      id: {"RequestParams": getRequestParams(), "Model": record.toModelDict()},
     };
   }
 }

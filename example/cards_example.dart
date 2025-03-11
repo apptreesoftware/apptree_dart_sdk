@@ -279,4 +279,7 @@ void main() {
     ),
   );
   app.initialize();
+
+  var generatorController = GeneratorController(app: app);
+  generatorController.generateConnectors();
 }

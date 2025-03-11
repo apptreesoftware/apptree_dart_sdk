@@ -3,16 +3,20 @@ import 'package:apptree_dart_sdk/src/util/strings.dart';
 import 'package:apptree_dart_sdk/src/util/file.dart';
 
 class RequestGenerator {
-  final Request request;
+  final String requestName;
+  final Map<String, dynamic> requestMap;
   final String projectDir;
 
-  RequestGenerator({required this.request, required this.projectDir}) {
-    request.register();
+  RequestGenerator({
+    required this.requestName,
+    required this.requestMap,
+    required this.projectDir,
+  }) {
     generateRequest();
   }
 
   String getFileName() {
-    return separateCapitalsWithUnderscore(request.runtimeType.toString());
+    return separateCapitalsWithUnderscore(requestName);
   }
 
   String generateImports() {
@@ -71,20 +75,20 @@ class RequestGenerator {
     String result = '';
     result += generateImports();
     result += generateSignature(
-      request.runtimeType.toString(),
-      request.getFieldTypes(),
+      requestName,
+      requestMap,
     );
     result += generateInit(
-      request.runtimeType.toString(),
-      request.getFieldTypes(),
+      requestName,
+      requestMap,
     );
     result += generateFromJson(
-      request.runtimeType.toString(),
-      request.getFieldTypes(),
+      requestName,
+      requestMap,
     );
     result += generateToJson(
-      request.runtimeType.toString(),
-      request.getFieldTypes(),
+      requestName,
+      requestMap,
     );
     result += '}\n';
 

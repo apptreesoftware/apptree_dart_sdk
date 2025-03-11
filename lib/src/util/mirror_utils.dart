@@ -30,6 +30,7 @@ Map<String, dynamic> describeRequest<I extends Request>() {
   //   ],
   // }
   final instanceMirror = reflectClass(I);
+  final instanceName = MirrorSystem.getName(instanceMirror.simpleName);
   final Map<String, dynamic> dataDict = {};
 
   dynamic describeType(TypeMirror typeMirror, [Set<TypeMirror>? visited]) {
@@ -93,7 +94,7 @@ Map<String, dynamic> describeRequest<I extends Request>() {
     }
   });
 
-  return dataDict;
+  return {instanceName: dataDict};
 }
 
 String getRequestName<I extends Request>() {
