@@ -1,4 +1,3 @@
-import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:apptree_dart_sdk/src/util/strings.dart';
 import 'package:apptree_dart_sdk/src/util/file.dart';
 

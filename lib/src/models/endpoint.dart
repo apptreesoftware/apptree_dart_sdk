@@ -39,13 +39,14 @@ abstract class SubmissionEndpoint<I extends Request, R extends Record>
     };
   }
 
+  Map<String, dynamic> getRequestParams() {
+    return describeRequest<I>();
+  }
+
   @override
   Map<String, dynamic> getModelDict() {
     return {
-      id: {
-        "RequestParams": describeRequest<I>(),
-        "Model": record.toModelDict(),
-      },
+      id: {"RequestParams": getRequestParams(), "Model": record.toModelDict()},
     };
   }
 }

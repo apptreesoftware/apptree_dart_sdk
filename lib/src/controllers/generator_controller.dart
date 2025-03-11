@@ -1,5 +1,4 @@
 import 'package:apptree_dart_sdk/apptree.dart';
-import 'package:yaml_writer/yaml_writer.dart';
 import 'package:dotenv/dotenv.dart';
 import 'dart:io';
 

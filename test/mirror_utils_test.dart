@@ -28,7 +28,7 @@ class ListRecord extends Record {
   final IntField age = IntField();
 }
 
-class MyListEndpoint extends ListEndpoint<EmptyRequest, ListRecord> {
+class MyListEndpoint extends ListEndpoint<ListRecord> {
   const MyListEndpoint() : super(id: 'listData');
 }
 
