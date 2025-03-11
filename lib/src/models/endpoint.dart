@@ -17,13 +17,8 @@ abstract class Endpoint<R extends Record> {
   }
 }
 
-abstract class ListEndpoint<I extends Request, R extends Record>
-    extends Endpoint<R> {
+abstract class ListEndpoint<R extends Record> extends Endpoint<R> {
   const ListEndpoint({required super.id});
-
-  Map<String, dynamic> buildRequest(I request) {
-    return {"url": '{{environment.url}}/list/$id', "data": request.toJson()};
-  }
 
   @override
   Map<String, dynamic> getModelDict() {
