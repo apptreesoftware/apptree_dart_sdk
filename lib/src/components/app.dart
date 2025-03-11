@@ -8,7 +8,7 @@ class App {
   List<Feature> features = [];
   Map<String, MenuItem> menuItems = {};
   List<Template> templates = [];
-
+  List<Endpoint> endpoints = [];
   App({required this.name, required this.configVersion});
 
   void addFeature(Feature feature, {required MenuItem menuItem}) {
@@ -46,6 +46,7 @@ class App {
       YamlWriter().write(app),
       extension: '.apptreemobile',
     );
+    
   }
 
   void initialize() {
@@ -65,6 +66,7 @@ class App {
     for (var feature in features) {
       writeFeature(feature, buildContext: buildContext);
     }
+
     toYaml();
   }
 
@@ -72,9 +74,11 @@ class App {
     Feature feature, {
     required BuildContext buildContext,
   }) {
+    // Build the feature
     var buildResult = feature.build(buildContext);
     print("Writing feature: ${feature.id}");
 
+    // If there are errors, print them
     if (buildResult.errors.isNotEmpty) {
       print("Error in ${buildResult.buildIdentifier}");
       for (var error in buildResult.errors) {
@@ -87,13 +91,19 @@ class App {
       }
     }
 
+    // Write the feature to the file
     var yaml = YamlWriter(
       allowUnquotedStrings: true,
     ).write({"features": buildResult.featureData});
     writeYaml(name, feature.id, yaml);
 
+    // Recursively build and write child features
     for (var childFeature in buildResult.childFeatures) {
       writeFeature(childFeature, buildContext: buildContext);
+    }
+
+    if (buildResult.endpoints.isNotEmpty) {
+      endpoints.addAll(buildResult.endpoints);
     }
 
     return buildResult;

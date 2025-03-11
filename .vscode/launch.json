@@ -29,15 +29,6 @@
       "program": "example_connector/bin/server.dart"
     },
     {
-      "name": "Connector Generators",
-      "request": "launch",
-      "type": "dart",
-      "program": "example/connector_generators.dart",
-      "env": {
-        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
-      }
-    },
-    {
       "name": "SQL Expression Test",
       "request": "launch",
       "type": "dart",

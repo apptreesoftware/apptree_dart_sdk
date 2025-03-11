@@ -7,3 +7,7 @@ abstract class CollectionDataSource<TInput, TOutput> {
 abstract class ListDataSource<TOutput> {
   Future<List<TOutput>> getList();
 }
+
+abstract class SubmissionDataSource<TInput, TOutput> {
+  Future<TOutput> submit(TInput input);
+}

@@ -9,7 +9,7 @@ class MockRecord extends Record {
 
 class MockRequest extends Request {}
 
-class MockListEndpoint extends ListEndpoint<MockRequest, MockRecord> {
+class MockListEndpoint extends ListEndpoint<MockRecord> {
   const MockListEndpoint() : super(id: 'mockList');
 }
 
