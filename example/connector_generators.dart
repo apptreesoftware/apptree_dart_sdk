@@ -8,7 +8,8 @@ void generateConnector(
   datasourceName,
   routeName,
   projectDir,
-  request,
+  requestName,
+  requestMap,
   openAiApiKey,
 ) {
   ModelGenerator(record: record, projectDir: projectDir);
@@ -16,15 +17,19 @@ void generateConnector(
   CollectionDatasourceGenerator(
     datasourceName: datasourceName,
     record: record,
-    request: request,
+    requestName: requestName,
     projectDir: projectDir,
   );
 
-  RequestGenerator(request: request, projectDir: projectDir);
+  RequestGenerator(
+    requestName: requestName,
+    requestMap: requestMap,
+    projectDir: projectDir,
+  );
 
   CollectionSampleGenerator(
     record: record,
-    request: request,
+    requestName: requestName,
     dataSourceName: datasourceName,
     openaiApiKey: openAiApiKey,
     projectDir: projectDir,
@@ -76,17 +81,12 @@ void main() {
     'MyCardsCollection',
     'my-cards',
     projectDir,
-    MyCardsRequest(owner: 'John Doe', filter: 'My Cards'),
+    'MyCardsRequest',
+    {'owner': 'John Doe', 'filter': 'My Cards'},
     openAiApiKey,
   );
 
-  generateListConnector(
-    Owner(),
-    'Owners',
-    'owners',
-    projectDir,
-    openAiApiKey,
-  );
+  generateListConnector(Owner(), 'Owners', 'owners', projectDir, openAiApiKey);
 
   PackageGenerator(
     projectDir: projectDir,

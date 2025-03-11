@@ -4,7 +4,7 @@ class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
   const MyCardsEndpoint() : super(id: 'MyCards');
 }
 
-class OwnersListEndpoint extends ListEndpoint<EmptyRequest, Owner> {
+class OwnersListEndpoint extends ListEndpoint<Owner> {
   const OwnersListEndpoint() : super(id: 'Owners');
 }
 

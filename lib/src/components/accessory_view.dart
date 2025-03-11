@@ -18,7 +18,7 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
   final List<ListFilter>? filters;
   final String? sort;
   final RecordTemplateBuilder<T> template;
-  final ListEndpoint<I, T> listEndpoint;
+  final ListEndpoint<T> listEndpoint;
 
   SelectListInputAccessoryView({
     super.visibleWhen,
