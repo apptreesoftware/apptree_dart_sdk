@@ -6,3 +6,4 @@ export 'src/models/user.dart';
 export 'src/models/expression.dart';
 export 'src/models/annotations.dart';
 export 'src/models/errors.dart';
+export 'src/models/color.dart';
