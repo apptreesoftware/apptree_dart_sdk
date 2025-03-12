@@ -10,11 +10,11 @@ class OwnersListEndpoint extends ListEndpoint<Owner> {
 
 class CreateCardEndpoint
     extends SubmissionEndpoint<CardSubmissionRequest, Card> {
-  const CreateCardEndpoint() : super(id: 'CreateCard');
+  const CreateCardEndpoint() : super(id: 'CreateCard', submissionType: SubmissionType.create);
 }
 
 class CreateOwnerEndpoint extends SubmissionEndpoint<EmptyRequest, Owner> {
-  const CreateOwnerEndpoint() : super(id: 'CreateOwner');
+  const CreateOwnerEndpoint() : super(id: 'CreateOwner', submissionType: SubmissionType.create);
 }
 
 class Card extends Record {

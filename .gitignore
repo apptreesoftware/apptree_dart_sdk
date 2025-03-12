@@ -2,6 +2,7 @@
 
 res/app_config/
 res/connector/
-example_connector/
+res/generated/
+Cards/
 /.idea/
 .env

@@ -1,23 +1,28 @@
-import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:apptree_dart_sdk/src/util/file.dart';
 import 'package:apptree_dart_sdk/src/util/dir.dart';
 import 'package:apptree_dart_sdk/src/util/strings.dart';
-import 'dart:mirrors';
+
+enum ConnectorType { collection, list, submission }
+
+class ConnectorItem {
+  String recordName;
+  String datasourceName;
+  String? requestName;
+  ConnectorType type;
+
+  ConnectorItem({
+    required this.recordName,
+    required this.datasourceName,
+    this.requestName,
+    required this.type,
+  });
+}
 
 class PackageGenerator {
-  final String routeName;
   final String projectDir;
-  final Record record;
-  final Request request;
-  final String datasourceName;
+  final List<ConnectorItem> connectors;
 
-  PackageGenerator({
-    required this.routeName,
-    required this.projectDir,
-    required this.record,
-    required this.request,
-    required this.datasourceName,
-  }) {
+  PackageGenerator({required this.projectDir, required this.connectors}) {
     generateExport();
     generateInit();
     generateApp();
@@ -26,32 +31,64 @@ class PackageGenerator {
     generatePubspec();
   }
 
-  String getRecordFileName() {
-    return '${separateCapitalsWithUnderscore(MirrorSystem.getName(reflect(record).type.simpleName))}.dart';
+  String getDataSourceFileName(ConnectorItem connector) {
+    return separateCapitalsWithUnderscore(connector.datasourceName);
   }
 
-  String getRecordName() {
-    return MirrorSystem.getName(reflect(record).type.simpleName);
+  String getRequestFileName(ConnectorItem connector) {
+    return separateCapitalsWithUnderscore(connector.requestName ?? '');
   }
 
-  String getRequestFileName() {
-    return '${separateCapitalsWithUnderscore(MirrorSystem.getName(reflect(request).type.simpleName))}.dart';
+  String getSampleFileName(ConnectorItem connector) {
+    return separateCapitalsWithUnderscore(connector.datasourceName);
   }
 
-  String getRequestName() {
-    return MirrorSystem.getName(reflect(request).type.simpleName);
+  String getModelFileName(ConnectorItem connector) {
+    return separateCapitalsWithUnderscore(connector.recordName);
   }
 
-  String getDatasourceFileName() {
-    return separateCapitalsWithUnderscore(datasourceName);
+  String getDataSourceExports(List<ConnectorItem> connectors) {
+    return connectors
+        .map(
+          (connector) =>
+              'export \'datasources/${getDataSourceFileName(connector)}.dart\';\n',
+        )
+        .join();
+  }
+
+  String getModelExports(List<ConnectorItem> connectors) {
+    final uniqueModelFileNames =
+        connectors.map((connector) => getModelFileName(connector)).toSet();
+    return uniqueModelFileNames
+        .map((fileName) => 'export \'models/$fileName.dart\';\n')
+        .join();
+  }
+
+  String getRequestExports(List<ConnectorItem> connectors) {
+    return connectors
+        .where((connector) => connector.type != ConnectorType.list)
+        .map(
+          (connector) =>
+              'export \'models/${getRequestFileName(connector)}.dart\';\n',
+        )
+        .join();
+  }
+
+  String getSampleExports(List<ConnectorItem> connectors) {
+    return connectors
+        .map(
+          (connector) =>
+              'export \'samples/${getSampleFileName(connector)}_sample.dart\';\n',
+        )
+        .join();
   }
 
   void generateExport() {
     String result =
-        'export \'datasources/${getDatasourceFileName()}.dart\';\n'
-        'export \'models/${getRecordFileName()}\';\n'
-        'export \'models/${getRequestFileName()}\';\n'
-        'export \'samples/${getDatasourceFileName()}_sample.dart\';\n'
+        '${getDataSourceExports(connectors)}\n'
+        '${getModelExports(connectors)}\n'
+        '${getRequestExports(connectors)}\n'
+        '${getSampleExports(connectors)}\n'
         'export \'init.dart\';\n';
 
     writeGeneratedDart(projectDir, 'generated', result);
@@ -62,12 +99,21 @@ class PackageGenerator {
         'import \'generated.dart\';\n';
   }
 
+  String generateInitRegister(List<ConnectorItem> connectors) {
+    return connectors
+        .map(
+          (connector) =>
+              '  app.register(Sample${connector.datasourceName}());\n',
+        )
+        .join();
+  }
+
   void generateInit() {
     String result = '';
     result += generateInitImport();
     result +=
         'void registerSamples(AppBase app) {\n'
-        '  app.register(Sample$datasourceName());\n'
+        '${generateInitRegister(connectors)}\n'
         '}\n';
 
     writeGeneratedDart(projectDir, 'init', result);
@@ -78,6 +124,15 @@ class PackageGenerator {
         'import \'generated/generated.dart\';\n';
   }
 
+  String generateAppRegister(List<ConnectorItem> connectors) {
+    return connectors
+        .map(
+          (connector) =>
+              '    register<${connector.datasourceName}>(Sample${connector.datasourceName}());\n',
+        )
+        .join();
+  }
+
   void generateApp() {
     String result = '';
     result += generateAppImport();
@@ -85,29 +140,37 @@ class PackageGenerator {
     result += '  App();\n\n';
     result += '  init() {\n';
     result += '    registerSamples(this);\n';
-    result += '    register<$datasourceName>(Sample$datasourceName());\n';
+    result += '${generateAppRegister(connectors)}\n';
     result += '  }\n';
     result += '}\n';
 
     writeAppDart(projectDir, 'app', result);
   }
 
-  // TODO: Needs to account for multiple collections
-  String generateAddCollectionRoute() {
+  String addRoute(List<ConnectorItem> connectors) {
     String result = '';
-    result +=
-        'server.addCollectionRoute<${getRequestName()}, $datasourceName, ${getRecordName()}>(\n';
-    result += '   \'/$routeName\', \n';
-    result += '   ${getRequestName()}.fromJson, \n';
-    result += ' );\n';
-
+    for (var connector in connectors) {
+      switch (connector.type) {
+        case ConnectorType.collection:
+          result += '''
+  server.addCollectionRoute<${connector.requestName}, ${connector.datasourceName}, ${connector.recordName}>(
+    '/${connector.datasourceName}',
+    (Map<String, dynamic> json) => ${connector.requestName}.fromJson(json),
+  );
+''';
+        case ConnectorType.list:
+          result += "// Implement list route\n";
+        case ConnectorType.submission:
+          result += "// Implement submission route\n";
+      }
+    }
     return result;
   }
 
   String generateServerImport() {
     return 'import \'package:server/server.dart\';\n'
-        'import \'package:example_connector/app.dart\';\n'
-        'import \'package:example_connector/generated/generated.dart\';\n';
+        'import \'package:$projectDir/app.dart\';\n'
+        'import \'package:$projectDir/generated/generated.dart\';\n';
   }
 
   void generateServer() {
@@ -117,7 +180,7 @@ class PackageGenerator {
     result += '  var app = App();\n';
     result += '  app.init();\n\n';
     result += '  var server = Server<App>(app);\n';
-    result += '  ${generateAddCollectionRoute()}\n';
+    result += '  ${addRoute(connectors)}\n';
     result += '  server.start();\n';
     result += '}\n';
 

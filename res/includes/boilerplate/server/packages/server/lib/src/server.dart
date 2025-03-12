@@ -37,6 +37,10 @@ class Server<T extends AppBase> {
     );
   }
 
+  // TODO: Add list route
+
+  // TODO: Add submission route
+
   Future<ShelfRunContext> start() async {
     return shelfRun(_handler);
   }

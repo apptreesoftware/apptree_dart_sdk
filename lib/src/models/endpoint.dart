@@ -30,7 +30,9 @@ abstract class ListEndpoint<R extends Record> extends Endpoint<R> {
 
 abstract class SubmissionEndpoint<I extends Request, R extends Record>
     extends Endpoint<R> {
-  const SubmissionEndpoint({required super.id});
+  const SubmissionEndpoint({required super.id, required this.submissionType});
+
+  final SubmissionType submissionType;
 
   Map<String, dynamic> buildRequest(I? request) {
     return {

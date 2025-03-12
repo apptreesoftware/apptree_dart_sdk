@@ -122,7 +122,7 @@ class StringField extends Field {
 
   @override
   String getFieldType() {
-    return 'string';
+    return 'String';
   }
 
   Conditional equals(String value) {
