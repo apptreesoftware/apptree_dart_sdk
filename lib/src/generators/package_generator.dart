@@ -26,7 +26,7 @@ class PackageGenerator {
     generateExport();
     generateInit();
     generateApp();
-    // generateServer();
+    generateServer();
     copyBoilerplate(projectDir);
     generatePubspec();
   }
@@ -147,29 +147,30 @@ class PackageGenerator {
     writeAppDart(projectDir, 'app', result);
   }
 
-  String addRoute(ConnectorItem connector) {
-    switch (connector.type) {
-      case ConnectorType.collection:
-        return 'server.addCollectionRoute<${connector.requestName}, ${connector.datasourceName}, ${connector.recordName}>(\n';
-      case ConnectorType.list:
-        return "Implement list route";
-      case ConnectorType.submission:
-        return "Implement submission route";
-    }
-  }
-
-  String generateAddCollectionRoutes(List<ConnectorItem> connectors) {
+  String addRoute(List<ConnectorItem> connectors) {
     String result = '';
     for (var connector in connectors) {
-      result += addRoute(connector);
+      switch (connector.type) {
+        case ConnectorType.collection:
+          result += '''
+  server.addCollectionRoute<${connector.requestName}, ${connector.datasourceName}, ${connector.recordName}>(
+    '/${connector.datasourceName}',
+    (Map<String, dynamic> json) => ${connector.requestName}.fromJson(json),
+  );
+''';
+        case ConnectorType.list:
+          result += "// Implement list route\n";
+        case ConnectorType.submission:
+          result += "// Implement submission route\n";
+      }
     }
     return result;
   }
 
   String generateServerImport() {
     return 'import \'package:server/server.dart\';\n'
-        'import \'package:example_connector/app.dart\';\n'
-        'import \'package:example_connector/generated/generated.dart\';\n';
+        'import \'package:$projectDir/app.dart\';\n'
+        'import \'package:$projectDir/generated/generated.dart\';\n';
   }
 
   void generateServer() {
@@ -179,7 +180,7 @@ class PackageGenerator {
     result += '  var app = App();\n';
     result += '  app.init();\n\n';
     result += '  var server = Server<App>(app);\n';
-    result += '  ${generateAddCollectionRoutes(connectors)}\n';
+    result += '  ${addRoute(connectors)}\n';
     result += '  server.start();\n';
     result += '}\n';
 
