@@ -9,5 +9,5 @@ abstract class ListDataSource<TOutput> {
 }
 
 abstract class SubmissionDataSource<TInput, TOutput> {
-  Future<TOutput> submit(TInput input);
+  Future<TOutput> submit(TInput input, TOutput record);
 }

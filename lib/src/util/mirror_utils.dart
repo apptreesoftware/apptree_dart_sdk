@@ -45,7 +45,7 @@ Map<String, dynamic> describeRequest<I extends Request>() {
         typeMirror.reflectedType == double ||
         typeMirror.reflectedType == String ||
         typeMirror.reflectedType == bool) {
-      return MirrorSystem.getName(typeMirror.simpleName).toLowerCase();
+      return MirrorSystem.getName(typeMirror.simpleName); 
     }
 
     // Handle List types: return a one-item list with the element type description

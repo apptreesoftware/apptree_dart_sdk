@@ -1,18 +1,19 @@
 import 'package:apptree_dart_sdk/src/util/file.dart';
 import 'package:apptree_dart_sdk/src/util/dir.dart';
+import 'package:apptree_dart_sdk/src/util/strings.dart';
 
 enum ConnectorType { collection, list, submission }
 
 class ConnectorItem {
   String recordName;
   String datasourceName;
-  String requestName;
+  String? requestName;
   ConnectorType type;
 
   ConnectorItem({
     required this.recordName,
     required this.datasourceName,
-    required this.requestName,
+    this.requestName,
     required this.type,
   });
 }
@@ -25,30 +26,50 @@ class PackageGenerator {
     generateExport();
     generateInit();
     generateApp();
-    generateServer();
+    // generateServer();
     copyBoilerplate(projectDir);
     generatePubspec();
+  }
+
+  String getDataSourceFileName(ConnectorItem connector) {
+    return separateCapitalsWithUnderscore(connector.datasourceName);
+  }
+
+  String getRequestFileName(ConnectorItem connector) {
+    return separateCapitalsWithUnderscore(connector.requestName ?? '');
+  }
+
+  String getSampleFileName(ConnectorItem connector) {
+    return separateCapitalsWithUnderscore(connector.datasourceName);
+  }
+
+  String getModelFileName(ConnectorItem connector) {
+    return separateCapitalsWithUnderscore(connector.recordName);
   }
 
   String getDataSourceExports(List<ConnectorItem> connectors) {
     return connectors
         .map(
           (connector) =>
-              'export \'datasources/${connector.datasourceName}.dart\';\n',
+              'export \'datasources/${getDataSourceFileName(connector)}.dart\';\n',
         )
         .join();
   }
 
-  String getRecordExports(List<ConnectorItem> connectors) {
-    return connectors
-        .map((connector) => 'export \'models/${connector.recordName}.dart\';\n')
+  String getModelExports(List<ConnectorItem> connectors) {
+    final uniqueModelFileNames =
+        connectors.map((connector) => getModelFileName(connector)).toSet();
+    return uniqueModelFileNames
+        .map((fileName) => 'export \'models/$fileName.dart\';\n')
         .join();
   }
 
   String getRequestExports(List<ConnectorItem> connectors) {
     return connectors
+        .where((connector) => connector.type != ConnectorType.list)
         .map(
-          (connector) => 'export \'requests/${connector.requestName}.dart\';\n',
+          (connector) =>
+              'export \'models/${getRequestFileName(connector)}.dart\';\n',
         )
         .join();
   }
@@ -57,7 +78,7 @@ class PackageGenerator {
     return connectors
         .map(
           (connector) =>
-              'export \'samples/${connector.datasourceName}_sample.dart\';\n',
+              'export \'samples/${getSampleFileName(connector)}_sample.dart\';\n',
         )
         .join();
   }
@@ -65,7 +86,7 @@ class PackageGenerator {
   void generateExport() {
     String result =
         '${getDataSourceExports(connectors)}\n'
-        '${getRecordExports(connectors)}\n'
+        '${getModelExports(connectors)}\n'
         '${getRequestExports(connectors)}\n'
         '${getSampleExports(connectors)}\n'
         'export \'init.dart\';\n';

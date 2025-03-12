@@ -63,12 +63,12 @@ class CollectionDatasourceGenerator extends DatasourceGenerator {
 
   @override
   String generateSignature() {
-    return 'abstract class $datasourceName extends CollectionDataSource<${getRequestName()}, ${getRecordName()}> {\n';
+    return 'abstract class $datasourceName extends CollectionDataSource<$requestName, ${getRecordName()}> {\n';
   }
 
   String generateGetRecords() {
     String result =
-        '  @override\n  Future<List<${getRecordName()}>> getCollection(${getRequestName()} request);\n\n';
+        '  @override\n  Future<List<${getRecordName()}>> getCollection($requestName request);\n\n';
     return result;
   }
 
@@ -135,7 +135,7 @@ enum SubmissionType { create, update }
 class SubmissionDatasourceGenerator extends DatasourceGenerator {
   final String requestName;
   final SubmissionType submissionType;
-  
+
   SubmissionDatasourceGenerator({
     required super.datasourceName,
     required super.record,
@@ -147,32 +147,33 @@ class SubmissionDatasourceGenerator extends DatasourceGenerator {
     generateDatasource();
   }
 
+  String getRequestFileName() {
+    return '${separateCapitalsWithUnderscore(requestName)}.dart';
+  }
+
   @override
   String generateImports() {
     return 'import \'package:server/server.dart\';\n\n'
-        'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n';
+        'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n'
+        'import \'package:$projectDir/generated/models/${getRequestFileName()}\';\n';
   }
 
   @override
   String generateSignature() {
-    return 'abstract class $datasourceName extends SubmissionDataSource<${getRecordName()}> {\n';
+    return 'abstract class $datasourceName extends SubmissionDataSource<$requestName, ${getRecordName()}> {\n';
   }
 
   String generateUpdate() {
     return '''
     @override
-    Future<${getRecordName()}> submit(${getRequestName()} request) {
-      return request;
-    }
+    Future<${getRecordName()}> submit($requestName request, ${getRecordName()} record);
     ''';
   }
 
   String generateCreate() {
     return '''
     @override
-    Future<${getRecordName()}> submit(${getRequestName()} request) {
-      return request;
-    }
+    Future<${getRecordName()}> submit($requestName request, ${getRecordName()} record);
     ''';
   }
 

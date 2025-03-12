@@ -6,7 +6,7 @@ import 'dart:mirrors';
 class GeneratorController {
   final App app;
   late String openAiApiKey;
-
+  List<String> modelNames = [];
   List<ConnectorItem> connectors = [];
 
   GeneratorController({required this.app}) {
@@ -58,19 +58,19 @@ class GeneratorController {
     CollectionDatasourceGenerator(
       datasourceName: connector.datasourceName,
       record: endpoint.record,
-      requestName: connector.requestName,
+      requestName: connector.requestName!,
       projectDir: projectDir,
     );
 
     RequestGenerator(
-      requestName: connector.requestName,
+      requestName: connector.requestName!,
       requestMap: requestMap,
       projectDir: projectDir,
     );
-
+    
     CollectionSampleGenerator(
       record: endpoint.record,
-      requestName: connector.requestName,
+      requestName: connector.requestName!,
       dataSourceName: connector.datasourceName,
       openaiApiKey: openAiApiKey,
       projectDir: projectDir,
@@ -120,15 +120,23 @@ class GeneratorController {
     SubmissionDatasourceGenerator(
       datasourceName: connector.datasourceName,
       record: endpoint.record,
-      requestName: connector.requestName,
+      requestName: connector.requestName!,
       submissionType: endpoint.submissionType,
       projectDir: app.name,
     );
 
     RequestGenerator(
-      requestName: connector.requestName,
+      requestName: connector.requestName!,
       requestMap: requestMap,
       projectDir: app.name,
+    );
+
+    SubmissionSampleGenerator(
+      record: endpoint.record,
+      dataSourceName: connector.datasourceName,
+      openaiApiKey: openAiApiKey,
+      projectDir: app.name,
+      requestName: connector.requestName!,
     );
   }
 }

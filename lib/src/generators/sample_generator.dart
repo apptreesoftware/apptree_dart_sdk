@@ -39,11 +39,10 @@ abstract class SampleGenerator {
 
   String generateImports();
 
-  Future<String> generateSampleData();
-
   Future<String> generateSampleClass();
 
   Future<void> generateSamples();
+
 }
 
 class CollectionSampleGenerator extends SampleGenerator {
@@ -56,9 +55,7 @@ class CollectionSampleGenerator extends SampleGenerator {
     required super.openaiApiKey,
     required this.requestName,
     super.overwrite = false,
-  }) {
-    generateSamples();
-  }
+  });
 
   String getRequestName() {
     return requestName;
@@ -75,7 +72,6 @@ class CollectionSampleGenerator extends SampleGenerator {
         'import \'package:$projectDir/generated/datasources/${getDataSourceFileName()}\';\n';
   }
 
-  @override
   Future<String> generateSampleData() async {
     return await generateSampleDataLLM(
       'Please produce 10 samples of the ${getRecordName()} objects.',
@@ -87,13 +83,11 @@ class CollectionSampleGenerator extends SampleGenerator {
     );
   }
 
-  // TODO: Needs to be updated to return the correct object
   String generateGetRecord() {
     return '@override\n  Future<${getRecordName()}> getRecord(String id) async { return samples[0]; }\n';
   }
 
-  // TODO: Implement Filters
-  @override
+
   Future<String> generateSampleClass() async {
     String res = 'class Sample$dataSourceName extends $dataSourceName {\n';
     res += '  ${await generateSampleData()}\n';
@@ -107,7 +101,6 @@ class CollectionSampleGenerator extends SampleGenerator {
     return res;
   }
 
-  @override
   Future<void> generateSamples() async {
     String res = '';
     res += generateImports();
@@ -131,7 +124,6 @@ class ListSampleGenerator extends SampleGenerator {
         'import \'package:$projectDir/generated/datasources/${getDataSourceFileName()}\';\n';
   }
 
-  @override
   Future<String> generateSampleData() async {
     return await generateSampleDataLLM(
       'Please produce 10 samples of the ${getRecordName()} objects.',
@@ -153,6 +145,50 @@ class ListSampleGenerator extends SampleGenerator {
     res += '  }\n';
     res += '}\n';
     return res;
+  }
+
+  Future<void> generateSamples() async {
+    String res = '';
+    res += generateImports();
+    res += await generateSampleClass();
+
+    writeSampleDart(projectDir, getFileName(), res);
+  }
+}
+
+
+class SubmissionSampleGenerator extends SampleGenerator {
+  final String requestName;
+
+  SubmissionSampleGenerator({
+    required super.record,
+    required super.dataSourceName,
+    required super.projectDir,
+    required super.openaiApiKey,
+    required this.requestName,
+  });
+
+  String getRequestFileName() {
+    return '${separateCapitalsWithUnderscore(requestName)}.dart';
+  }
+
+  @override
+  String generateImports() {
+    return 'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n'
+        'import \'package:$projectDir/generated/models/${getRequestFileName()}\';\n'
+        'import \'package:$projectDir/generated/datasources/${getDataSourceFileName()}\';\n';
+  }
+
+  @override
+  Future<String> generateSampleClass() async {
+    String res = 'class Sample$dataSourceName extends $dataSourceName {\n';
+    res += '  @override\n';
+    res += '  Future<${getRecordName()}> submit($requestName request, ${getRecordName()} record) async {\n';
+    res += '  return record;\n';
+    res += '  }\n';
+    res += '}\n';
+    return res;
+
   }
 
   @override

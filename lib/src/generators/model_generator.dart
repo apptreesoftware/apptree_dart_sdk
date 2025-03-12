@@ -24,11 +24,11 @@ class ModelGenerator {
   void buildRecordGraph(Record record) {
     // Analyze the record to determine the fields and their types
     for (final field in record.fields) {
-      if (field is Record) {
+      if (field is Record && !records.any((r) => r == field)) {
         buildRecordGraph(field);
         records.add(field);
       }
-      if (field is ListField) {
+      if (field is ListField && !records.any((r) => r == field.record)) {
         buildRecordGraph(field.record);
         records.add(field.record);
       }
