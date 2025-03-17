@@ -43,6 +43,7 @@ class GeneratorController {
   void generateCollectionConnector(CollectionEndpoint endpoint) {
     var connector = ConnectorItem(
       recordName: getRecordName(endpoint.record),
+      pkField: endpoint.record.pkFieldName!,
       datasourceName: endpoint.id,
       requestName: endpoint.getRequestParams().keys.first,
       type: ConnectorType.collection,
@@ -82,6 +83,7 @@ class GeneratorController {
       recordName: getRecordName(endpoint.record),
       datasourceName: endpoint.id,
       requestName: '',
+      pkField: endpoint.record.pkFieldName!,
       type: ConnectorType.list,
     );
     connectors.add(connector);
@@ -109,6 +111,7 @@ class GeneratorController {
       recordName: getRecordName(endpoint.record),
       datasourceName: endpoint.id,
       requestName: endpoint.getRequestParams().keys.first,
+      pkField: endpoint.record.pkFieldName!,
       type: ConnectorType.submission,
     );
     connectors.add(connector);

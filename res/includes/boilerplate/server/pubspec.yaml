@@ -14,6 +14,7 @@ dependencies:
   logging: ^1.2.0
   server:
     path: ./packages/server
+  dotenv: ^4.2.0
 
 dev_dependencies:
   http: ^1.1.0

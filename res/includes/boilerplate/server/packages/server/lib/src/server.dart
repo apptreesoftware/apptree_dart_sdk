@@ -17,24 +17,32 @@ class Server<T extends AppBase> {
   final router = Router().plus;
   Server(this.app);
 
-  void addCollectionRoute<TInput,
-      TDataSource extends CollectionDataSource<TInput, TOutput>, TOutput>(
+  void addCollectionRoute<
+    TInput,
+    TDataSource extends CollectionDataSource<TInput, TOutput>,
+    TOutput
+  >(
     String path,
+    String pkField,
     TInput Function(Map<String, dynamic>) fromJson,
   ) {
-    router.post(
-      path,
-      (Request request) async {
-        var dataSource = app.get<TDataSource>();
-        var data = await handleCollectionPostRequest<TInput, List<TOutput>>(
-          app: app,
-          request: request,
-          fromJson: fromJson,
-          fetch: (input) => dataSource.getCollection(input),
-        );
-        return data;
-      },
-    );
+    router.post(path, (Request request) async {
+      var dataSource = app.get<TDataSource>();
+      var data = await handleCollectionPostRequest<TInput, List<TOutput>>(
+        app: app,
+        request: request,
+        fromJson: fromJson,
+        fetch: (input) => dataSource.getCollection(input),
+      );
+
+      app.service.uploadCollection(
+        collectionId: path,
+        data: data,
+        pkField: pkField,
+        username: app.username,
+      );
+      return data;
+    });
   }
 
   // TODO: Add list route
@@ -49,11 +57,12 @@ class Server<T extends AppBase> {
     return router.call;
   }
 
-  Future<dynamic> handleCollectionPostRequest<TInput, TOutput>(
-      {required AppBase app,
-      required Request request,
-      required TInput Function(Map<String, dynamic>) fromJson,
-      required dynamic Function(TInput) fetch}) async {
+  Future<dynamic> handleCollectionPostRequest<TInput, TOutput>({
+    required AppBase app,
+    required Request request,
+    required TInput Function(Map<String, dynamic>) fromJson,
+    required dynamic Function(TInput) fetch,
+  }) async {
     var traceId = _generateTraceId();
     try {
       var input = await _parseJsonBody<TInput>(request, fromJson);

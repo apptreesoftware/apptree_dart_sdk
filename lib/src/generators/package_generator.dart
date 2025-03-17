@@ -9,12 +9,14 @@ class ConnectorItem {
   String datasourceName;
   String? requestName;
   ConnectorType type;
+  String pkField;
 
   ConnectorItem({
     required this.recordName,
     required this.datasourceName,
     this.requestName,
     required this.type,
+    required this.pkField,
   });
 }
 
@@ -137,7 +139,8 @@ class PackageGenerator {
     String result = '';
     result += generateAppImport();
     result += 'class App extends AppBase {\n';
-    result += '  App();\n\n';
+    result +=
+        '  App({required super.projectName, required super.username});\n\n';
     result += '  init() {\n';
     result += '    registerSamples(this);\n';
     result += '${generateAppRegister(connectors)}\n';
@@ -155,6 +158,7 @@ class PackageGenerator {
           result += '''
   server.addCollectionRoute<${connector.requestName}, ${connector.datasourceName}, ${connector.recordName}>(
     '/${connector.datasourceName}',
+    '${connector.pkField}',
     (Map<String, dynamic> json) => ${connector.requestName}.fromJson(json),
   );
 ''';
@@ -177,7 +181,8 @@ class PackageGenerator {
     String result = '';
     result += generateServerImport();
     result += 'void main() {\n';
-    result += '  var app = App();\n';
+    result +=
+        '  var app = App(projectName: "${projectDir}", username: "qtech}");\n'; // TODO: Add dynamic username fetching
     result += '  app.init();\n\n';
     result += '  var server = Server<App>(app);\n';
     result += '  ${addRoute(connectors)}\n';
