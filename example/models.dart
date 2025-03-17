@@ -10,11 +10,24 @@ class OwnersListEndpoint extends ListEndpoint<Owner> {
 
 class CreateCardEndpoint
     extends SubmissionEndpoint<CardSubmissionRequest, Card> {
-  const CreateCardEndpoint() : super(id: 'CreateCard', submissionType: SubmissionType.create);
+  const CreateCardEndpoint()
+    : super(id: 'CreateCard', submissionType: SubmissionType.create);
+}
+
+class UpdateCardEndpoint
+    extends SubmissionEndpoint<CardSubmissionRequest, Card> {
+  const UpdateCardEndpoint()
+    : super(id: 'UpdateCard', submissionType: SubmissionType.update);
 }
 
 class CreateOwnerEndpoint extends SubmissionEndpoint<EmptyRequest, Owner> {
-  const CreateOwnerEndpoint() : super(id: 'CreateOwner', submissionType: SubmissionType.create);
+  const CreateOwnerEndpoint()
+    : super(id: 'CreateOwner', submissionType: SubmissionType.create);
+}
+
+class UpdateOwnerEndpoint extends SubmissionEndpoint<EmptyRequest, Owner> {
+  const UpdateOwnerEndpoint()
+    : super(id: 'UpdateOwner', submissionType: SubmissionType.update);
 }
 
 class Card extends Record {

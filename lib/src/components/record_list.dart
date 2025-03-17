@@ -91,9 +91,7 @@ class RecordList<INPUT extends Request, RECORD extends Record, VARIABLE>
           if (mapSettingsData != null) "mapSettings": mapSettingsData,
           "onItemSelected":
               navigateTo != null
-                  ? [
-                    {'navigateTo': navigateTo.featureData},
-                  ]
+                  ? {'navigateTo': navigateTo.featureData}
                   : null,
           if (builtToolbar != null) "toolbar": builtToolbar.featureData,
         },
