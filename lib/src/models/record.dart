@@ -49,7 +49,7 @@ class FieldBase {
     var path =
         parent != null
             ? parent!.getPath(wrapped: false, scoped: scoped)
-            : scoped
+            : scoped && scope != null
             ? '${scope!.name}()'
             : '';
     if (listKeyField != null) {
@@ -179,7 +179,10 @@ class BoolField extends Field {
 }
 
 class ListField<T extends Record> extends Field {
-  ListField();
+  late T _record;
+  ListField() {
+    _record = instantiateRecord<T>();
+  }
 
   @override
   String getFieldType() {
@@ -192,6 +195,10 @@ class ListField<T extends Record> extends Field {
 
   Record getRecord() {
     return instantiateRecord<T>();
+  }
+
+  Record get record {
+    return _record;
   }
 }
 
