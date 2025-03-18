@@ -11,7 +11,7 @@ var cardsForm = Form<Card>(
             title: 'Submit',
             actions: [
               SubmitFormAction<CardSubmissionRequest, Card>(
-                endpoint: CreateCardEndpoint(),
+                endpoint: UpdateCardEndpoint(),
                 submissionTitle: (context, record) => 'Saving ${record.name}',
                 request: (context) {
                   return CardSubmissionRequest(
@@ -164,7 +164,7 @@ var attacksForm = Form<Attack>(
 );
 
 void main() {
-  final app = App(name: 'Cards', configVersion: 2);
+  final app = App(name: 'cards', configVersion: 2);
   app.addFeature(
     cardRecordList,
     menuItem: MenuItem(

@@ -1,7 +1,25 @@
+import "package:dotenv/dotenv.dart";
+import 'package:apptree_mobile/apptree_mobile.dart';
+
 abstract class AppBase {
   AppBase();
   // Map to store dependencies with Type as key
   final Map<Type, dynamic> _dependencies = {};
+
+  String getServiceSecret() {
+    // Try to get the secret from the environment variable
+    // If it's not set, throw an error
+    final env = DotEnv(includePlatformEnvironment: true)..load();
+    var secret = env['APPTREE_SERVICE_SECRET'];
+    if (secret == null) {
+      throw Exception("APPTREE_SERVICE_SECRET is not set");
+    }
+    return secret;
+  }
+
+  Service getApptreeService(String projectName) {
+    return Service(project: projectName, secret: getServiceSecret());
+  }
 
   /// Registers a dependency of type T
   /// If a dependency of the same type already exists, it will be overridden

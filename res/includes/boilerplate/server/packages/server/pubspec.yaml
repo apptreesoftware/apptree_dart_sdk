@@ -9,6 +9,9 @@ environment:
 dependencies:
   logging: ^1.2.0
   shelf_plus: ^1.10.0
+  dotenv: ^4.2.0
+  apptree_mobile:
+    path: ../../../../apptree_7/dart_graph_sdk
 
 dev_dependencies:
   mocktail: ^1.0.4

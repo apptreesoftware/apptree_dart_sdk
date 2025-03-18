@@ -26,7 +26,7 @@
       "name": "Example Connector",
       "request": "launch",
       "type": "dart",
-      "program": "example_connector/bin/server.dart"
+      "program": "cards/bin/server.dart",
     },
     {
       "name": "SQL Expression Test",

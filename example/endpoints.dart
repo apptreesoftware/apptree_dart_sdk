@@ -10,24 +10,24 @@ class OwnersListEndpoint extends ListEndpoint<Owner> {
   const OwnersListEndpoint() : super(id: 'Owners');
 }
 
-class AttacksEndpoint
-    extends CollectionEndpoint<CardRelationshipRequest, Attack> {
-  const AttacksEndpoint() : super(id: 'Attacks');
-}
-
-class CardRelationshipRequest extends Request {
-  final String cardId;
-
-  CardRelationshipRequest({required this.cardId});
-}
-
 class CreateCardEndpoint
     extends SubmissionEndpoint<CardSubmissionRequest, Card> {
   const CreateCardEndpoint()
     : super(id: 'CreateCard', submissionType: SubmissionType.create);
 }
 
+class UpdateCardEndpoint
+    extends SubmissionEndpoint<CardSubmissionRequest, Card> {
+  const UpdateCardEndpoint()
+    : super(id: 'UpdateCard', submissionType: SubmissionType.update);
+}
+
 class CreateOwnerEndpoint extends SubmissionEndpoint<EmptyRequest, Owner> {
   const CreateOwnerEndpoint()
     : super(id: 'CreateOwner', submissionType: SubmissionType.create);
+}
+
+class UpdateOwnerEndpoint extends SubmissionEndpoint<EmptyRequest, Owner> {
+  const UpdateOwnerEndpoint()
+    : super(id: 'UpdateOwner', submissionType: SubmissionType.update);
 }
