@@ -1,4 +1,5 @@
 import "package:apptree_dart_sdk/apptree.dart";
+import "package:apptree_dart_sdk/src/models/color.dart";
 
 class Form<I extends Record> extends Feature {
   final FormToolbarBuilder<I>? toolbarBuilder;
@@ -203,15 +204,9 @@ abstract class FormInputField extends BindingFormField {
     baseData["title"] = title;
     baseData["required"] = required;
     baseData["editable"] = editable;
-    if (requiredWhen != null) {
-      baseData["requiredWhen"] = requiredWhen.toString();
-    }
-    if (enabledWhen != null) {
-      baseData["enabledWhen"] = enabledWhen.toString();
-    }
-    if (visibleWhen != null) {
-      baseData["visibleWhen"] = visibleWhen.toString();
-    }
+    if (requiredWhen != null) baseData["requiredWhen"] = requiredWhen;
+    if (enabledWhen != null) baseData["enabledWhen"] = enabledWhen;
+    if (visibleWhen != null) baseData["visibleWhen"] = visibleWhen.toString();
     return baseData;
   }
 }

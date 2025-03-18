@@ -29,10 +29,25 @@ typedef MapSettingsBuilder<I extends Record> =
 typedef FormToolbarBuilder<I extends Record> =
     Toolbar Function(BuildContext context, I record);
 
-class BuildContext {
+class BuildContext extends Record {
   final User user;
 
   BuildContext({required this.user});
+
+  IntField get recordCount =>
+      IntField()
+        ..parent = this
+        ..relativeFieldPath = 'recordCount()';
+
+  DateTimeField get currentDateTime =>
+      DateTimeField()
+        ..parent = this
+        ..relativeFieldPath = 'currentDateTime()';
+
+  DateTimeField get currentDate =>
+      DateTimeField()
+        ..parent = this
+        ..relativeFieldPath = 'currentDate()';
 }
 
 class BuildResultBuilder {

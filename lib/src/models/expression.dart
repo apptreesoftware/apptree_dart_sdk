@@ -171,7 +171,7 @@ class Contains extends Conditional {
     if (type == ConditionalType.sqlite) {
       return '${field1.getSqlPath()} LIKE ?';
     }
-    return '${field1.getFormPath()}.${operator.value}("$value")';
+    return '${field1.getPath()}.${operator.value}("$value")';
   }
 
   @override
@@ -202,7 +202,7 @@ class RecordContains extends Conditional {
     if (type == ConditionalType.sqlite) {
       return '${field.getSqlPath()} IN ?';
     }
-    return '${field.getFormPath()}.${operator.value}()';
+    return '${field.getPath()}.${operator.value}()';
   }
 
   @override
@@ -229,7 +229,7 @@ class StringEquals extends Conditional {
     if (type == ConditionalType.sqlite) {
       return '${field1.getSqlPath()} ${operator.sqlValue} ?';
     }
-    return '${field1.getFormPath()} ${operator.value} "$value"';
+    return '${field1.getPath()} ${operator.value} "$value"';
   }
 
   @override
@@ -256,7 +256,7 @@ class IntEquals extends Conditional {
     if (type == ConditionalType.sqlite) {
       return '${field1.getSqlPath()} ${operator.sqlValue} ?';
     }
-    return '${field1.getFormPath()} ${operator.value} $value';
+    return '${field1.getPath()} ${operator.value} $value';
   }
 
   @override
@@ -283,7 +283,7 @@ class BoolEquals extends Conditional {
     if (type == ConditionalType.sqlite) {
       return '${field1.getSqlPath()} ${operator.sqlValue} ?';
     }
-    return '${field1.getFormPath()} ${operator.value} $value';
+    return '${field1.getPath()} ${operator.value} $value';
   }
 
   @override

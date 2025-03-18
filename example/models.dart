@@ -1,21 +1,6 @@
 import 'package:apptree_dart_sdk/apptree.dart';
 
-class MyCardsEndpoint extends CollectionEndpoint<MyCardsRequest, Card> {
-  const MyCardsEndpoint() : super(id: 'MyCards');
-}
-
-class OwnersListEndpoint extends ListEndpoint<Owner> {
-  const OwnersListEndpoint() : super(id: 'Owners');
-}
-
-class CreateCardEndpoint
-    extends SubmissionEndpoint<CardSubmissionRequest, Card> {
-  const CreateCardEndpoint() : super(id: 'CreateCard', submissionType: SubmissionType.create);
-}
-
-class CreateOwnerEndpoint extends SubmissionEndpoint<EmptyRequest, Owner> {
-  const CreateOwnerEndpoint() : super(id: 'CreateOwner', submissionType: SubmissionType.create);
-}
+import 'endpoints.dart';
 
 class Card extends Record {
   @PkField()
@@ -26,7 +11,7 @@ class Card extends Record {
   final StringField description = StringField();
   final StringField rarity = StringField();
   final StringField type = StringField();
-  final ListField<Attack> attacks = ListField(record: Attack());
+  final ListField<Attack> attacks = ListField<Attack>();
   final FloatField latitude = FloatField();
   final FloatField longitude = FloatField();
 }

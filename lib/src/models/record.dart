@@ -1,6 +1,7 @@
 import 'dart:mirrors';
 import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:apptree_dart_sdk/src/constants.dart';
+import 'package:apptree_dart_sdk/src/util/strings.dart';
 
 /// Exception thrown when there's a type mismatch between a field and its ListEndpoint annotation
 class ListFieldTypeMismatchException implements Exception {
@@ -13,26 +14,19 @@ class ListFieldTypeMismatchException implements Exception {
 }
 
 class FieldBase {
-  Record? parent;
-  String? fullFieldPath;
+  FieldBase? parent;
+  //String? fullFieldPath;
   String? relativeFieldPath;
   bool? primaryKey;
   List<FieldBase> fields = [];
   String? fieldName;
+  FieldScope? scope;
 
   // Reference to the list endpoint if this field is annotated with @ListField
   ListEndpoint? listEndpoint;
   String? listKeyField;
 
   FieldBase();
-
-  FieldScope get scope {
-    return parent?.scope ?? FieldScope.record;
-  }
-
-  String getScope() {
-    return scope.name;
-  }
 
   String get value {
     return getPath(wrapped: false);
@@ -48,16 +42,20 @@ class FieldBase {
     if (parentDepth > 1) {
       throw Exception('Can not bind to a nested field');
     }
-    return fullFieldPath!;
+    return getPath(wrapped: false);
   }
 
-  String getPath({bool wrapped = true}) {
+  String getPath({bool wrapped = true, bool scoped = true}) {
     var path =
-        parent != null ? parent!.getPath(wrapped: false) : '${scope.name}()';
+        parent != null
+            ? parent!.getPath(wrapped: false, scoped: scoped)
+            : scoped
+            ? '${scope!.name}()'
+            : '';
     if (listKeyField != null) {
-      path = '$path.$listKeyField';
+      path = path.extendPath(listKeyField!);
     } else if (relativeFieldPath != null) {
-      path = '$path.$relativeFieldPath';
+      path = path.extendPath(relativeFieldPath!);
     }
 
     if (listEndpoint != null) {
@@ -70,13 +68,13 @@ class FieldBase {
     return path;
   }
 
-  String getFormPath() {
-    String recordPath = "${getScope()}().$fullFieldPath";
-    return recordPath;
-  }
+  // String getFormPath() {
+  //   String recordPath = "${getScope()}().$fullFieldPath";
+  //   return recordPath;
+  // }
 
   String getSqlPath() {
-    return 'json_extract(record, "\$.$fullFieldPath")';
+    return 'json_extract(record, "\$.${getPath(wrapped: false, scoped: false)}")';
   }
 
   @override
@@ -117,6 +115,21 @@ class FloatField extends Field {
   }
 }
 
+class DateTimeField extends Field {
+  DateTimeField();
+
+  @override
+  String getFieldType() {
+    return 'DateTime';
+  }
+
+  StringField format(String format) {
+    return StringField()
+      ..parent = this
+      ..relativeFieldPath = 'format("$format")';
+  }
+}
+
 class StringField extends Field {
   StringField();
 
@@ -134,13 +147,15 @@ class StringField extends Field {
   }
 
   StringField toUpper() {
-    fullFieldPath = '$fullFieldPath.toUpper()';
-    return this;
+    return StringField()
+      ..parent = this
+      ..relativeFieldPath = 'toUpper()';
   }
 
   StringField toLower() {
-    fullFieldPath = '$fullFieldPath.toLower()';
-    return this;
+    return StringField()
+      ..parent = this
+      ..relativeFieldPath = 'toLower()';
   }
 
   dynamic toJson() {
@@ -164,11 +179,7 @@ class BoolField extends Field {
 }
 
 class ListField<T extends Record> extends Field {
-  final Record record;
-
-  ListField({required this.record}) {
-    record.register();
-  }
+  ListField();
 
   @override
   String getFieldType() {
@@ -180,7 +191,41 @@ class ListField<T extends Record> extends Field {
   }
 
   Record getRecord() {
-    return record;
+    return instantiateRecord<T>();
+  }
+}
+
+class ListScalarField<T> extends Field {
+  ListScalarField();
+
+  @override
+  String getFieldType() {
+    return 'List<${getGenericFieldType()}>';
+  }
+
+  String getGenericFieldType() {
+    return T.toString();
+  }
+
+  IntField count() {
+    return IntField()
+      ..parent = this
+      ..relativeFieldPath = 'count()';
+  }
+}
+
+class StringListField extends ListScalarField<String> {
+  StringListField();
+
+  @override
+  String getFieldType() {
+    return 'List<String>';
+  }
+
+  StringField join(String separator) {
+    return StringField()
+      ..parent = this
+      ..relativeFieldPath = 'join("$separator")';
   }
 }
 
@@ -188,6 +233,7 @@ abstract class Record extends FieldBase {
   String? pkFieldName;
 
   void register() {
+    scope = FieldScope.record;
     buildMemberGraph();
     processAnnotations();
     buildFieldPaths();
@@ -264,7 +310,9 @@ abstract class Record extends FieldBase {
         }
 
         if (pkFieldName == null) {
-          throw Exception('No primary key found for record ${instanceMirror.type.simpleName}');
+          throw Exception(
+            'No primary key found for record ${instanceMirror.type.simpleName}',
+          );
         }
       }
     });
@@ -319,10 +367,10 @@ abstract class Record extends FieldBase {
             fieldName = '${fieldInstance.listKeyField}';
           }
 
-          fieldInstance.fullFieldPath =
-              fieldInstance.parent?.parent != null
-                  ? '${fieldInstance.parent!.fullFieldPath}.$fieldName'
-                  : fieldName;
+          // fieldInstance.fullFieldPath =
+          //     fieldInstance.parent?.parent != null
+          //         ? '${fieldInstance.parent!.fullFieldPath}.$fieldName'
+          //         : fieldName;
 
           fieldInstance.relativeFieldPath = fieldName;
           if (fieldInstance is Record) {

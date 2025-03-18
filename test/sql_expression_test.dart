@@ -1,32 +1,29 @@
+import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:test/test.dart';
-import 'package:apptree_dart_sdk/src/models/expression.dart';
-import 'package:apptree_dart_sdk/src/models/record.dart';
 
 /// A minimal Record model used for testing conditionals
 ///
 /// This model defines a few fields (name, active, age) used in our tests.
 /// For our purposes, we manually assign field paths.
 class TestRecord extends Record {
-  StringField name = StringField();
-  BoolField active = BoolField();
-  IntField age = IntField();
+  @PkField()
+  final StringField id = StringField();
+  final StringField name = StringField();
+  final BoolField active = BoolField();
+  final IntField age = IntField();
 
   TestRecord() {
     // Manually set the fullFieldPath for testing
-    name.fullFieldPath = 'name';
-    active.fullFieldPath = 'active';
-    age.fullFieldPath = 'age';
+    name.relativeFieldPath = 'name';
+    active.relativeFieldPath = 'active';
+    age.relativeFieldPath = 'age';
   }
-
-  // Override to avoid the need of reflection in tests.
-  @override
-  void register() {}
 }
 
 void main() {
   group('ConditionalType.sqlite tests', () {
     test('Test 1: StringEquals condition', () {
-      final record = TestRecord();
+      final record = TestRecord()..register();
       final condition = record.name
           .equals("John")
           .setType(ConditionalType.sqlite);
@@ -38,7 +35,7 @@ void main() {
     });
 
     test('Test 2: BoolEquals condition', () {
-      final record = TestRecord();
+      final record = TestRecord()..register();
       final condition = record.active
           .equals(true)
           .setType(ConditionalType.sqlite);
@@ -50,7 +47,7 @@ void main() {
     });
 
     test('Test 3: IntEquals condition', () {
-      final record = TestRecord();
+      final record = TestRecord()..register();
       final condition = record.age.equals(30).setType(ConditionalType.sqlite);
       expect(
         condition.toString(),
@@ -60,7 +57,7 @@ void main() {
     });
 
     test('Test 4: AND combination', () {
-      final record = TestRecord();
+      final record = TestRecord()..register();
       final condition = record.name
           .equals("John")
           .and(record.active.equals(true))
@@ -75,7 +72,7 @@ void main() {
     });
 
     test('Test 5: OR combination', () {
-      final record = TestRecord();
+      final record = TestRecord()..register();
       final condition = record.name
           .equals("John")
           .or(record.active.equals(true))
@@ -90,7 +87,7 @@ void main() {
     });
 
     test('Test 6: Contains condition', () {
-      final record = TestRecord();
+      final record = TestRecord()..register();
       final condition = record.name
           .contains("oh")
           .setType(ConditionalType.sqlite);
@@ -102,7 +99,7 @@ void main() {
     });
 
     test('Test 7: Nested OR and AND combination', () {
-      final record = TestRecord();
+      final record = TestRecord()..register();
       // Build an expression: (name equals "John" OR name equals "Doe") AND active equals true
       final orCondition = record.name
           .equals("John")
@@ -120,7 +117,7 @@ void main() {
     });
 
     test('Test 8: RecordContains condition', () {
-      final record = TestRecord();
+      final record = TestRecord()..register();
       // record.contains(field) returns a RecordContains instance.
       final condition = record
           .contains(record.name)
@@ -134,7 +131,7 @@ void main() {
     });
 
     test('Test 9: Complex nested combination', () {
-      final record = TestRecord();
+      final record = TestRecord()..register();
       // Build an expression: (name equals 'John' AND active equals true) OR (age equals 25 AND name contains 'D')
       final condition1 = record.name
           .equals("John")
@@ -150,7 +147,7 @@ void main() {
     });
 
     test('Test 10: Multiple nested conditions with mixed operators', () {
-      final record = TestRecord();
+      final record = TestRecord()..register();
       // Build an expression:
       // ((name equals "John" OR name equals "Doe") AND active equals true) OR (name contains "Test" AND age equals 40)
       final orPart = record.name.equals("John").or(record.name.equals("Doe"));

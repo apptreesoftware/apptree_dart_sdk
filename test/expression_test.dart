@@ -1,8 +1,8 @@
+import 'package:apptree_dart_sdk/apptree.dart';
 import 'package:test/test.dart';
-import 'package:apptree_dart_sdk/src/models/expression.dart';
-import 'package:apptree_dart_sdk/src/models/record.dart';
 
 class Card extends Record {
+  @PkField()
   final StringField name = StringField();
   final StringField rarity = StringField();
   final StringField type = StringField();
@@ -10,15 +10,18 @@ class Card extends Record {
 }
 
 class Attack extends Record {
+  @PkField()
   final StringField name = StringField();
   final IntField damage = IntField();
 }
 
 class Test extends Record {
+  @PkField()
   final StringField assetName = StringField();
 }
 
 class User extends Record {
+  @PkField()
   final StringField name = StringField();
 }
 
