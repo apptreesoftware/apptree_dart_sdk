@@ -15,3 +15,15 @@ String seperateCapitalsWithHyphen(String input) {
         (match) => '-${match[1]!.toLowerCase()}',
       );
 }
+
+extension StringExtensions on String {
+  String extendPath(String path) {
+    if (isEmpty) {
+      return path;
+    }
+    if (path.isEmpty) {
+      return this;
+    }
+    return '$this.$path';
+  }
+}

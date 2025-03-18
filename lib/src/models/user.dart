@@ -23,6 +23,7 @@ class User extends Record {
   Record? data;
 
   User({this.data}) : super() {
+    scope = FieldScope.user;
     register();
   }
 

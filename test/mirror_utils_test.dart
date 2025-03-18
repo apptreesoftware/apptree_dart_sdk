@@ -3,13 +3,18 @@ import 'package:apptree_dart_sdk/apptree.dart';
 
 // Test classes
 class SimpleRecord extends Record {
+  @PkField()
+  final StringField id = StringField();
   final StringField name = StringField();
   final IntField age = IntField();
 }
 
 class ComplexRecord extends Record {
+  @PkField()
+  final StringField id = StringField();
   final StringField name = StringField();
   final SimpleRecord nested = SimpleRecord();
+  final DateTimeField completedOn = DateTimeField();
   final List<SimpleRecord> records = [];
 
   @ExternalField(endpoint: MyListEndpoint(), key: 'listRecordId')
@@ -24,6 +29,8 @@ class SimpleRequest extends Request {
 }
 
 class ListRecord extends Record {
+  @PkField()
+  final StringField id = StringField();
   final StringField name = StringField();
   final IntField age = IntField();
 }
@@ -78,6 +85,10 @@ void main() {
       expect(
         record.listRecord.name.value,
         equals(r'getListItem("listData", record().listRecordId).name'),
+      );
+      expect(
+        record.completedOn.format('yyyy-MM-dd').toUpper().value,
+        equals(r'record().completedOn.format("yyyy-MM-dd").toUpper()'),
       );
     });
 
