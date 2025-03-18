@@ -1,12 +1,8 @@
 import "package:dotenv/dotenv.dart";
 import 'package:apptree_mobile/apptree_mobile.dart';
 
-
 abstract class AppBase {
-  final String projectName;
-  final String username;
-
-  AppBase({required this.projectName, required this.username});
+  AppBase();
   // Map to store dependencies with Type as key
   final Map<Type, dynamic> _dependencies = {};
 
@@ -21,7 +17,9 @@ abstract class AppBase {
     return secret;
   }
 
-  Service get service => Service(project: projectName, secret: getServiceSecret());
+  Service getApptreeService(String projectName) {
+    return Service(project: projectName, secret: getServiceSecret());
+  }
 
   /// Registers a dependency of type T
   /// If a dependency of the same type already exists, it will be overridden

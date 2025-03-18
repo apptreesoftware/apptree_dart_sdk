@@ -67,6 +67,7 @@ class GeneratorController {
       requestName: connector.requestName!,
       requestMap: requestMap,
       projectDir: projectDir,
+      type: ConnectorType.collection,
     );
     
     CollectionSampleGenerator(
@@ -132,6 +133,7 @@ class GeneratorController {
       requestName: connector.requestName!,
       requestMap: requestMap,
       projectDir: app.name,
+      type: ConnectorType.submission,
     );
 
     SubmissionSampleGenerator(

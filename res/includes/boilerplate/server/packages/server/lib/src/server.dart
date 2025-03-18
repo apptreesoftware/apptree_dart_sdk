@@ -31,15 +31,9 @@ class Server<T extends AppBase> {
       var data = await handleCollectionPostRequest<TInput, List<TOutput>>(
         app: app,
         request: request,
+        pkField: pkField,
         fromJson: fromJson,
         fetch: (input) => dataSource.getCollection(input),
-      );
-
-      app.service.uploadCollection(
-        collectionId: path,
-        data: data,
-        pkField: pkField,
-        username: app.username,
       );
       return data;
     });
@@ -60,6 +54,7 @@ class Server<T extends AppBase> {
   Future<dynamic> handleCollectionPostRequest<TInput, TOutput>({
     required AppBase app,
     required Request request,
+    required String pkField,
     required TInput Function(Map<String, dynamic>) fromJson,
     required dynamic Function(TInput) fetch,
   }) async {
@@ -69,6 +64,14 @@ class Server<T extends AppBase> {
       _logRequest(traceId, request, input);
       var result = await fetch(input);
       _logResponse(traceId, request, result);
+
+      var collectionRequest = input as CollectionRequest;
+      await app.getApptreeService(collectionRequest.app).uploadCollection(
+        collectionId: collectionRequest.collection,
+        data: result,
+        pkField: pkField,
+        username: collectionRequest.username,
+      );
       return result;
     } on JsonInputException catch (e) {
       serverLogger.severe('Error: $traceId - ${e.toString()}', e);
