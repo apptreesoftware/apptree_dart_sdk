@@ -68,6 +68,7 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
         if (sort != null) 'sort': sort,
         'list': listEndpoint.id,
         'template': templateBuildResult?.featureData,
+        'bindTo': bindTo,
       },
     }, 'SelectListInput bound to $bindTo');
   }

@@ -9,12 +9,14 @@ class ConnectorItem {
   String datasourceName;
   String? requestName;
   ConnectorType type;
+  String pkField;
 
   ConnectorItem({
     required this.recordName,
     required this.datasourceName,
     this.requestName,
     required this.type,
+    required this.pkField,
   });
 }
 
@@ -155,6 +157,7 @@ class PackageGenerator {
           result += '''
   server.addCollectionRoute<${connector.requestName}, ${connector.datasourceName}, ${connector.recordName}>(
     '/${connector.datasourceName}',
+    '${connector.pkField}',
     (Map<String, dynamic> json) => ${connector.requestName}.fromJson(json),
   );
 ''';

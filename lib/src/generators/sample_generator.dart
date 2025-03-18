@@ -87,7 +87,7 @@ class CollectionSampleGenerator extends SampleGenerator {
     return '@override\n  Future<${getRecordName()}> getRecord(String id) async { return samples[0]; }\n';
   }
 
-
+  @override
   Future<String> generateSampleClass() async {
     String res = 'class Sample$dataSourceName extends $dataSourceName {\n';
     res += '  ${await generateSampleData()}\n';
@@ -101,6 +101,7 @@ class CollectionSampleGenerator extends SampleGenerator {
     return res;
   }
 
+  @override
   Future<void> generateSamples() async {
     String res = '';
     res += generateImports();
@@ -147,6 +148,7 @@ class ListSampleGenerator extends SampleGenerator {
     return res;
   }
 
+  @override
   Future<void> generateSamples() async {
     String res = '';
     res += generateImports();

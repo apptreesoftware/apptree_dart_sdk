@@ -17,24 +17,26 @@ class Server<T extends AppBase> {
   final router = Router().plus;
   Server(this.app);
 
-  void addCollectionRoute<TInput,
-      TDataSource extends CollectionDataSource<TInput, TOutput>, TOutput>(
+  void addCollectionRoute<
+    TInput,
+    TDataSource extends CollectionDataSource<TInput, TOutput>,
+    TOutput
+  >(
     String path,
+    String pkField,
     TInput Function(Map<String, dynamic>) fromJson,
   ) {
-    router.post(
-      path,
-      (Request request) async {
-        var dataSource = app.get<TDataSource>();
-        var data = await handleCollectionPostRequest<TInput, List<TOutput>>(
-          app: app,
-          request: request,
-          fromJson: fromJson,
-          fetch: (input) => dataSource.getCollection(input),
-        );
-        return data;
-      },
-    );
+    router.post(path, (Request request) async {
+      var dataSource = app.get<TDataSource>();
+      var data = await handleCollectionPostRequest<TInput, List<TOutput>>(
+        app: app,
+        request: request,
+        pkField: pkField,
+        fromJson: fromJson,
+        fetch: (input) => dataSource.getCollection(input),
+      );
+      return data;
+    });
   }
 
   // TODO: Add list route
@@ -49,17 +51,27 @@ class Server<T extends AppBase> {
     return router.call;
   }
 
-  Future<dynamic> handleCollectionPostRequest<TInput, TOutput>(
-      {required AppBase app,
-      required Request request,
-      required TInput Function(Map<String, dynamic>) fromJson,
-      required dynamic Function(TInput) fetch}) async {
+  Future<dynamic> handleCollectionPostRequest<TInput, TOutput>({
+    required AppBase app,
+    required Request request,
+    required String pkField,
+    required TInput Function(Map<String, dynamic>) fromJson,
+    required dynamic Function(TInput) fetch,
+  }) async {
     var traceId = _generateTraceId();
     try {
       var input = await _parseJsonBody<TInput>(request, fromJson);
       _logRequest(traceId, request, input);
       var result = await fetch(input);
       _logResponse(traceId, request, result);
+
+      var collectionRequest = input as CollectionRequest;
+      await app.getApptreeService(collectionRequest.app).uploadCollection(
+        collectionId: collectionRequest.collection,
+        data: result,
+        pkField: pkField,
+        username: collectionRequest.username,
+      );
       return result;
     } on JsonInputException catch (e) {
       serverLogger.severe('Error: $traceId - ${e.toString()}', e);

@@ -6,6 +6,7 @@ class App {
   final String name;
   final int configVersion;
   List<Feature> features = [];
+  List<Feature> childFeatures = [];
   Map<String, MenuItem> menuItems = {};
   List<Template> templates = [];
   List<Endpoint> endpoints = [];
@@ -15,6 +16,10 @@ class App {
     features.add(feature);
     menuItem.setId(feature.id);
     menuItems[menuItem.title] = menuItem;
+  }
+
+  void addChildFeature(Feature feature) {
+    childFeatures.add(feature);
   }
 
   void addTemplate(Template template) {
@@ -28,12 +33,16 @@ class App {
   Map<String, dynamic> toDict() {
     List<String> featureIds =
         features.map((feature) => '${feature.id}.yaml').toList();
+    featureIds.addAll(childFeatures.map((feature) => '${feature.id}.yaml'));
     featureIds.add("menu.yaml");
     return {
       "name": name,
       "configVersion": configVersion,
       "merge": featureIds,
       "templates": templates.map((t) => "templates/${t.id}.fsx").toList(),
+      "environment": {
+        "url": "https://corey.apptree.dev",
+      },
     };
   }
 
@@ -46,7 +55,6 @@ class App {
       YamlWriter().write(app),
       extension: '.apptreemobile',
     );
-    
   }
 
   void initialize() {
@@ -78,6 +86,14 @@ class App {
     var buildResult = feature.build(buildContext);
     print("Writing feature: ${feature.id}");
 
+    // Write Templates
+    if (buildResult.templates.isNotEmpty) {
+      for (var template in buildResult.templates) {
+        writeTemplate(name, template.id, template.toFsx());
+        addTemplate(template);
+      }
+    }
+
     // If there are errors, print them
     if (buildResult.errors.isNotEmpty) {
       print("Error in ${buildResult.buildIdentifier}");
@@ -100,6 +116,7 @@ class App {
     // Recursively build and write child features
     for (var childFeature in buildResult.childFeatures) {
       writeFeature(childFeature, buildContext: buildContext);
+      addChildFeature(childFeature);
     }
 
     if (buildResult.endpoints.isNotEmpty) {
