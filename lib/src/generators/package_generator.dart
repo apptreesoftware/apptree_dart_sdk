@@ -167,6 +167,7 @@ class PackageGenerator {
           result += '''
   server.addListRoute<${connector.datasourceName}, ${connector.recordName}>(
     '/${connector.datasourceName}',
+    '${connector.datasourceName}',
     (Map<String, dynamic> json) => BaseRequest.fromJson(json),
   );
 ''';

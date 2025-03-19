@@ -6,6 +6,7 @@ import 'package:shelf_plus/shelf_plus.dart';
 import 'errors.dart';
 
 import 'package:server/server.dart';
+import 'request.dart';
 
 final serverLogger = Logger('Server')..level = Level.INFO;
 
@@ -16,7 +17,19 @@ class Server<T extends AppBase> {
   final T app;
 
   final router = Router().plus;
-  Server(this.app);
+  Server(this.app) {
+    print("Registering list");
+    app
+    .getApptreeService("cards.dev")
+    .registerList(
+      listId: "Owners",
+      scope: "app",
+      schema: [
+        {"fieldName": "ownerId", "fieldType": "text"},
+        {"fieldName": "name", "fieldType": "text"},
+      ],
+    );
+  }
 
   void addCollectionRoute<
     TInput,
