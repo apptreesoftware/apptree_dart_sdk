@@ -2,9 +2,10 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:logging/logging.dart';
-import 'package:server/server.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 import 'errors.dart';
+
+import 'package:server/server.dart';
 
 final serverLogger = Logger('Server')..level = Level.INFO;
 
@@ -45,11 +46,11 @@ class Server<T extends AppBase> {
   ) {
     router.post(path, (Request request) async {
       var dataSource = app.get<TDataSource>();
-      var data = await handleListPostRequest<TInput, TOutput>(
+      var data = await handleListPostRequest<TOutput>(
         app: app,
         request: request,
         fromJson: fromJson,
-        fetch: () => dataSource.getList(),
+        fetch: (input) => dataSource.getList(),
       );
       return data;
     });
@@ -80,12 +81,14 @@ class Server<T extends AppBase> {
       _logResponse(traceId, request, result);
 
       var collectionRequest = input as CollectionRequest;
-      await app.getApptreeService(collectionRequest.app).uploadCollection(
-        collectionId: collectionRequest.collection,
-        data: result,
-        pkField: pkField,
-        username: collectionRequest.username,
-      );
+      await app
+          .getApptreeService(collectionRequest.app)
+          .uploadCollection(
+            collectionId: collectionRequest.collection,
+            data: result,
+            pkField: pkField,
+            username: collectionRequest.username,
+          );
       return result;
     } on JsonInputException catch (e) {
       serverLogger.severe('Error: $traceId - ${e.toString()}', e);
@@ -104,23 +107,27 @@ class Server<T extends AppBase> {
     }
   }
 
-  Future<dynamic> handleListPostRequest<TInput, TOutput>({
+  Future<dynamic> handleListPostRequest<TOutput>({
     required AppBase app,
-    required TInput Function(Map<String, dynamic>) fromJson,
-    required dynamic Function(TInput) fetch,
+    required Request request,
+    required BaseRequest Function(Map<String, dynamic>) fromJson,
+    required dynamic Function(BaseRequest) fetch,
   }) async {
     var traceId = _generateTraceId();
     try {
-      var input = await _parseJsonBody<TInput>(request, fromJson);
+      var input = await _parseJsonBody<BaseRequest>(request, fromJson);
       _logRequest(traceId, request, input);
       var result = await fetch(input);
       _logResponse(traceId, request, result);
+
       var listRequest = input as BaseRequest;
-      await app.getApptreeService(listRequest.app).uploadList(
-        listId: listRequest.listId,
-        data: result,
-        username: listRequest.username,
-      );
+      await app
+          .getApptreeService(listRequest.app)
+          .uploadList(
+            listId: "Owners",
+            data: result,
+            username: listRequest.username,
+          );
       return result;
     } catch (e) {
       serverLogger.severe('Error: $traceId - ${e.toString()}', e);
@@ -131,7 +138,7 @@ class Server<T extends AppBase> {
       );
     }
   }
-  
+
   Future<T> _parseJsonBody<T>(
     Request request,
     T Function(Map<String, dynamic>) fromJson,
