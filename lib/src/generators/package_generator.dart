@@ -164,7 +164,12 @@ class PackageGenerator {
   );
 ''';
         case ConnectorType.list:
-          result += "// Implement list route\n";
+          result += '''
+  server.addListRoute<${connector.datasourceName}, ${connector.recordName}>(
+    '/${connector.datasourceName}',
+    (Map<String, dynamic> json) => BaseRequest.fromJson(json),
+  );
+''';
         case ConnectorType.submission:
           result += "// Implement submission route\n";
       }
