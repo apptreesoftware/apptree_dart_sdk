@@ -19,7 +19,7 @@ abstract class SampleGenerator {
     required this.projectDir,
     required this.openaiApiKey,
     required this.recordDependencyMap,
-    this.overwrite = true,
+    this.overwrite = false,
   }) {
     buildRecordGraph(record);
     generateSamples();

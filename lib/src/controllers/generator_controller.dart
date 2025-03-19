@@ -109,7 +109,7 @@ class GeneratorController {
 
     RequestGenerator(
       requestName: requestName,
-      requestMap: requestMap,
+      requestMap: requestMap[requestName]!,
       projectDir: projectDir,
       type: ConnectorType.collection,
     );
@@ -157,7 +157,7 @@ class GeneratorController {
 
     RequestGenerator(
       requestName: requestName,
-      requestMap: requestMap,
+      requestMap: requestMap[requestName]!,
       projectDir: projectDir,
       type: ConnectorType.submission,
     );
