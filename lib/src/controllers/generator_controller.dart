@@ -6,8 +6,7 @@ import 'dart:mirrors';
 class GeneratorController {
   final App app;
   late String openAiApiKey;
-  List<String> modelNames = [];
-  List<ConnectorItem> connectors = [];
+  Map<String, dynamic> recordDependencyMap = {};
 
   GeneratorController({required this.app}) {
     final env = DotEnv(includePlatformEnvironment: true)..load();
@@ -20,14 +19,70 @@ class GeneratorController {
       );
       exit(1);
     }
+
+    getRecordDependencyMap();
   }
 
   String getRecordName(Record record) {
     return MirrorSystem.getName(reflect(record).type.simpleName);
   }
 
+  Map<String, dynamic> getRecordDependencyMap() {
+    Map<String, dynamic> buildRecordDependencyMapImpl(Record record) {
+      Map<String, dynamic> recordMap = {};
+      for (final field in record.fields) {
+        if (field is Record) {
+          recordMap[field.runtimeType
+              .toString()] = buildRecordDependencyMapImpl(field);
+        }
+        if (field is ListField) {
+          recordMap[field.record.runtimeType
+              .toString()] = buildRecordDependencyMapImpl(field.record);
+        }
+      }
+
+      return recordMap;
+    }
+
+    for (var endpoint in app.endpoints) {
+      recordDependencyMap[endpoint.record.runtimeType
+          .toString()] = buildRecordDependencyMapImpl(endpoint.record);
+    }
+
+    return recordDependencyMap;
+  }
+
+  List<ConnectorItem> getConnectors() {
+    return app.endpoints
+        .map(
+          (endpoint) => ConnectorItem(
+            recordName: getRecordName(endpoint.record),
+            datasourceName: endpoint.id,
+            requestName: endpoint is SubmissionEndpoint
+                ? endpoint.getRequestParams().keys.first
+                : endpoint is CollectionEndpoint
+                ? endpoint.getRequestParams().keys.first
+                : null,
+            type:
+                endpoint is CollectionEndpoint
+                    ? ConnectorType.collection
+                    : endpoint is ListEndpoint
+                    ? ConnectorType.list
+                    : ConnectorType.submission,
+            pkField: endpoint.record.pkFieldName ?? '',
+          ),
+        )
+        .toList();
+  }
+
   void generateConnectors() {
     for (var endpoint in app.endpoints) {
+      ModelGenerator(
+        record: endpoint.record,
+        projectDir: app.name,
+        recordDependencyMap: recordDependencyMap,
+      );
+
       if (endpoint is CollectionEndpoint) {
         generateCollectionConnector(endpoint);
       } else if (endpoint is ListEndpoint) {
@@ -37,111 +92,83 @@ class GeneratorController {
       }
     }
 
-    PackageGenerator(projectDir: app.name, connectors: connectors);
+    PackageGenerator(projectDir: app.name, connectors: getConnectors());
   }
 
   void generateCollectionConnector(CollectionEndpoint endpoint) {
-    var connector = ConnectorItem(
-      recordName: getRecordName(endpoint.record),
-      pkField: endpoint.record.pkFieldName!,
-      datasourceName: endpoint.id,
-      requestName: endpoint.getRequestParams().keys.first,
-      type: ConnectorType.collection,
-    );
-    connectors.add(connector);
-
-    var requestMap = endpoint.getRequestParams()[connector.requestName];
-
+    var requestMap = endpoint.getRequestParams();
+    var requestName = requestMap.keys.first;
     var projectDir = app.name;
 
-    ModelGenerator(record: endpoint.record, projectDir: projectDir);
-
     CollectionDatasourceGenerator(
-      datasourceName: connector.datasourceName,
+      datasourceName: endpoint.id,
       record: endpoint.record,
-      requestName: connector.requestName!,
+      requestName: requestName,
       projectDir: projectDir,
     );
 
     RequestGenerator(
-      requestName: connector.requestName!,
+      requestName: requestName,
       requestMap: requestMap,
       projectDir: projectDir,
       type: ConnectorType.collection,
     );
-    
+
     CollectionSampleGenerator(
       record: endpoint.record,
-      requestName: connector.requestName!,
-      dataSourceName: connector.datasourceName,
+      requestName: requestName,
+      dataSourceName: endpoint.id,
       openaiApiKey: openAiApiKey,
+      recordDependencyMap: recordDependencyMap,
       projectDir: projectDir,
     );
   }
 
-  void generateListConnector(ListEndpoint endpoint) {
-    var connector = ConnectorItem(
-      recordName: getRecordName(endpoint.record),
-      datasourceName: endpoint.id,
-      requestName: '',
-      pkField: endpoint.record.pkFieldName!,
-      type: ConnectorType.list,
-    );
-    connectors.add(connector);
-
+  void generateListConnector(Endpoint endpoint) {
     var projectDir = app.name;
 
-    ModelGenerator(record: endpoint.record, projectDir: projectDir);
-
     ListDatasourceGenerator(
-      datasourceName: connector.datasourceName,
+      datasourceName: endpoint.id,
       record: endpoint.record,
       projectDir: projectDir,
     );
 
     ListSampleGenerator(
       record: endpoint.record,
-      dataSourceName: connector.datasourceName,
+      dataSourceName: endpoint.id,
       openaiApiKey: openAiApiKey,
+      recordDependencyMap: recordDependencyMap,
       projectDir: projectDir,
     );
   }
 
   void generateSubmissionConnector(SubmissionEndpoint endpoint) {
-    var connector = ConnectorItem(
-      recordName: getRecordName(endpoint.record),
-      datasourceName: endpoint.id,
-      requestName: endpoint.getRequestParams().keys.first,
-      pkField: endpoint.record.pkFieldName!,
-      type: ConnectorType.submission,
-    );
-    connectors.add(connector);
-
-    var requestMap = endpoint.getRequestParams()[connector.requestName];
-
-    ModelGenerator(record: endpoint.record, projectDir: app.name);
+    var requestMap = endpoint.getRequestParams();
+    var requestName = requestMap.keys.first;
+    var projectDir = app.name;
 
     SubmissionDatasourceGenerator(
-      datasourceName: connector.datasourceName,
+      datasourceName: endpoint.id,
       record: endpoint.record,
-      requestName: connector.requestName!,
-      submissionType: endpoint.submissionType,
-      projectDir: app.name,
+      requestName: requestName,
+      submissionType: endpoint.submissionType!,
+      projectDir: projectDir,
     );
 
     RequestGenerator(
-      requestName: connector.requestName!,
+      requestName: requestName,
       requestMap: requestMap,
-      projectDir: app.name,
+      projectDir: projectDir,
       type: ConnectorType.submission,
     );
 
     SubmissionSampleGenerator(
       record: endpoint.record,
-      dataSourceName: connector.datasourceName,
+      dataSourceName: endpoint.id,
       openaiApiKey: openAiApiKey,
-      projectDir: app.name,
-      requestName: connector.requestName!,
+      recordDependencyMap: recordDependencyMap,
+      projectDir: projectDir,
+      requestName: requestName,
     );
   }
 }

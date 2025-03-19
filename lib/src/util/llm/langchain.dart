@@ -1,37 +1,43 @@
 import 'package:apptree_dart_sdk/src/util/file.dart';
 import 'package:langchain/langchain.dart';
 import 'package:langchain_openai/langchain_openai.dart';
+import 'package:apptree_dart_sdk/apptree.dart';
 
+Future<String> generateSampleDataLLM(
+  String codeRequest,
+  String fileName,
+  List<String> relatedRecordNames,
+  String projectDir,
+  String openaiApiKey,
+  bool overwrite,
+) async {
+  // 1. Attempt to read in existing samples
+  final existingSamples = await readSamplePartialDart(projectDir, fileName);
+  if (existingSamples.isNotEmpty && overwrite) {
+    return existingSamples;
+  }
 
-Future<String> generateSampleDataLLM(String codeRequest, String fileName, String recordName, String projectDir, String openaiApiKey, bool overwrite) async {
-    // 1. Attempt to read in existing samples
-    final existingSamples = await readSamplePartialDart(
-      projectDir,
-      fileName,
-    );
-    if (existingSamples.isNotEmpty && overwrite) {
-      return existingSamples;
-    }
+  // 2. Generate new samples
+  final vectorStore = MemoryVectorStore(
+    embeddings: OpenAIEmbeddings(apiKey: openaiApiKey),
+  );
+  List<Document> documents = [];
+  for (final recordName in relatedRecordNames) {
+    final model = await readModelDart(projectDir, recordName);
+    documents.add(Document(pageContent: model));
+  }
+  await vectorStore.addDocuments(documents: documents);
 
-    // 2. Generate new samples
-    final vectorStore = MemoryVectorStore(
-      embeddings: OpenAIEmbeddings(apiKey: openaiApiKey),
-    );
-    final modelDart = await readModelDart(projectDir, recordName);
-    await vectorStore.addDocuments(
-      documents: [Document(pageContent: modelDart)],
-    );
+  // 3. Define the retrieval chain
+  final retriever = vectorStore.asRetriever();
+  final setupAndRetrieval = Runnable.fromMap<String>({
+    'context': retriever.pipe(
+      Runnable.mapInput((docs) => docs.map((d) => d.pageContent).join('\n')),
+    ),
+    'code_request': Runnable.passthrough(),
+  });
 
-    // 3. Define the retrieval chain
-    final retriever = vectorStore.asRetriever();
-    final setupAndRetrieval = Runnable.fromMap<String>({
-      'context': retriever.pipe(
-        Runnable.mapInput((docs) => docs.map((d) => d.pageContent).join('\n')),
-      ),
-      'code_request': Runnable.passthrough(),
-    });
-
-    const String systemPrompt = '''
+  const String systemPrompt = '''
         You are a Dart developer.
         You are given a code request and a context.
         You need to generate a Dart code snippet that implements the code request.
@@ -46,31 +52,31 @@ Future<String> generateSampleDataLLM(String codeRequest, String fileName, String
         {context}
       ''';
 
-    // 4. Construct a RAG prompt template
-    final promptTemplate = ChatPromptTemplate.fromPromptMessages([
-      SystemChatMessagePromptTemplate.fromTemplate(systemPrompt),
-      HumanChatMessagePromptTemplate.fromTemplate('{code_request}'),
-    ]);
+  // 4. Construct a RAG prompt template
+  final promptTemplate = ChatPromptTemplate.fromPromptMessages([
+    SystemChatMessagePromptTemplate.fromTemplate(systemPrompt),
+    HumanChatMessagePromptTemplate.fromTemplate('{code_request}'),
+  ]);
 
-    // 5. Define the final chain
-    final model = ChatOpenAI(
-      apiKey: openaiApiKey,
-      defaultOptions: ChatOpenAIOptions(
-        model: 'gpt-4o-mini',
-        temperature: 0,
-        responseFormat: ChatOpenAIResponseFormat.jsonObject,
-      ),
-    );
-    final outputParser = JsonOutputParser<ChatResult>();
-    final chain = setupAndRetrieval
-        .pipe(promptTemplate)
-        .pipe(model)
-        .pipe(outputParser);
+  // 5. Define the final chain
+  final model = ChatOpenAI(
+    apiKey: openaiApiKey,
+    defaultOptions: ChatOpenAIOptions(
+      model: 'gpt-4o-mini',
+      temperature: 0,
+      responseFormat: ChatOpenAIResponseFormat.jsonObject,
+    ),
+  );
+  final outputParser = JsonOutputParser<ChatResult>();
+  final chain = setupAndRetrieval
+      .pipe(promptTemplate)
+      .pipe(model)
+      .pipe(outputParser);
 
-    // 6. Run the pipeline
-    final res = await chain.invoke(codeRequest);
+  // 6. Run the pipeline
+  final res = await chain.invoke(codeRequest);
 
-    // 7. Write the samples to the file
-    writeSamplePartialDart(projectDir, fileName, res['code']);
-    return res['code'];
-  }
+  // 7. Write the samples to the file
+  writeSamplePartialDart(projectDir, fileName, res['code']);
+  return res['code'];
+}

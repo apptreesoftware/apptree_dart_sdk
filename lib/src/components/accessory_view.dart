@@ -58,19 +58,25 @@ class SelectListInputAccessoryView<I extends Request, T extends Record>
     }
     //childBuildErrors.addAll(templateBuildResult.errors);
 
-    return builder.build({
-      'selectListInput': {
-        'label': label,
-        'displayValue': displayValueFormat,
-        if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
-        'allowClear': allowClear,
-        if (filters != null && filters!.isNotEmpty) 'filters': filterData,
-        if (sort != null) 'sort': sort,
-        'list': listEndpoint.id,
-        'template': templateBuildResult?.featureData,
-        'bindTo': bindTo,
+    return BuildResult(
+      buildIdentifier: 'SelectListInput bound to $bindTo',
+      childFeatures: [],
+      errors: builder.errors,
+      featureData: {
+        'selectListInput': {
+          'label': label,
+          'displayValue': displayValueFormat,
+          if (visibleWhen != null) 'visibleWhen': visibleWhen?.toString(),
+          'allowClear': allowClear,
+          if (filters != null && filters!.isNotEmpty) 'filters': filterData,
+          if (sort != null) 'sort': sort,
+          'list': listEndpoint.id,
+          'template': templateBuildResult?.featureData,
+          'bindTo': bindTo,
+        },
       },
-    }, 'SelectListInput bound to $bindTo');
+      endpoints: [listEndpoint],
+    );
   }
 }
 

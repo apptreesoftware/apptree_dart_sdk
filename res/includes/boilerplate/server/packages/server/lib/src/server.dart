@@ -39,7 +39,21 @@ class Server<T extends AppBase> {
     });
   }
 
-  // TODO: Add list route
+  void addListRoute<TDataSource extends ListDataSource<TOutput>, TOutput>(
+    String path,
+    BaseRequest Function(Map<String, dynamic>) fromJson,
+  ) {
+    router.post(path, (Request request) async {
+      var dataSource = app.get<TDataSource>();
+      var data = await handleListPostRequest<TInput, TOutput>(
+        app: app,
+        request: request,
+        fromJson: fromJson,
+        fetch: () => dataSource.getList(),
+      );
+      return data;
+    });
+  }
 
   // TODO: Add submission route
 
@@ -90,6 +104,34 @@ class Server<T extends AppBase> {
     }
   }
 
+  Future<dynamic> handleListPostRequest<TInput, TOutput>({
+    required AppBase app,
+    required TInput Function(Map<String, dynamic>) fromJson,
+    required dynamic Function(TInput) fetch,
+  }) async {
+    var traceId = _generateTraceId();
+    try {
+      var input = await _parseJsonBody<TInput>(request, fromJson);
+      _logRequest(traceId, request, input);
+      var result = await fetch(input);
+      _logResponse(traceId, request, result);
+      var listRequest = input as BaseRequest;
+      await app.getApptreeService(listRequest.app).uploadList(
+        listId: listRequest.listId,
+        data: result,
+        username: listRequest.username,
+      );
+      return result;
+    } catch (e) {
+      serverLogger.severe('Error: $traceId - ${e.toString()}', e);
+      return Response.badRequest(
+        body: json.encode({'error': e.toString()}),
+        encoding: utf8,
+        headers: {'content-type': 'application/json'},
+      );
+    }
+  }
+  
   Future<T> _parseJsonBody<T>(
     Request request,
     T Function(Map<String, dynamic>) fromJson,
