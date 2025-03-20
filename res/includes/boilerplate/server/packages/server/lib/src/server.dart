@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:logging/logging.dart';
-import 'package:server/server.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 import 'errors.dart';
+
+import 'package:server/server.dart';
+import 'request.dart';
 
 final serverLogger = Logger('Server')..level = Level.INFO;
 
@@ -15,7 +17,19 @@ class Server<T extends AppBase> {
   final T app;
 
   final router = Router().plus;
-  Server(this.app);
+  Server(this.app) {
+    print("Registering list");
+    app
+    .getApptreeService("cards.dev")
+    .registerList(
+      listId: "Owners",
+      scope: "app",
+      schema: [
+        {"fieldName": "ownerId", "fieldType": "text"},
+        {"fieldName": "name", "fieldType": "text"},
+      ],
+    );
+  }
 
   void addCollectionRoute<
     TInput,
@@ -39,7 +53,21 @@ class Server<T extends AppBase> {
     });
   }
 
-  // TODO: Add list route
+  void addListRoute<TDataSource extends ListDataSource<TOutput>, TOutput>(
+    String path,
+    BaseRequest Function(Map<String, dynamic>) fromJson,
+  ) {
+    router.post(path, (Request request) async {
+      var dataSource = app.get<TDataSource>();
+      var data = await handleListPostRequest<TOutput>(
+        app: app,
+        request: request,
+        fromJson: fromJson,
+        fetch: (input) => dataSource.getList(),
+      );
+      return data;
+    });
+  }
 
   // TODO: Add submission route
 
@@ -66,12 +94,14 @@ class Server<T extends AppBase> {
       _logResponse(traceId, request, result);
 
       var collectionRequest = input as CollectionRequest;
-      await app.getApptreeService(collectionRequest.app).uploadCollection(
-        collectionId: collectionRequest.collection,
-        data: result,
-        pkField: pkField,
-        username: collectionRequest.username,
-      );
+      await app
+          .getApptreeService(collectionRequest.app)
+          .uploadCollection(
+            collectionId: collectionRequest.collection,
+            data: result,
+            pkField: pkField,
+            username: collectionRequest.username,
+          );
       return result;
     } on JsonInputException catch (e) {
       serverLogger.severe('Error: $traceId - ${e.toString()}', e);
@@ -80,6 +110,38 @@ class Server<T extends AppBase> {
         encoding: utf8,
         headers: {'content-type': 'application/json'},
       );
+    } catch (e) {
+      serverLogger.severe('Error: $traceId - ${e.toString()}', e);
+      return Response.badRequest(
+        body: json.encode({'error': e.toString()}),
+        encoding: utf8,
+        headers: {'content-type': 'application/json'},
+      );
+    }
+  }
+
+  Future<dynamic> handleListPostRequest<TOutput>({
+    required AppBase app,
+    required Request request,
+    required BaseRequest Function(Map<String, dynamic>) fromJson,
+    required dynamic Function(BaseRequest) fetch,
+  }) async {
+    var traceId = _generateTraceId();
+    try {
+      var input = await _parseJsonBody<BaseRequest>(request, fromJson);
+      _logRequest(traceId, request, input);
+      var result = await fetch(input);
+      _logResponse(traceId, request, result);
+
+      var listRequest = input as BaseRequest;
+      await app
+          .getApptreeService(listRequest.app)
+          .uploadList(
+            listId: "Owners",
+            data: result,
+            username: listRequest.username,
+          );
+      return result;
     } catch (e) {
       serverLogger.severe('Error: $traceId - ${e.toString()}', e);
       return Response.badRequest(

@@ -10,15 +10,49 @@ abstract class SampleGenerator {
   final String projectDir;
   final String openaiApiKey;
   final bool overwrite;
+  final Map<String, dynamic> recordDependencyMap;
+  final List<Record> records = [];
 
   SampleGenerator({
     required this.record,
     required this.dataSourceName,
     required this.projectDir,
     required this.openaiApiKey,
+    required this.recordDependencyMap,
     this.overwrite = false,
   }) {
+    buildRecordGraph(record);
     generateSamples();
+  }
+
+  bool isTopLevelRecord(String recordName) {
+    return recordDependencyMap.keys.contains(recordName) &&
+        getRecordName() != recordName;
+  }
+
+  List<String> getRelatedRecordNames() {
+    List<String> recordNames = [MirrorSystem.getName(reflect(record).type.simpleName)];
+    // Return all the records names that are top level and in records
+    for (final record in records) {
+      if (isTopLevelRecord(MirrorSystem.getName(reflect(record).type.simpleName))) {
+        recordNames.add(MirrorSystem.getName(reflect(record).type.simpleName));
+      }
+    }
+    return recordNames;
+  }
+
+  void buildRecordGraph(Record record) {
+    // Analyze the record to determine the fields and their types
+    for (final field in record.fields) {
+      if (field is Record && !records.any((r) => r == field)) {
+        buildRecordGraph(field);
+        records.add(field);
+      }
+      if (field is ListField && !records.any((r) => r == field.record)) {
+        buildRecordGraph(field.record);
+        records.add(field.record);
+      }
+    }
   }
 
   String getRecordName() {
@@ -29,11 +63,17 @@ abstract class SampleGenerator {
     return '${separateCapitalsWithUnderscore(getRecordName())}.dart';
   }
 
+  String getFileName(Record record) {
+    return separateCapitalsWithUnderscore(
+      MirrorSystem.getName(reflect(record).type.simpleName),
+    );
+  }
+
   String getDataSourceFileName() {
     return '${separateCapitalsWithUnderscore(dataSourceName)}.dart';
   }
 
-  String getFileName() {
+  String getSampleFileName() {
     return '${separateCapitalsWithUnderscore(dataSourceName)}_sample';
   }
 
@@ -42,7 +82,6 @@ abstract class SampleGenerator {
   Future<String> generateSampleClass();
 
   Future<void> generateSamples();
-
 }
 
 class CollectionSampleGenerator extends SampleGenerator {
@@ -53,6 +92,7 @@ class CollectionSampleGenerator extends SampleGenerator {
     required super.dataSourceName,
     required super.projectDir,
     required super.openaiApiKey,
+    required super.recordDependencyMap,
     required this.requestName,
     super.overwrite = false,
   });
@@ -69,14 +109,15 @@ class CollectionSampleGenerator extends SampleGenerator {
   String generateImports() {
     return 'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n'
         'import \'package:$projectDir/generated/models/${getRequestFileName()}\';\n'
-        'import \'package:$projectDir/generated/datasources/${getDataSourceFileName()}\';\n';
+        'import \'package:$projectDir/generated/datasources/${getDataSourceFileName()}\';\n'
+        '${records.map((r) => isTopLevelRecord(MirrorSystem.getName(reflect(r).type.simpleName)) ? 'import \'package:$projectDir/generated/models/${getFileName(r)}.dart\';' : '').join('\n')}\n';
   }
 
   Future<String> generateSampleData() async {
     return await generateSampleDataLLM(
       'Please produce 10 samples of the ${getRecordName()} objects.',
-      getFileName(),
-      getRecordName(),
+      getSampleFileName(),
+      getRelatedRecordNames(),
       projectDir,
       openaiApiKey,
       overwrite,
@@ -107,7 +148,7 @@ class CollectionSampleGenerator extends SampleGenerator {
     res += generateImports();
     res += await generateSampleClass();
 
-    writeSampleDart(projectDir, getFileName(), res);
+    writeSampleDart(projectDir, getSampleFileName(), res);
   }
 }
 
@@ -117,6 +158,7 @@ class ListSampleGenerator extends SampleGenerator {
     required super.dataSourceName,
     required super.projectDir,
     required super.openaiApiKey,
+    required super.recordDependencyMap,
   });
 
   @override
@@ -128,8 +170,8 @@ class ListSampleGenerator extends SampleGenerator {
   Future<String> generateSampleData() async {
     return await generateSampleDataLLM(
       'Please produce 10 samples of the ${getRecordName()} objects.',
-      getFileName(),
-      getRecordName(),
+      getSampleFileName(),
+      getRelatedRecordNames(),
       projectDir,
       openaiApiKey,
       overwrite,
@@ -154,7 +196,7 @@ class ListSampleGenerator extends SampleGenerator {
     res += generateImports();
     res += await generateSampleClass();
 
-    writeSampleDart(projectDir, getFileName(), res);
+    writeSampleDart(projectDir, getSampleFileName(), res);
   }
 }
 
@@ -167,6 +209,7 @@ class SubmissionSampleGenerator extends SampleGenerator {
     required super.dataSourceName,
     required super.projectDir,
     required super.openaiApiKey,
+    required super.recordDependencyMap,
     required this.requestName,
   });
 
@@ -178,19 +221,20 @@ class SubmissionSampleGenerator extends SampleGenerator {
   String generateImports() {
     return 'import \'package:$projectDir/generated/models/${getRecordFileName()}\';\n'
         'import \'package:$projectDir/generated/models/${getRequestFileName()}\';\n'
-        'import \'package:$projectDir/generated/datasources/${getDataSourceFileName()}\';\n';
+        'import \'package:$projectDir/generated/datasources/${getDataSourceFileName()}\';\n'
+        '${records.map((r) => isTopLevelRecord(MirrorSystem.getName(reflect(r).type.simpleName)) ? 'import \'package:$projectDir/generated/models/${getFileName(r)}.dart\';' : '').join('\n')}\n';
   }
 
   @override
   Future<String> generateSampleClass() async {
     String res = 'class Sample$dataSourceName extends $dataSourceName {\n';
     res += '  @override\n';
-    res += '  Future<${getRecordName()}> submit($requestName request, ${getRecordName()} record) async {\n';
+    res +=
+        '  Future<${getRecordName()}> submit($requestName request, ${getRecordName()} record) async {\n';
     res += '  return record;\n';
     res += '  }\n';
     res += '}\n';
     return res;
-
   }
 
   @override
@@ -199,6 +243,6 @@ class SubmissionSampleGenerator extends SampleGenerator {
     res += generateImports();
     res += await generateSampleClass();
 
-    writeSampleDart(projectDir, getFileName(), res);
+    writeSampleDart(projectDir, getSampleFileName(), res);
   }
 }

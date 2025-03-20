@@ -5,11 +5,17 @@ import 'package:apptree_dart_sdk/src/util/strings.dart';
 
 class ModelGenerator {
   final Record record;
-  late String recordName;
-  List<Record> records = [];
+  final Map<String, dynamic> recordDependencyMap;
   final String projectDir;
 
-  ModelGenerator({required this.record, required this.projectDir}) {
+  List<Record> records = [];
+  List<String> modelNames = [];
+
+  ModelGenerator({
+    required this.record,
+    required this.projectDir,
+    required this.recordDependencyMap,
+  }) {
     // Register the record
     record.register();
     records.add(record);
@@ -19,6 +25,21 @@ class ModelGenerator {
 
     // Generate and write the model
     generateModel();
+  }
+
+  String getRecordName() {
+    return MirrorSystem.getName(reflect(record).type.simpleName);
+  }
+
+  bool isTopLevelRecord(String recordName) {
+    return recordDependencyMap.keys.contains(recordName) &&
+        getRecordName() != recordName;
+  }
+
+  List<String> getModelNames() {
+    return records
+        .map((r) => MirrorSystem.getName(reflect(r).type.simpleName))
+        .toList();
   }
 
   void buildRecordGraph(Record record) {
@@ -78,7 +99,8 @@ class ModelGenerator {
   }
 
   String generateImports() {
-    return 'import \'package:server/server.dart\';\n\n';
+    return 'import \'package:server/server.dart\';'
+        '${records.map((r) => isTopLevelRecord(MirrorSystem.getName(reflect(r).type.simpleName)) ? 'import \'${getFileName(r)}.dart\';' : '').join('\n')}\n';
   }
 
   String generateSignature(String recordName, Map<String, dynamic> recordMap) {
@@ -145,6 +167,9 @@ class ModelGenerator {
     for (final record in records) {
       final recordMap = analyzeRecord(record);
       final recordName = MirrorSystem.getName(reflect(record).type.simpleName);
+      if (isTopLevelRecord(recordName)) {
+        continue;
+      }
       result += generateSignature(recordName, recordMap);
       result += generateInit(recordName, recordMap);
       result += generateFromJson(recordName, recordMap);

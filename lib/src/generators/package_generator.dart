@@ -1,6 +1,7 @@
 import 'package:apptree_dart_sdk/src/util/file.dart';
 import 'package:apptree_dart_sdk/src/util/dir.dart';
 import 'package:apptree_dart_sdk/src/util/strings.dart';
+import 'package:apptree_dart_sdk/apptree.dart';
 
 enum ConnectorType { collection, list, submission }
 
@@ -23,6 +24,7 @@ class ConnectorItem {
 class PackageGenerator {
   final String projectDir;
   final List<ConnectorItem> connectors;
+  final List<String> modelNames = [];
 
   PackageGenerator({required this.projectDir, required this.connectors}) {
     generateExport();
@@ -162,7 +164,13 @@ class PackageGenerator {
   );
 ''';
         case ConnectorType.list:
-          result += "// Implement list route\n";
+          result += '''
+  server.addListRoute<${connector.datasourceName}, ${connector.recordName}>(
+    '/${connector.datasourceName}',
+    '${connector.datasourceName}',
+    (Map<String, dynamic> json) => BaseRequest.fromJson(json),
+  );
+''';
         case ConnectorType.submission:
           result += "// Implement submission route\n";
       }
