@@ -130,6 +130,25 @@ class DateTimeField extends Field {
   }
 }
 
+class LocationField extends Field {
+  LocationField();
+
+  @override
+  String getFieldType() {
+    return 'Location';
+  }
+
+  FloatField get latitude =>
+      FloatField()
+        ..parent = this
+        ..relativeFieldPath = 'latitude';
+
+  FloatField get longitude =>
+      FloatField()
+        ..parent = this
+        ..relativeFieldPath = 'longitude';
+}
+
 class StringField extends Field {
   StringField();
 

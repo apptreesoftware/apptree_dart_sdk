@@ -115,7 +115,7 @@ var cardRecordList = RecordList<MyCardsRequest, Card>(
       TemplateAccessoryView(
         template:
             (context) => Workbench(
-              title: 'Count: ${context.recordCount}',
+              title: 'Count: ${context.recordCount} - ${context.app}',
               subtitle: 'No results',
             ),
       ),
@@ -164,7 +164,7 @@ var attacksForm = Form<Attack>(
 );
 
 void main() {
-  final app = App(name: 'cards', configVersion: 2);
+  final app = App<AppModel>(name: 'cards', configVersion: 2);
   app.addFeature(
     cardRecordList,
     menuItem: MenuItem(

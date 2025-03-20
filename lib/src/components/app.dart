@@ -2,7 +2,7 @@ import "package:apptree_dart_sdk/apptree.dart";
 import "package:yaml_writer/yaml_writer.dart";
 import "package:apptree_dart_sdk/src/util/file.dart";
 
-class App {
+class App<T extends Record> {
   final String name;
   final int configVersion;
   List<Feature> features = [];
@@ -10,6 +10,7 @@ class App {
   Map<String, MenuItem> menuItems = {};
   List<Template> templates = [];
   List<Endpoint> endpoints = [];
+
   App({required this.name, required this.configVersion});
 
   void addFeature(Feature feature, {required MenuItem menuItem}) {
@@ -40,9 +41,7 @@ class App {
       "configVersion": configVersion,
       "merge": featureIds,
       "templates": templates.map((t) => "templates/${t.id}.fsx").toList(),
-      "environment": {
-        "url": "https://corey.apptree.dev",
-      },
+      "environment": {"url": "https://corey.apptree.dev"},
     };
   }
 
@@ -59,7 +58,8 @@ class App {
 
   void initialize() {
     Map<String, dynamic> configDict = {};
-    var buildContext = BuildContext(user: User());
+    var appDataModel = instantiateRecord<T>();
+    var buildContext = BuildContext(user: User(), app: appDataModel);
 
     for (var template in templates) {
       writeTemplate(name, template.id, template.toFsx());
