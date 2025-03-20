@@ -1,7 +1,7 @@
 name: apptree_dart_sdk
 description: A starting point for Dart libraries or applications.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/apptreesoftware/apptree_dart_sdk
 
 environment:
   sdk: ^3.7.0

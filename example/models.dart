@@ -2,6 +2,10 @@ import 'package:apptree_dart_sdk/apptree.dart';
 
 import 'endpoints.dart';
 
+class AppModel extends Record {
+  BoolField get debugEnabled => BoolField();
+}
+
 class Card extends Record {
   @PkField()
   final StringField cardId = StringField();
