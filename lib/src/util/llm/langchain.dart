@@ -1,7 +1,7 @@
 import 'package:apptree_dart_sdk/src/util/file.dart';
 import 'package:langchain/langchain.dart';
 import 'package:langchain_openai/langchain_openai.dart';
-import 'package:apptree_dart_sdk/apptree.dart';
+
 
 Future<String> generateSampleDataLLM(
   String codeRequest,

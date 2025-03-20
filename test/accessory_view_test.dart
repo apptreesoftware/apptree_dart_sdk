@@ -7,6 +7,11 @@ class MockRecord extends Record {
   final IntField age = IntField();
 }
 
+class MockApp extends Record {
+  final StringField name = StringField();
+  final IntField age = IntField();
+}
+
 class MockRequest extends Request {}
 
 class MockListEndpoint extends ListEndpoint<MockRecord> {
@@ -37,7 +42,7 @@ void main() {
     late MockListEndpoint mockListEndpoint;
 
     setUp(() {
-      context = BuildContext(user: User());
+      context = BuildContext(user: User(), app: MockApp());
       mockListEndpoint = const MockListEndpoint();
 
       accessoryView = SelectListInputAccessoryView<MockRequest, MockRecord>(
@@ -132,7 +137,7 @@ void main() {
     late SegmentedControlAccessoryView accessoryView;
 
     setUp(() {
-      context = BuildContext(user: User());
+      context = BuildContext(user: User(), app: MockApp());
 
       final segments = [
         SegmentItem(title: 'Option 1', value: 'value1'),

@@ -57,15 +57,12 @@ class App<T extends Record> {
   }
 
   void initialize() {
-    Map<String, dynamic> configDict = {};
     var appDataModel = instantiateRecord<T>();
     var buildContext = BuildContext(user: User(), app: appDataModel);
 
     for (var template in templates) {
       writeTemplate(name, template.id, template.toFsx());
     }
-
-    writeConfigYaml(name, YamlWriter().write(configDict));
 
     // Initialize Menu Items
     Menu menu = Menu(menuItems: menuItems);

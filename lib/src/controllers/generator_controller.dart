@@ -151,7 +151,7 @@ class GeneratorController {
       datasourceName: endpoint.id,
       record: endpoint.record,
       requestName: requestName,
-      submissionType: endpoint.submissionType!,
+      submissionType: endpoint.submissionType,
       projectDir: projectDir,
     );
 

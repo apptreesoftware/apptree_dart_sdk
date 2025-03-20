@@ -23,14 +23,6 @@ void writeTemplate(String dir, String fileName, String fsx) {
   FileUtil.writeFile('res/app_config/$dir/templates', "$fileName.fsx", fsx);
 }
 
-void writeModelYaml(String dir, String fileName, String yaml) {
-  FileUtil.writeFile('res/connector/models/$dir', "$fileName.yaml", yaml);
-}
-
-void writeConfigYaml(String dir, String yaml) {
-  FileUtil.writeFile('res/connector/config/$dir', "config.yaml", yaml);
-}
-
 void writeModelDart(String dir, String fileName, String dart) {
   FileUtil.writeFile('$dir/lib/generated/models', '$fileName.dart', dart);
 }
