@@ -1,25 +1,11 @@
 import 'package:apptree_dart_sdk/apptree.dart';
-import 'package:dotenv/dotenv.dart';
-import 'dart:io';
 import 'dart:mirrors';
 
 class GeneratorController {
   final App app;
-  late String openAiApiKey;
   Map<String, dynamic> recordDependencyMap = {};
 
   GeneratorController({required this.app}) {
-    final env = DotEnv(includePlatformEnvironment: true)..load();
-    openAiApiKey = env['OPENAI_API_KEY'] ?? '';
-
-    if (openAiApiKey == '') {
-      stderr.writeln(
-        'You need to set your OpenAI key in the '
-        'OPENAI_API_KEY environment variable.',
-      );
-      exit(1);
-    }
-
     getRecordDependencyMap();
   }
 
@@ -58,11 +44,12 @@ class GeneratorController {
           (endpoint) => ConnectorItem(
             recordName: getRecordName(endpoint.record),
             datasourceName: endpoint.id,
-            requestName: endpoint is SubmissionEndpoint
-                ? endpoint.getRequestParams().keys.first
-                : endpoint is CollectionEndpoint
-                ? endpoint.getRequestParams().keys.first
-                : null,
+            requestName:
+                endpoint is SubmissionEndpoint
+                    ? endpoint.getRequestParams().keys.first
+                    : endpoint is CollectionEndpoint
+                    ? endpoint.getRequestParams().keys.first
+                    : null,
             type:
                 endpoint is CollectionEndpoint
                     ? ConnectorType.collection
@@ -118,7 +105,6 @@ class GeneratorController {
       record: endpoint.record,
       requestName: requestName,
       dataSourceName: endpoint.id,
-      openaiApiKey: openAiApiKey,
       recordDependencyMap: recordDependencyMap,
       projectDir: projectDir,
     );
@@ -136,7 +122,6 @@ class GeneratorController {
     ListSampleGenerator(
       record: endpoint.record,
       dataSourceName: endpoint.id,
-      openaiApiKey: openAiApiKey,
       recordDependencyMap: recordDependencyMap,
       projectDir: projectDir,
     );
@@ -165,7 +150,6 @@ class GeneratorController {
     SubmissionSampleGenerator(
       record: endpoint.record,
       dataSourceName: endpoint.id,
-      openaiApiKey: openAiApiKey,
       recordDependencyMap: recordDependencyMap,
       projectDir: projectDir,
       requestName: requestName,

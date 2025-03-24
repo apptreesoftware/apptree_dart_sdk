@@ -2,13 +2,12 @@ import 'package:apptree_dart_sdk/src/util/file.dart';
 import 'package:apptree_dart_sdk/src/util/strings.dart';
 import 'package:apptree_dart_sdk/apptree.dart';
 import 'dart:mirrors';
-import 'package:apptree_dart_sdk/src/util/llm/langchain.dart';
+
 
 abstract class SampleGenerator {
   final Record record;
   final String dataSourceName;
   final String projectDir;
-  final String openaiApiKey;
   final bool overwrite;
   final Map<String, dynamic> recordDependencyMap;
   final List<Record> records = [];
@@ -17,7 +16,6 @@ abstract class SampleGenerator {
     required this.record,
     required this.dataSourceName,
     required this.projectDir,
-    required this.openaiApiKey,
     required this.recordDependencyMap,
     this.overwrite = false,
   }) {
@@ -91,7 +89,6 @@ class CollectionSampleGenerator extends SampleGenerator {
     required super.record,
     required super.dataSourceName,
     required super.projectDir,
-    required super.openaiApiKey,
     required super.recordDependencyMap,
     required this.requestName,
     super.overwrite = false,
@@ -114,14 +111,8 @@ class CollectionSampleGenerator extends SampleGenerator {
   }
 
   Future<String> generateSampleData() async {
-    return await generateSampleDataLLM(
-      'Please produce 10 samples of the ${getRecordName()} objects.',
-      getSampleFileName(),
-      getRelatedRecordNames(),
-      projectDir,
-      openaiApiKey,
-      overwrite,
-    );
+    // TODO: Integrate with Server
+    return '';
   }
 
   String generateGetRecord() {
@@ -157,7 +148,6 @@ class ListSampleGenerator extends SampleGenerator {
     required super.record,
     required super.dataSourceName,
     required super.projectDir,
-    required super.openaiApiKey,
     required super.recordDependencyMap,
   });
 
@@ -168,14 +158,8 @@ class ListSampleGenerator extends SampleGenerator {
   }
 
   Future<String> generateSampleData() async {
-    return await generateSampleDataLLM(
-      'Please produce 10 samples of the ${getRecordName()} objects.',
-      getSampleFileName(),
-      getRelatedRecordNames(),
-      projectDir,
-      openaiApiKey,
-      overwrite,
-    );
+    // TODO: Integrate with Server
+    return '';
   }
 
   @override
@@ -208,7 +192,6 @@ class SubmissionSampleGenerator extends SampleGenerator {
     required super.record,
     required super.dataSourceName,
     required super.projectDir,
-    required super.openaiApiKey,
     required super.recordDependencyMap,
     required this.requestName,
   });
